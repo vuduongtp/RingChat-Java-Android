@@ -6,12 +6,12 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@drawable/backgroung2"
-    tools:context=".LoginActivity">
+    tools:context=".activity.LoginActivity">
 
     <TextView
         android:gravity="center"
         android:layout_marginTop="10dp"
-        android:layout_marginBottom="20dp"
+        android:layout_marginBottom="10dp"
         android:fontFamily="@font/roboto_bold"
         android:textSize="30sp"
         android:textColor="@color/colorMain"
@@ -86,41 +86,30 @@
         android:inputType="textPassword"
         android:hint="@string/password" />
 
-    <CheckBox
-        android:id="@+id/checkBox"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:textSize="18sp"
-        android:layout_margin="5dp"
-        android:text="@string/remember_pass" />
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/textView"
-            android:layout_width="0dp"
+<!--        <TextView-->
+<!--            android:layout_width="2dp"-->
+<!--            android:background="@color/white"-->
+<!--            android:layout_height="match_parent"/>-->
+
+        <CheckBox
+            android:id="@+id/chkRememberPass"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="2dp"
-            android:layout_weight="1"
-            android:fontFamily="@font/roboto_regular"
-            android:paddingEnd="10dp"
-            android:gravity="right"
-            android:text="@string/forget_pass"
-            android:textColor="@color/dark_blue"
-            android:textSize="20sp" />
+            android:layout_gravity="center"
+            android:layout_marginStart="10dp"
+            android:textColor="@color/white"
+            android:text="@string/remember_pass"
+            android:textSize="18sp" />
 
         <TextView
-            android:layout_width="2dp"
-            android:background="@color/white"
-            android:layout_height="match_parent"/>
-
-        <TextView
-            android:id="@+id/textView2"
-            android:gravity="left"
+            android:id="@+id/btnForgetPass"
+            android:gravity="center"
             android:layout_margin="2dp"
             android:paddingStart="10dp"
             android:fontFamily="@font/roboto_regular"
@@ -129,11 +118,11 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/register" />
+            android:text="@string/forget_pass" />
     </LinearLayout>
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/btnLogin"
         android:layout_margin="10dp"
         android:textColor="@color/white"
         android:background="@drawable/button_transparent"
@@ -142,4 +131,15 @@
         android:layout_width="140dp"
         android:layout_height="wrap_content"
         android:text="@string/login" />
+
+    <TextView
+        android:id="@+id/btnGoToRegister"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="2dp"
+        android:fontFamily="@font/roboto_regular"
+        android:gravity="center"
+        android:text="@string/register"
+        android:textColor="@color/white"
+        android:textSize="22sp" />
 </LinearLayout>

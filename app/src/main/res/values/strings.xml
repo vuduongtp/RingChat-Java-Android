@@ -4,6 +4,11 @@
     <string name="register">Register</string>
     <string name="remember_pass">Remember password?</string>
     <string name="forget_pass">Forget password</string>
-    <string name="username">Username</string>
+    <string name="username">Email</string>
     <string name="password">Password</string>
+    <string name="confirm_password">Confirm password</string>
+    <string name="lastname">Lastname</string>
+    <string name="firstname">Firstname</string>
+    <string name="birthday">Birthday</string>
+    <string name="gender">Gender</string>
 </resources>

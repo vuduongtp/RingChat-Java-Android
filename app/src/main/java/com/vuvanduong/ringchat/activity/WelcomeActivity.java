@@ -1,10 +1,12 @@
-package com.vuvanduong.ringchat;
+package com.vuvanduong.ringchat.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+
+import com.vuvanduong.ringchat.R;
 
 public class WelcomeActivity extends AppCompatActivity {
 
