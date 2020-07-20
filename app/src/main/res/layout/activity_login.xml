@@ -8,20 +8,10 @@
     android:background="@drawable/backgroung2"
     tools:context=".activity.LoginActivity">
 
-    <TextView
-        android:gravity="center"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
-        android:fontFamily="@font/roboto_bold"
-        android:textSize="30sp"
-        android:textColor="@color/colorMain"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/login" />
-
     <androidx.cardview.widget.CardView
         android:layout_width="120dp"
         android:layout_height="120dp"
+        android:layout_marginTop="20dp"
         android:layout_gravity="center"
         app:cardCornerRadius="20dp">
 
@@ -44,14 +34,25 @@
         android:text="@string/app_name" />
 
     <TextView
-        android:id="@+id/txtErrorLogin"
-        android:layout_marginBottom="10dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/roboto_regular"
+        android:layout_marginBottom="10dp"
+        android:fontFamily="@font/roboto_bold"
         android:gravity="center"
+        android:text="@string/login"
+        android:textColor="@color/colorMain"
+        android:textSize="30sp" />
+
+    <TextView
+        android:id="@+id/txtErrorLogin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:fontFamily="@font/roboto_bold"
+        android:gravity="center"
+        android:textSize="20sp"
         android:text=""
-        android:textColor="@color/red"  />
+        android:textColor="@color/red" />
 
     <EditText
         android:id="@+id/txtUsernameLogin"
@@ -65,9 +66,9 @@
         android:layout_width="match_parent"
         android:textColor="@color/white"
         android:textStyle="bold"
-        android:layout_height="60dp"
+        android:layout_height="50dp"
         android:ems="10"
-        android:inputType="textPersonName"
+        android:inputType="textEmailAddress"
         android:hint="@string/username"/>
 
     <EditText
@@ -81,7 +82,7 @@
         android:layout_width="match_parent"
         android:textColor="@color/white"
         android:textStyle="bold"
-        android:layout_height="60dp"
+        android:layout_height="50dp"
         android:ems="10"
         android:inputType="textPassword"
         android:hint="@string/password" />
@@ -125,10 +126,10 @@
         android:id="@+id/btnLogin"
         android:layout_margin="10dp"
         android:textColor="@color/white"
-        android:background="@drawable/button_transparent"
+        android:background="@drawable/button_gradient"
         android:layout_gravity="center"
         android:textSize="18sp"
-        android:layout_width="140dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/login" />
 

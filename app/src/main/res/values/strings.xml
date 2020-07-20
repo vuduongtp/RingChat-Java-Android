@@ -11,4 +11,18 @@
     <string name="firstname">Firstname</string>
     <string name="birthday">Birthday</string>
     <string name="gender">Gender</string>
+    <string name="reset_pass">Reset password</string>
+    <string name="err_emty_pass">Please type password.</string>
+    <string name="err_emty_confirm_pass">Please confirm password.</string>
+    <string name="err_emty_email">Please type email.</string>
+    <string name="err_emty_firstname">Please type firstname.</string>
+    <string name="err_emty_lastname">Please type lastname.</string>
+    <string name="err_emty_birthday">Please type birthday.</string>
+    <string name="err_pass_not_match">Password not match.</string>
+    <string name="err_email_invalid">Email address invalid.</string>
+    <string name="err_user_exist">This email is registed.</string>
+    <string name="err_login">Email or password incorrect.</string>
+    <string name="register_success">Register successful.</string>
+    <string name="required_login">Please login again.</string>
+
 </resources>

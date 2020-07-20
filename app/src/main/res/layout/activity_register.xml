@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@drawable/background"
+    android:background="@drawable/backgroung2"
     tools:context=".activity.RegisterActivity">
 
     <ScrollView
@@ -71,8 +71,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
-                android:fontFamily="@font/roboto_regular"
+                android:fontFamily="@font/roboto_bold"
                 android:gravity="center"
+                android:textSize="20sp"
                 android:text=""
                 android:textColor="@color/red" />
 
@@ -88,7 +89,7 @@
                 android:drawablePadding="20dp"
                 android:ems="10"
                 android:hint="@string/username"
-                android:inputType="textPersonName"
+                android:inputType="textEmailAddress"
                 android:paddingStart="20sp"
                 android:textColor="@color/white"
                 android:textStyle="bold" />
@@ -105,7 +106,7 @@
                 android:drawablePadding="20dp"
                 android:ems="10"
                 android:hint="@string/password"
-                android:inputType="textPersonName"
+                android:inputType="textPassword"
                 android:paddingStart="20sp"
                 android:textColor="@color/white"
                 android:textStyle="bold" />
@@ -122,7 +123,7 @@
                 android:drawablePadding="20dp"
                 android:ems="10"
                 android:hint="@string/confirm_password"
-                android:inputType="textPersonName"
+                android:inputType="textPassword"
                 android:paddingStart="20sp"
                 android:textColor="@color/white"
                 android:textStyle="bold" />
@@ -167,31 +168,40 @@
                     android:textStyle="bold" />
             </LinearLayout>
 
-            <EditText
-                android:id="@+id/txtBirthdayRegister"
+            <LinearLayout
+                android:id="@+id/layoutBirthday"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="10dp"
                 android:layout_marginBottom="5dp"
                 android:background="@drawable/edit_text_register"
-                android:drawableLeft="@drawable/ic_calendar_white_24dp"
-                android:drawablePadding="20dp"
-                android:ems="10"
-                android:hint="@string/birthday"
-                android:inputType="textPersonName"
-                android:paddingStart="20sp"
-                android:textColor="@color/white"
-                android:textStyle="bold" />
+                android:orientation="horizontal">
 
+                <ImageView
+                    android:layout_gravity="center"
+                    android:layout_width="70dp"
+                    android:layout_height="wrap_content"
+                    app:srcCompat="@drawable/ic_calendar_white_24dp" />
+
+                <TextView
+                    android:id="@+id/txtBirthdayRegister"
+                    android:layout_gravity="center"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="#4C5360"
+                    android:textStyle="bold"
+                    android:textSize="18sp"
+                    android:text="@string/birthday" />
+            </LinearLayout>
             <Button
                 android:id="@+id/btnRegister"
                 android:layout_margin="10dp"
                 android:textColor="@color/white"
-                android:background="@drawable/button_transparent"
+                android:background="@drawable/button_gradient"
                 android:layout_gravity="center"
                 android:textSize="18sp"
-                android:layout_width="140dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/register" />
 
