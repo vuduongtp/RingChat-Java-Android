@@ -24,5 +24,12 @@
     <string name="err_login">Email or password incorrect.</string>
     <string name="register_success">Register successful.</string>
     <string name="required_login">Please login again.</string>
+    <string name="nav_home">Home</string>
+    <string name="nav_group">Group</string>
+    <string name="nav_contact">Contact</string>
+    <string name="nav_account">Account</string>
+    <string name="search">Search</string>
+    <string name="add">Add</string>
+
 
 </resources>

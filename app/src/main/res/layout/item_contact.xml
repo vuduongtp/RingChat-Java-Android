@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="1.5"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/imgAvatarFriend"
+                android:layout_weight="8"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                app:srcCompat="@drawable/user" />
+            <TextView
+                android:id="@+id/txtStatusFriend"
+                android:layout_width="match_parent"
+                android:gravity="center"
+                android:layout_height="0dp"
+                android:layout_weight="2"
+                android:textSize="12sp"
+                android:textColor="@color/green"
+                android:fontFamily="@font/roboto_light"
+                android:text="Online" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="5"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/txtNameFriend"
+                android:fontFamily="@font/roboto_bold"
+                android:textSize="24sp"
+                android:layout_marginStart="5dp"
+                android:textColor="@color/dark_blue"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Vu Duong" />
+
+            <TextView
+                android:id="@+id/txtEmailFriend"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/roboto_regular"
+                android:textSize="18sp"
+                android:textColor="@color/gray"
+                android:layout_marginStart="10dp"
+                android:text="adb@gmail.com" />
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="1.5"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/btnGoToChatFriend"
+                android:layout_width="match_parent"
+                android:layout_height="28dp"
+                app:srcCompat="@drawable/chat" />
+
+            <ImageView
+                android:id="@+id/btnAddNewFriend"
+                android:layout_width="match_parent"
+                android:layout_height="28dp"
+                app:srcCompat="@drawable/addfriend" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/gray"
+        android:text="" />
+</LinearLayout>

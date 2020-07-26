@@ -13,6 +13,7 @@
         android:roundIcon="@drawable/logo"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".activity.AddFriendActivity"></activity>
         <activity android:name=".activity.HomeActivity" />
         <activity android:name=".activity.ForgetPasswordActivity" />
         <activity android:name=".activity.RegisterActivity" />
