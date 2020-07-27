@@ -7,7 +7,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="80dp"
+        android:layout_height="85dp"
         android:orientation="horizontal">
 
         <LinearLayout
@@ -19,6 +19,7 @@
             <ImageView
                 android:id="@+id/imgAvatarFriend"
                 android:layout_weight="8"
+                android:layout_marginTop="5dp"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 app:srcCompat="@drawable/user" />
@@ -29,9 +30,10 @@
                 android:layout_height="0dp"
                 android:layout_weight="2"
                 android:textSize="12sp"
+                android:layout_marginBottom="2dp"
                 android:textColor="@color/green"
                 android:fontFamily="@font/roboto_light"
-                android:text="Online" />
+                android:text="" />
         </LinearLayout>
 
         <LinearLayout
@@ -49,7 +51,7 @@
                 android:textColor="@color/dark_blue"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Vu Duong" />
+                android:text="" />
 
             <TextView
                 android:id="@+id/txtEmailFriend"
@@ -59,7 +61,7 @@
                 android:textSize="18sp"
                 android:textColor="@color/gray"
                 android:layout_marginStart="10dp"
-                android:text="adb@gmail.com" />
+                android:text="" />
 
 
         </LinearLayout>
@@ -73,22 +75,24 @@
 
             <ImageView
                 android:id="@+id/btnGoToChatFriend"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
+                android:layout_gravity="center"
                 android:layout_height="28dp"
                 app:srcCompat="@drawable/chat" />
 
             <ImageView
                 android:id="@+id/btnAddNewFriend"
-                android:layout_width="match_parent"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
                 android:layout_height="28dp"
                 app:srcCompat="@drawable/addfriend" />
         </LinearLayout>
 
     </LinearLayout>
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/gray"
-        android:text="" />
+<!--    <TextView-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="1dp"-->
+<!--        android:background="@color/gray"-->
+<!--        android:text="" />-->
 </LinearLayout>

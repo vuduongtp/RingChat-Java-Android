@@ -16,38 +16,5 @@ public class DBUtil {
     private static DatabaseReference dbReference = database.getReference();
     private static DatabaseReference users = dbReference.child("users");
     public static DatabaseReference contacts = dbReference.child("contacts");
-    private static final ArrayList<User> allUser = new ArrayList<>();
-
-    private void selectAllUser(){
-        synchronized (this) {
-            allUser.clear();
-            ValueEventListener getAllUser = new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    for (DataSnapshot item : dataSnapshot.getChildren()) {
-                        User user = item.getValue(User.class);
-                        assert user != null;
-                        user.setId(item.getKey());
-                        allUser.add(user);
-                        System.out.println("user "+user.toString());
-                    }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                }
-            };
-            users.addListenerForSingleValueEvent(getAllUser);
-            users.removeEventListener(getAllUser);
-        }
-    }
-
-    public static ArrayList<User> getAllUser(){
-        synchronized (allUser) {
-            selectAllUser();
-        }
-        return allUser;
-    }
 
 }

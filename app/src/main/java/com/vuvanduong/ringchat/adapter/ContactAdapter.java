@@ -11,6 +11,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.vuvanduong.ringchat.R;
 import com.vuvanduong.ringchat.model.User;
 
@@ -20,11 +22,17 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
     private ArrayList<User> users;
     private Context context;
     private boolean isAddFriend;
+    private User userLogin;
+    private FirebaseDatabase database = FirebaseDatabase.getInstance();
+    private DatabaseReference dbReference = database.getReference();
+    private DatabaseReference userContacts;
 
-    public ContactAdapter(ArrayList<User> users, Context context, boolean isAddFriend) {
+    public ContactAdapter(ArrayList<User> users, Context context, boolean isAddFriend, User user) {
         this.users = users;
         this.context = context;
         this.isAddFriend = isAddFriend;
+        this.userLogin = user;
+        userContacts = dbReference.child("contacts/"+user.getId()+"/");
     }
 
     @NonNull
@@ -36,8 +44,8 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ContactAdapter.ViewHolder holder, int position) {
-        final String fullName = users.get(position).getLastname()+users.get(position).getFirstname();
+    public void onBindViewHolder(@NonNull final ContactAdapter.ViewHolder holder, final int position) {
+        final String fullName = users.get(position).getLastname()+" "+users.get(position).getFirstname();
         if (!isAddFriend) {
             holder.txtStatusFriend.setText(users.get(position).getStatus());
             holder.btnAddNewFriend.setVisibility(View.GONE);
@@ -52,7 +60,9 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
             holder.btnAddNewFriend.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Toast.makeText(context, fullName, Toast.LENGTH_SHORT).show();
+                    userContacts.child(users.get(position).getId()).setValue(users.get(position).getId());
+                    v.setVisibility(View.GONE);
+                    Toast.makeText(context, R.string.add_friend_success, Toast.LENGTH_SHORT).show();
                 }
             });
         }
