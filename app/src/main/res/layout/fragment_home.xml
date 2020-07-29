@@ -1,17 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:orientation="vertical">
+
+
+    <LinearLayout
+        android:id="@+id/header_home"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:minHeight="80dp"
+        android:background="@color/colorMain"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0">
+
+        <ImageView
+            android:id="@+id/img_avt_friend"
+            android:padding="3dp"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            app:srcCompat="@drawable/user"
+            android:layout_margin="5dp"
+            android:layout_marginStart="15dp" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="7"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/txtUserHome"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:fontFamily="@font/roboto_bold"
+                android:gravity="bottom"
+                android:textColor="@color/white"
+                android:paddingStart="15dp"
+                android:textSize="25sp"
+                android:text="@string/nav_home"
+                tools:ignore="RtlSymmetry" />
+
+            <TextView
+                android:id="@+id/txtEmailHome"
+                android:layout_width="match_parent"
+                android:layout_marginStart="15dp"
+                android:layout_height="24dp"
+                android:text="@string/search"
+                android:fontFamily="@font/roboto_regular"
+                android:textColor="@color/dark_blue"
+                android:textSize="15sp" />
+        </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/btnSearchHome"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1.5"
+            android:background="@null"
+            app:srcCompat="@drawable/search" />
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+    android:id="@+id/rvConversation"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/colorPrimary">
+    android:layout_height="wrap_content"
+    android:layout_below="@+id/header_home"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_gravity="center"
-        android:gravity="center"
-        android:textSize="30sp"
-        android:layout_height="wrap_content"
-        android:text="@string/nav_home" />
-
-</LinearLayout>
+</RelativeLayout>

@@ -1,6 +1,7 @@
 package com.vuvanduong.ringchat.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,17 +10,19 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.vuvanduong.ringchat.R;
+import com.vuvanduong.ringchat.activity.ConversationActivity;
 import com.vuvanduong.ringchat.model.User;
 
 import java.util.ArrayList;
 
 public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHolder> {
-    private ArrayList<User> users;
+    private ArrayList<User> users ;
     private Context context;
     private boolean isAddFriend;
     private User userLogin;
@@ -45,14 +48,23 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(@NonNull final ContactAdapter.ViewHolder holder, final int position) {
-        final String fullName = users.get(position).getLastname()+" "+users.get(position).getFirstname();
         if (!isAddFriend) {
-            holder.txtStatusFriend.setText(users.get(position).getStatus());
+            if (users.get(position).getStatus()==null || users.get(position).getStatus().equalsIgnoreCase("" )
+                    || users.get(position).getStatus().equalsIgnoreCase("Offline")){
+                holder.txtStatusFriend.setText("Offline");
+                holder.txtStatusFriend.setTextColor(ContextCompat.getColor(context, R.color.red));
+            }else {
+                holder.txtStatusFriend.setText(users.get(position).getStatus());
+            }
             holder.btnAddNewFriend.setVisibility(View.GONE);
             holder.btnGoToChatFriend.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Toast.makeText(context, fullName, Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(context, fullName, Toast.LENGTH_SHORT).show();
+                    Intent conversation = new Intent(v.getContext(), ConversationActivity.class);
+                    conversation.putExtra("userLogin",userLogin);
+                    conversation.putExtra("friend",users.get(position));
+                    v.getContext().startActivity(conversation);
                 }
             });
         }else {
@@ -66,13 +78,17 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
                 }
             });
         }
-        holder.txtNameFriend.setText(fullName);
+        holder.txtNameFriend.setText(users.get(position).getFullname());
         holder.txtEmailFriend.setText(users.get(position).getEmail());
     }
 
     @Override
     public int getItemCount() {
-        return users.size();
+        if (users == null){
+            return 0;
+        }else {
+            return users.size();
+        }
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

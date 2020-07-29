@@ -88,4 +88,8 @@ public class User implements Serializable {
     public void setStatus(String status) {
         this.status = status;
     }
+
+    public String getFullname() {
+        return this.firstname+" "+this.lastname;
+    }
 }

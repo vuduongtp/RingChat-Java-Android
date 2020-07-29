@@ -34,7 +34,6 @@ public class AddFriendActivity extends AppCompatActivity {
     ImageView btnBackToContact;
     EditText txtSearchNewFriend;
     ImageButton btnSearchNewFriend;
-    RecyclerView rvContactAdd;
     private FirebaseDatabase database = FirebaseDatabase.getInstance();
     private DatabaseReference dbReference = database.getReference();
     private DatabaseReference users = dbReference.child("users");
@@ -57,6 +56,13 @@ public class AddFriendActivity extends AppCompatActivity {
     }
 
     private void setEvent() {
+        btnBackToContact.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
         btnSearchNewFriend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -129,7 +135,6 @@ public class AddFriendActivity extends AppCompatActivity {
         btnBackToContact = findViewById(R.id.btnBackToContact);
         txtSearchNewFriend = findViewById(R.id.txtSearchNewFriend);
         btnSearchNewFriend = findViewById(R.id.btnSearchNewFriend);
-        rvContactAdd = findViewById(R.id.rvContactAdd);
         initView();
     }
 

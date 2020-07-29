@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity.ConversationActivity">
+
+    <LinearLayout
+        android:id="@+id/layout_header_chatting"
+        android:layout_width="match_parent"
+        android:layout_height="75dp"
+        android:minHeight="75dp"
+        android:background="@color/light_gray"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2.5"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/imgAvatarFriendConversation"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="5dp"
+                android:layout_gravity="center"
+                app:srcCompat="@drawable/user" />
+
+            <TextView
+                android:id="@+id/txtStatusConversation"
+                android:layout_width="match_parent"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:fontFamily="@font/roboto_regular"
+                android:layout_height="wrap_content"
+                android:textColor="@color/red"
+                android:text="Offline"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="8"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/txtNameFriendConversation"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center|start"
+                android:textColor="@color/dark_blue"
+                android:paddingStart="15dp"
+                android:paddingEnd="15dp"
+                android:fontFamily="@font/roboto_regular"
+                android:textSize="22sp"
+                android:text=""
+                tools:ignore="RtlSymmetry" />
+
+        </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/img_but_video"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1.5"
+            android:background="@null"
+            app:srcCompat="@drawable/camera" />
+
+        <ImageButton
+            android:id="@+id/img_but_voice"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1.5"
+            android:background="@null"
+            app:srcCompat="@drawable/call" />
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvChatConversation"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/linearLayout"
+        android:layout_below="@+id/layout_header_chatting"
+        android:layout_alignParentStart="true"
+        android:background="#fff"
+        android:layout_alignParentEnd="true" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="@color/light_gray"
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0">
+
+        <EditText
+            android:id="@+id/txtContextConversation"
+            android:layout_width="0dp"
+            android:layout_height="45dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="10dp"
+            android:layout_weight="9"
+            android:fontFamily="@font/roboto_regular"
+            android:autofillHints=""
+            android:ellipsize="none"
+            android:textSize="16sp"
+            android:background="@drawable/edit_text_login"
+            android:textColor="@color/dark_blue"
+            android:ems="10"
+            android:hint="Aa"
+            android:inputType="textMultiLine"
+            android:paddingStart="15dp"
+            android:scrollHorizontally="false"/>
+
+        <Button
+            android:id="@+id/btnSendMessageConversation"
+            android:layout_width="0dp"
+            android:layout_height="32dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="10dp"
+            android:layout_weight="1"
+            android:background="@drawable/send"/>
+    </LinearLayout>
+
+</RelativeLayout>
