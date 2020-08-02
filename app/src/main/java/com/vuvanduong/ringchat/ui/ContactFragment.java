@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -43,6 +44,7 @@ public class ContactFragment extends Fragment {
     private ArrayList<User> listFriend;
     private ContactAdapter contactAdapter;
     private View view;
+    private ProgressBar loading;
 
     @Nullable
     @Override
@@ -51,6 +53,9 @@ public class ContactFragment extends Fragment {
 
         assert getArguments() != null;
         user = (User) getArguments().getSerializable("user_login");
+
+        loading = view.findViewById(R.id.loadingContacts);
+        loading.setVisibility(View.VISIBLE);
         initFriend();
         return view;
     }
@@ -142,5 +147,6 @@ public class ContactFragment extends Fragment {
         btnAddContact = view.findViewById(R.id.img_but_add_user);
         rvContact = view.findViewById(R.id.rvContact);
         initView();
+        loading.setVisibility(View.GONE);
     }
 }

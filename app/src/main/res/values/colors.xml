@@ -15,4 +15,10 @@
     <color name="orange">#F9690E</color>
     <color name="green">#2BDC01</color>
     <color name="light_gray">#CACDCD</color>
+    <color name="colorCallToggleButtonEnabled">#808080</color>
+    <color name="colorCallToggleButtonDisabled">#f2f2f2</color>
+    <color name="lvChat">#EDEDED</color>
+    <color name="black">#272727</color>
+    <color name="me">#0055ff</color>
+    <color name="you">#bdbdbd</color>
 </resources>

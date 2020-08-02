@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -21,6 +22,7 @@ public class HomeFragment extends Fragment {
     TextView txtUserHome,txtEmailHome;
     ImageButton btnSearchHome;
     RecyclerView rvConversation;
+    ProgressBar loading;
 
     @Nullable
     @Override
@@ -44,5 +46,7 @@ public class HomeFragment extends Fragment {
         rvConversation = view.findViewById(R.id.rvConversation);
         txtUserHome.setText(user.getFullname());
         txtEmailHome.setText(user.getEmail());
+        loading = view.findViewById(R.id.loadingHomeFragment);
+        loading.setVisibility(View.VISIBLE);
     }
 }

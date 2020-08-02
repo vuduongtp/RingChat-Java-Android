@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
@@ -42,6 +43,7 @@ public class AddFriendActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     ContactAdapter contactAdapter;
     private DatabaseReference userContacts;
+    private ProgressBar loading;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +68,7 @@ public class AddFriendActivity extends AppCompatActivity {
         btnSearchNewFriend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                loading.setVisibility(View.VISIBLE);
                 final String findUser = txtSearchNewFriend.getText().toString().trim();
                 userFind.clear();
                 ValueEventListener getAllUser = new ValueEventListener() {
@@ -98,7 +101,9 @@ public class AddFriendActivity extends AppCompatActivity {
                                 }
                             }
                             if (count == dataSnapshot.getChildrenCount()){
-                                contactAdapter.notifyDataSetChanged();
+                                initView();
+                                loading.setVisibility(View.GONE);
+//                                contactAdapter.notifyDataSetChanged();
                                 if (userFind.isEmpty()){
                                     Toast.makeText(AddFriendActivity.this, R.string.user_not_found, Toast.LENGTH_SHORT).show();
                                 }
@@ -125,7 +130,6 @@ public class AddFriendActivity extends AppCompatActivity {
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
                 linearLayoutManager.getOrientation());
         recyclerView.addItemDecoration(dividerItemDecoration);
-        userFind = new ArrayList<>();
         contactAdapter = new ContactAdapter(userFind,getApplicationContext(),true,userLogin);
         recyclerView.setAdapter(contactAdapter);
 
@@ -135,7 +139,8 @@ public class AddFriendActivity extends AppCompatActivity {
         btnBackToContact = findViewById(R.id.btnBackToContact);
         txtSearchNewFriend = findViewById(R.id.txtSearchNewFriend);
         btnSearchNewFriend = findViewById(R.id.btnSearchNewFriend);
-        initView();
+        userFind = new ArrayList<>();
+        loading = findViewById(R.id.loadingAddContact);
     }
 
     @Override
