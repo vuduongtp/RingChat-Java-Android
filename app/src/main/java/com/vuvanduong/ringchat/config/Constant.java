@@ -7,6 +7,8 @@ public class Constant {
     public static final String SIP_SERVER = "103.40.192.96";
     private static Locale local= Locale.getDefault();
     public static final SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", local);
+    public static final SimpleDateFormat dateMessage = new SimpleDateFormat("dd/MM/yyyy HH:mm", local);
+    public static final SimpleDateFormat dateChatRoom = new SimpleDateFormat("yyyy//MM/dd HH:mm", local);
     public static final String EMAIL = "email";
     public static final String PASSWORD = "password";
     public static final String IS_SAVE_PASS = "is_save_pass";

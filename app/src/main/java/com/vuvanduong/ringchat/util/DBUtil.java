@@ -4,6 +4,7 @@ package com.vuvanduong.ringchat.util;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -54,6 +55,32 @@ public class DBUtil {
             }
         }
         return result.toString();
+    }
+
+    public static String convertDatetimeMessage(String date){
+        Date dateTime = new Date();
+        SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy  HH:mm", Locale.getDefault());
+        SimpleDateFormat formatNew = new SimpleDateFormat("yyyy-MM-dd  HH:mm:ss", Locale.getDefault());
+        try {
+            dateTime = format.parse(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        assert dateTime != null;
+        return formatNew.format(dateTime);
+    }
+
+    public static String revertDatetimeMessage(String date){
+        Date dateTime = new Date();
+        SimpleDateFormat formatNew = new SimpleDateFormat("dd-MM-yyyy HH:mm", Locale.getDefault());
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        try {
+            dateTime = format.parse(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        assert dateTime != null;
+        return formatNew.format(dateTime);
     }
 
 }

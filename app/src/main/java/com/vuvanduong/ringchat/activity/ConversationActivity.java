@@ -24,6 +24,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.vuvanduong.ringchat.R;
 import com.vuvanduong.ringchat.adapter.MessageAdapter;
+import com.vuvanduong.ringchat.model.ChatRoom;
 import com.vuvanduong.ringchat.model.Message;
 import com.vuvanduong.ringchat.model.User;
 import com.vuvanduong.ringchat.util.DBUtil;
@@ -79,8 +80,9 @@ public class ConversationActivity extends AppCompatActivity {
                     newMessage.setUserID(userLogin.getId());
 
                     //them vao firebase
-                    conversationLastMessage.setValue(newMessage);
                     conversationMessages.push().setValue(newMessage);
+                    newMessage.setDatetime(DBUtil.getStringDateTimeChatRoom());
+                    conversationLastMessage.setValue(newMessage);
                 }
                 txtContextConversation.setText("");
             }
@@ -180,6 +182,7 @@ public class ConversationActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (!dataSnapshot.hasChild(chatRoom)){
+                    ChatRoom chatRoom = new ChatRoom();
                     conversationMessages.setValue(0);
                 }else {
                     return;

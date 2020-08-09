@@ -92,4 +92,18 @@ public class User implements Serializable {
     public String getFullname() {
         return this.firstname+" "+this.lastname;
     }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id='" + id + '\'' +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", lastname='" + lastname + '\'' +
+                ", firstname='" + firstname + '\'' +
+                ", birthday=" + birthday +
+                ", image='" + image + '\'' +
+                ", status='" + status + '\'' +
+                '}';
+    }
 }

@@ -1,8 +1,11 @@
 package com.vuvanduong.ringchat.model;
 
+import androidx.annotation.NonNull;
+
 import java.io.Serializable;
 
 public class Message implements Serializable {
+    private String IdRoom;
     private String UserID;
     private String Context;
     private String Datetime;
@@ -16,6 +19,14 @@ public class Message implements Serializable {
         Context = context;
         Datetime = datetime;
         Type = type;
+    }
+
+    public String getIdRoom() {
+        return IdRoom;
+    }
+
+    public void setIdRoom(String idRoom) {
+        IdRoom = idRoom;
     }
 
     public String getUserID() {
@@ -48,5 +59,16 @@ public class Message implements Serializable {
 
     public void setType(String type) {
         Type = type;
+    }
+
+    @Override
+    public String toString() {
+        return "Message{" +
+                "IdRoom='" + IdRoom + '\'' +
+                ", UserID='" + UserID + '\'' +
+                ", Context='" + Context + '\'' +
+                ", Datetime='" + Datetime + '\'' +
+                ", Type='" + Type + '\'' +
+                '}';
     }
 }

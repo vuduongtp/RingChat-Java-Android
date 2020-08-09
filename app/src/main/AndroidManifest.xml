@@ -13,7 +13,8 @@
         android:roundIcon="@drawable/logo"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.ConversationActivity"></activity>
+        <activity android:name=".activity.GroupConversationActivity"></activity>
+        <activity android:name=".activity.ConversationActivity" />
         <activity android:name=".activity.AddFriendActivity" />
         <activity android:name=".activity.HomeActivity" />
         <activity android:name=".activity.ForgetPasswordActivity" />

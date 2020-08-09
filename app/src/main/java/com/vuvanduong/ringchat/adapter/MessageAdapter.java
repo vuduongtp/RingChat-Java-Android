@@ -19,12 +19,13 @@ import com.vuvanduong.ringchat.R;
 import com.vuvanduong.ringchat.activity.ConversationActivity;
 import com.vuvanduong.ringchat.model.Message;
 import com.vuvanduong.ringchat.model.User;
+import com.vuvanduong.ringchat.util.DBUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private final int ME = 0, YOU = 1;
+    private final int ME = 0, YOU = 1, LAST_MESSAGE=2;
 
     private ArrayList<Message> messages;
     private Context context;
@@ -46,7 +47,9 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     @Override
     public int getItemViewType(int position) {
-        if (messages.get(position).getUserID().equals(userLogin.getId())) {
+        if (messages.get(position).getIdRoom() != null) {
+            return LAST_MESSAGE;
+        }else if (messages.get(position).getUserID().equals(userLogin.getId())) {
             return ME;
         } else if (!messages.get(position).getUserID().equals(userLogin.getId())) {
             return YOU;
@@ -74,6 +77,10 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 View you = inflater.inflate(R.layout.item_message_you, parent, false);
                 viewHolder = new HolderYou(you);
                 break;
+            case LAST_MESSAGE:
+                View lastMessage = inflater.inflate(R.layout.item_conversation, parent, false);
+                viewHolder = new HolderLastMessage(lastMessage);
+                break;
             default:
                 break;
         }
@@ -82,7 +89,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     }
 
     @Override
-    public void onBindViewHolder(@NonNull final RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final RecyclerView.ViewHolder holder, final int position) {
         switch (holder.getItemViewType()) {
             case ME:
                 final HolderMe me = (HolderMe) holder;
@@ -109,6 +116,20 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                         }else {
                             you.txtTimeMessageYou.setVisibility(View.GONE);
                         }
+                    }
+                });
+                break;
+            case LAST_MESSAGE:
+                final HolderLastMessage lastMessage = (HolderLastMessage) holder;
+                configureViewHolderLastMessage(lastMessage, position);
+                holder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent conversation = new Intent(v.getContext(), ConversationActivity.class);
+                        conversation.putExtra("userLogin",userLogin);
+                        conversation.putExtra("friend",usersInRoom.get(position));
+                        System.out.println(usersInRoom.get(position).toString());
+                        v.getContext().startActivity(conversation);
                     }
                 });
                 break;
@@ -144,6 +165,28 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
     }
 
+    private void configureViewHolderLastMessage(HolderLastMessage lastMessage, int position) {
+        String time = DBUtil.revertDatetimeMessage(messages.get(position).getDatetime());
+        lastMessage.txtTimeMessageLast.setText(time);
+        String context = "";
+        if (userLogin.getId().equalsIgnoreCase(messages.get(position).getUserID())) {
+            context = this.context.getString(R.string.you) + ": "+messages.get(position).getContext();
+        }else {
+            context = usersInRoom.get(position).getFirstname() + ": "+messages.get(position).getContext();
+        }
+        if (context.length() > 22) {
+            context = context.substring(0, 22) + "...";
+        }
+        lastMessage.txtContextMessageHome.setText(context);
+        lastMessage.txtNameFriendHome.setText(usersInRoom.get(position).getFullname());
+        if (messages.get(position).getType().equalsIgnoreCase("message")) {
+            lastMessage.imgIconMessageLast.requestLayout();
+            lastMessage.imgIconMessageLast.getLayoutParams().height = 0;
+            lastMessage.imgIconMessageLast.getLayoutParams().width = 0;
+            lastMessage.imgIconMessageLast.setScaleType(ImageView.ScaleType.FIT_XY);
+        }
+    }
+
     private class HolderMe extends RecyclerView.ViewHolder {
         TextView txtTimeMessageMe;
         TextView txtContextMessageMe;
@@ -173,7 +216,22 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             imgIconMessageYou = itemView.findViewById(R.id.imgIconMessageYou);
             imgAvatarFriendYou = itemView.findViewById(R.id.imgAvatarFriendYou);
         }
+    }
 
+    private class HolderLastMessage extends RecyclerView.ViewHolder {
+        TextView txtNameFriendHome;
+        TextView txtTimeMessageLast;
+        TextView txtContextMessageHome;
+        ImageView imgFriendHome;
+        ImageView imgIconMessageLast;
 
+        public HolderLastMessage(@NonNull View itemView) {
+            super(itemView);
+            txtNameFriendHome = itemView.findViewById(R.id.txtNameFriendHome);
+            txtTimeMessageLast = itemView.findViewById(R.id.txtTimeMessageLast);
+            txtContextMessageHome = itemView.findViewById(R.id.txtContextMessageHome);
+            imgFriendHome = itemView.findViewById(R.id.imgFriendHome);
+            imgIconMessageLast = itemView.findViewById(R.id.imgIconMessageLast);
+        }
     }
 }
