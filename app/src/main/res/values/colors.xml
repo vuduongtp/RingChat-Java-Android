@@ -2,8 +2,8 @@
 <resources>
     <color name="colorPrimary">#6200EE</color>
     <color name="colorPrimaryDark">#3700B3</color>
-    <color name="colorAccent">#03DAC5</color>
-    <color name="colorMain">#4D8FAC</color>
+    <color name="colorAccent">#0779e4</color>
+    <color name="colorMain">#0779e4</color>
     <color name="colorBackgroundMain">#EFEBEA</color>
     <color name="colorMenuSelected">#D2D7D3</color>
     <color name="textBold">#2F3230</color>
@@ -14,11 +14,11 @@
     <color name="red">#A62029</color>
     <color name="orange">#F9690E</color>
     <color name="green">#2BDC01</color>
-    <color name="light_gray">#CACDCD</color>
+    <color name="light_gray">#D8DADA</color>
     <color name="colorCallToggleButtonEnabled">#808080</color>
     <color name="colorCallToggleButtonDisabled">#f2f2f2</color>
     <color name="lvChat">#EDEDED</color>
     <color name="black">#272727</color>
-    <color name="me">#0055ff</color>
+    <color name="me">#0779e4</color>
     <color name="you">#bdbdbd</color>
 </resources>

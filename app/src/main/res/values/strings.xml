@@ -33,5 +33,16 @@
     <string name="user_not_found">User not found.</string>
     <string name="add_friend_success">Add friend successful.</string>
     <string name="you">You</string>
+    <string name="type_name_group">Enter your group name here.</string>
+    <string name="create">Create</string>
+    <string name="cancel">Cancel</string>
+    <string name="group_name">Group name</string>
+    <string name="create_new_group">Create new group</string>
+    <string name="change_account_info">Change account information</string>
+    <string name="change_pass">Change password</string>
+    <string name="language">Language</string>
+    <string name="help">Help</string>
+    <string name="about">About</string>
+    <string name="logout">Logout</string>
 
 </resources>

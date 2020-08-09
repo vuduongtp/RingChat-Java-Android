@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/topOfAddGroup"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:orientation="horizontal"
+        android:background="@color/colorMain">
+
+        <ImageView
+            android:id="@+id/btnBackToContact"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_weight="1"
+            app:srcCompat="@drawable/ic_arrow_back_black_24dp"
+            android:contentDescription="@string/search" />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_marginBottom="5dp"
+            android:layout_height="match_parent"
+            android:layout_weight="8"
+            android:gravity="center|start"
+            android:fontFamily="@font/roboto_bold"
+            android:text="@string/create_new_group"
+            android:textSize="24sp"
+            android:textColor="@color/white"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/middleOfAddGroup"
+        android:layout_below="@+id/topOfAddGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/txtGroupName"
+            android:layout_gravity="center"
+            android:layout_margin="5dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:textColor="@color/black"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="@drawable/edit_text_login"
+            android:ems="10"
+            android:hint="@string/type_name_group"
+            android:inputType="textPersonName"/>
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvFriendsAddGroup"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/middleOfAddGroup"
+        android:layout_above="@+id/bottomOfAddGroup"/>
+
+    <LinearLayout
+        android:id="@+id/bottomOfAddGroup"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:gravity="center"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btn_add_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:gravity="center"
+            android:background="@drawable/button_login"
+            android:text="@string/create"
+            android:textColor="#fff" />
+
+        <Button
+            android:id="@+id/btn_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:background="@drawable/button_gradient"
+            android:text="@string/cancel" />
+    </LinearLayout>
+</RelativeLayout>

@@ -69,11 +69,11 @@
 
         <ImageButton
             android:id="@+id/btnSearchGroup"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1.5"
-            android:background="@null"
-            app:srcCompat="@drawable/search" />
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_marginEnd="10dp"
+            android:layout_gravity="center"
+            android:background="@drawable/ic_search_black_24dp"/>
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
@@ -81,5 +81,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/header_group"/>
+
+    <ImageButton
+        android:id="@+id/img_but_add_group"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/add"
+        android:contentDescription="@string/add" />
 
 </RelativeLayout>
