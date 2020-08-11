@@ -20,7 +20,7 @@
             android:layout_marginStart="5dp"
             android:layout_marginTop="15dp"
             app:srcCompat="@drawable/ic_search_black_24dp"
-            android:contentDescription="@string/search" />
+            android:contentDescription="@string/account_info" />
 
         <TextView
             android:layout_width="0dp"
@@ -65,7 +65,7 @@
             android:textColor="@color/dark_blue"
             android:gravity="center|start"
             android:textSize="24sp"
-            android:text="@string/nav_home" />
+            android:text="" />
 
             <TextView
                 android:id="@+id/txtEmailAccount"
@@ -75,10 +75,10 @@
                 android:paddingStart="10dp"
                 android:fontFamily="@font/roboto_regular"
                 android:paddingEnd="5dp"
-                android:textColor="@color/gray"
+                android:textColor="@color/you"
                 android:gravity="center|start"
                 android:textSize="18sp"
-                android:text="@string/nav_home" />
+                android:text="" />
         </LinearLayout>
 
     </LinearLayout>
@@ -122,7 +122,7 @@
         android:background="@color/light_gray"/>
 
     <LinearLayout
-        android:id="@+id/layoutEditInfo"
+        android:id="@+id/layoutChangePass"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:layout_marginStart="10dp"
@@ -154,7 +154,7 @@
         android:layout_height="1dp"
         android:background="@color/light_gray"/>
     <LinearLayout
-        android:id="@+id/layoutEditInfo"
+        android:id="@+id/layoutLanguage"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:layout_marginStart="10dp"
@@ -186,7 +186,7 @@
         android:layout_height="10dp"
         android:background="@color/light_gray"/>
     <LinearLayout
-        android:id="@+id/layoutEditInfo"
+        android:id="@+id/layoutHelp"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:layout_marginStart="10dp"
@@ -218,7 +218,7 @@
         android:layout_height="1dp"
         android:background="@color/light_gray"/>
     <LinearLayout
-        android:id="@+id/layoutEditInfo"
+        android:id="@+id/layoutAbout"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:layout_marginStart="10dp"
@@ -250,7 +250,7 @@
         android:layout_height="1dp"
         android:background="@color/light_gray"/>
     <LinearLayout
-        android:id="@+id/layoutEditInfo"
+        android:id="@+id/layoutLogout"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:layout_marginStart="10dp"

@@ -44,5 +44,10 @@
     <string name="help">Help</string>
     <string name="about">About</string>
     <string name="logout">Logout</string>
+    <string name="account_info">Account information</string>
+    <string name="confirm_logout">Are you sure to logout?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="loading">Loading. Please wait...</string>
 
 </resources>

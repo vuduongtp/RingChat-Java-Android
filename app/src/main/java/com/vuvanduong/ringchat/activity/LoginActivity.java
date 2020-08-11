@@ -3,6 +3,7 @@ package com.vuvanduong.ringchat.activity;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -33,6 +34,7 @@ public class LoginActivity extends AppCompatActivity {
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference dbReference = database.getReference();
     DatabaseReference users = dbReference.child("users");
+    ProgressDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +72,8 @@ public class LoginActivity extends AppCompatActivity {
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                dialog = ProgressDialog.show(LoginActivity.this, "",
+                        getString(R.string.loading), true);
                 if (txtUsernameLogin.getText().toString().trim().equalsIgnoreCase("")) {
                     txtErrorLogin.setText(R.string.err_emty_email);
                 } else if (!RegisterActivity.checkEmailAddress(txtUsernameLogin.getText().toString().trim())) {
@@ -80,6 +84,9 @@ public class LoginActivity extends AppCompatActivity {
                     if (isSavePass) {
                         SharedPrefs.getInstance().put(Constant.EMAIL, txtUsernameLogin.getText().toString().trim());
                         SharedPrefs.getInstance().put(Constant.PASSWORD, txtPasswordLogin.getText().toString().trim());
+                    }else {
+                        SharedPrefs.getInstance().put(Constant.EMAIL, "");
+                        SharedPrefs.getInstance().put(Constant.PASSWORD, "");
                     }
                     SharedPrefs.getInstance().put(Constant.IS_SAVE_PASS, isSavePass);
                     final String email=txtUsernameLogin.getText().toString().trim();
@@ -94,6 +101,7 @@ public class LoginActivity extends AppCompatActivity {
                                 if (user.getEmail().equalsIgnoreCase(email)&&user.getPassword().equalsIgnoreCase(MD5.getMd5(pass))) {
                                     SharedPrefs.getInstance().put(Constant.IS_LOGIN, true);
                                     SharedPrefs.getInstance().put(Constant.EMAIL_USER_LOGIN, user.getEmail());
+                                    SharedPrefs.getInstance().put(Constant.MY_AVATAR, user.getImage());
                                     SharedPrefs.getInstance().put(Constant.ID_USER_LOGIN, user.getId());
                                     SharedPrefs.getInstance().put(Constant.LASTNAME_USER_LOGIN, user.getLastname());
                                     SharedPrefs.getInstance().put(Constant.FIRSTNAME_USER_LOGIN, user.getFirstname());
@@ -103,10 +111,12 @@ public class LoginActivity extends AppCompatActivity {
                                     welcome.putExtra("user_login",user);
                                     welcome.putExtra(Constant.IS_FROM_LOGIN,true);
                                     startActivity(welcome);
+                                    finish();
                                     return;
                                 }
                             }
                             txtErrorLogin.setText(R.string.err_login);
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -136,7 +146,7 @@ public class LoginActivity extends AppCompatActivity {
             String password = SharedPrefs.getInstance().get(Constant.PASSWORD, String.class);
             txtUsernameLogin.setText(email);
             txtPasswordLogin.setText(password);
-            chkRememberPass.setChecked(true);
+            chkRememberPass.setChecked(false);
         }
     }
 }

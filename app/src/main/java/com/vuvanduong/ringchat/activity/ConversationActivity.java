@@ -182,7 +182,6 @@ public class ConversationActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (!dataSnapshot.hasChild(chatRoom)){
-                    ChatRoom chatRoom = new ChatRoom();
                     conversationMessages.setValue(0);
                 }else {
                     return;

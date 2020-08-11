@@ -10,6 +10,7 @@ public class Constant {
     public static final SimpleDateFormat dateMessage = new SimpleDateFormat("dd/MM/yyyy HH:mm", local);
     public static final SimpleDateFormat dateChatRoom = new SimpleDateFormat("yyyy//MM/dd HH:mm", local);
     public static final String EMAIL = "email";
+    public static final String MY_AVATAR = "my_avatar";
     public static final String PASSWORD = "password";
     public static final String IS_SAVE_PASS = "is_save_pass";
     public static final String IS_LOGIN = "is_login";

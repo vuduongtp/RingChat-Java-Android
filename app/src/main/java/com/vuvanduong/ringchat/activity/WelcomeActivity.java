@@ -37,7 +37,7 @@ public class WelcomeActivity extends AppCompatActivity {
             Intent home = new Intent(WelcomeActivity.this, HomeActivity.class);
             home.putExtra("user_login",user);
             startActivity(home);
-            finishAffinity();
+            finish();
             return;
         }
         if (SharedPrefs.getInstance().get(Constant.IS_LOGIN, Boolean.class)){
@@ -52,6 +52,7 @@ public class WelcomeActivity extends AppCompatActivity {
                         user.setId(item.getKey());
                         if (user.getEmail().equalsIgnoreCase(email)&&user.getPassword().equalsIgnoreCase(MD5.getMd5(pass))) {
                             SharedPrefs.getInstance().put(Constant.IS_LOGIN, true);
+                            SharedPrefs.getInstance().put(Constant.MY_AVATAR, user.getImage());
                             SharedPrefs.getInstance().put(Constant.EMAIL_USER_LOGIN, user.getEmail());
                             SharedPrefs.getInstance().put(Constant.ID_USER_LOGIN, user.getId());
                             SharedPrefs.getInstance().put(Constant.LASTNAME_USER_LOGIN, user.getLastname());
