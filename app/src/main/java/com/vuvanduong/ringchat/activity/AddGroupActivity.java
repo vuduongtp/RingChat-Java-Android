@@ -14,6 +14,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -23,7 +24,10 @@ import com.google.firebase.database.ValueEventListener;
 import com.vuvanduong.ringchat.R;
 import com.vuvanduong.ringchat.adapter.ContactAdapter;
 import com.vuvanduong.ringchat.adapter.SelectFriendAdapter;
+import com.vuvanduong.ringchat.model.GroupChat;
+import com.vuvanduong.ringchat.model.Message;
 import com.vuvanduong.ringchat.model.User;
+import com.vuvanduong.ringchat.util.DBUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,6 +37,9 @@ public class AddGroupActivity extends AppCompatActivity {
     private FirebaseDatabase database = FirebaseDatabase.getInstance();
     private DatabaseReference dbReference = database.getReference();
     private DatabaseReference users = dbReference.child("users");
+    private DatabaseReference groupMembers = dbReference.child("groupMembers");
+    private DatabaseReference groupMessages = dbReference.child("groupMessages");
+    private DatabaseReference groupLastMessages = dbReference.child("groupLastMessages");
     private ArrayList<User> listFriend;
     private ArrayList<String> idFriends;
     private DatabaseReference userContacts;
@@ -41,7 +48,7 @@ public class AddGroupActivity extends AppCompatActivity {
     private ProgressBar loading;
     SelectFriendAdapter selectFriendAdapter;
     ImageView btnBackToContact;
-    Button btnCreateAddGroup,btnCancelAddGroup;
+    Button btnCreateAddGroup;
     ArrayList<User> chosenContact;
 
 
@@ -67,19 +74,51 @@ public class AddGroupActivity extends AppCompatActivity {
             }
         });
 
-        btnCancelAddGroup.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
-
         btnCreateAddGroup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 chosenContact = new ArrayList<>();
                 chosenContact = selectFriendAdapter.getListFriendSelected();
-                System.out.println(Arrays.toString(chosenContact.toArray()));
+                if (chosenContact.size()==0){
+                    Toast.makeText(AddGroupActivity.this, getString(R.string.please_select_friend), Toast.LENGTH_SHORT).show();
+                }else if (txtGroupName.getText().toString().trim().equalsIgnoreCase("")){
+                    Toast.makeText(AddGroupActivity.this, getString(R.string.please_type_group_name), Toast.LENGTH_SHORT).show();
+                }else if (txtGroupName.getText().toString().trim().length()>50){
+                    Toast.makeText(AddGroupActivity.this, getString(R.string.group_name_too_long), Toast.LENGTH_SHORT).show();
+                }else {
+                    String newKey = groupMembers.push().getKey();
+                    String groupName = txtGroupName.getText().toString().trim();
+                    StringBuilder nameMembers = new StringBuilder();
+                    chosenContact.add(user);
+                    for (int i=0; i<chosenContact.size();i++) {
+                        assert newKey != null;
+                        User newUser = chosenContact.get(i);
+                        groupMembers.child(newKey).child(newUser.getId()).setValue(newUser.getId());
+                        if (!newUser.getId().equalsIgnoreCase(user.getId())) {
+                            if (i == chosenContact.size() - 1) {
+                                nameMembers.append(newUser.getFullname());
+                            } else {
+                                nameMembers.append(newUser.getFullname()).append(",");
+                            }
+                        }
+                    }
+                    Message message = new Message();
+                    message.setDatetime(DBUtil.getStringDateTimeChatRoom());
+                    message.setUserID(user.getId());
+                    message.setType("group");
+                    String context = user.getFullname()+" "+
+                            getString(R.string.created_group)+" "+
+                            groupName+" "+getString(R.string.and_add)+" "+
+                            nameMembers+" "+getString(R.string.into_group);
+                    message.setContext(context);
+                    assert newKey != null;
+                    GroupChat groupChat = new GroupChat(message.getUserID(),message.getContext(),message.getDatetime(),message.getType(),groupName);
+                    groupLastMessages.child(newKey).setValue(groupChat);
+                    message.setDatetime(DBUtil.getStringDateTime());
+                    groupMessages.child(newKey).push().setValue(message);
+                    Toast.makeText(AddGroupActivity.this, getString(R.string.create_group_success), Toast.LENGTH_SHORT).show();
+                    finish();
+                }
             }
         });
     }
@@ -89,7 +128,6 @@ public class AddGroupActivity extends AppCompatActivity {
         txtGroupName = findViewById(R.id.txtGroupName);
         btnBackToContact = findViewById(R.id.btnBackToContact);
         btnCreateAddGroup = findViewById(R.id.btnCreateAddGroup);
-        btnCancelAddGroup = findViewById(R.id.btnCancelAddGroup);
         initView();
     }
 

@@ -174,8 +174,8 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }else {
             context = usersInRoom.get(position).getFirstname() + ": "+messages.get(position).getContext();
         }
-        if (context.length() > 22) {
-            context = context.substring(0, 22) + "...";
+        if (context.length() > 32) {
+            context = context.substring(0, 32) + "...";
         }
         lastMessage.txtContextMessageHome.setText(context);
         lastMessage.txtNameFriendHome.setText(usersInRoom.get(position).getFullname());

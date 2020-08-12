@@ -72,7 +72,7 @@
     <LinearLayout
         android:id="@+id/bottomOfAddGroup"
         android:layout_width="match_parent"
-        android:layout_height="70dp"
+        android:layout_height="60dp"
         android:gravity="center"
         android:layout_alignParentBottom="true"
         android:orientation="horizontal">
@@ -80,19 +80,11 @@
         <Button
             android:id="@+id/btnCreateAddGroup"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             android:layout_marginEnd="10dp"
             android:gravity="center"
-            android:background="@drawable/button_login"
+            android:background="@drawable/button_gradient"
             android:text="@string/create"
             android:textColor="#fff" />
-
-        <Button
-            android:id="@+id/btnCancelAddGroup"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:background="@drawable/button_gradient"
-            android:text="@string/cancel" />
     </LinearLayout>
 </RelativeLayout>

@@ -49,5 +49,13 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="loading">Loading. Please wait...</string>
+    <string name="please_select_friend">Please select friend.</string>
+    <string name="please_type_group_name">Please type group name.</string>
+    <string name="created_group">created group</string>
+    <string name="and_add">and add</string>
+    <string name="into_group">into group.</string>
+    <string name="create_group_success">Create group successful.</string>
+    <string name="someone">Someone</string>
+    <string name="group_name_too_long">Group name is too long. Please type name again.</string>
 
 </resources>

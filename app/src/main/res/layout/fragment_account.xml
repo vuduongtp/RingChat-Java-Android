@@ -30,7 +30,7 @@
             android:fontFamily="@font/roboto_bold"
             android:gravity="center|start"
             android:padding="10dp"
-            android:text="@string/create_new_group"
+            android:text="@string/account_info"
             android:textColor="@color/white"
             android:textSize="24sp" />
 
