@@ -80,7 +80,7 @@ public class GroupFragment extends Fragment {
 
         initView();
 
-        Query getGroups = groupMembers.orderByKey();
+        final Query getGroups = groupMembers.orderByKey();
         getGroups.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -104,6 +104,7 @@ public class GroupFragment extends Fragment {
                                             loading.setVisibility(View.GONE);
                                         }
                                     }
+                                    groupLastMessages.removeEventListener(this);
                                 }
 
                                 @Override
@@ -114,6 +115,7 @@ public class GroupFragment extends Fragment {
                         }
                     }
                 }
+                groupMembers.removeEventListener(this);
             }
 
             @Override

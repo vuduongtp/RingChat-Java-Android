@@ -2,17 +2,19 @@ package com.vuvanduong.ringchat.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.vuvanduong.ringchat.R;
+import com.vuvanduong.ringchat.activity.GroupConversationActivity;
 import com.vuvanduong.ringchat.model.GroupChat;
 import com.vuvanduong.ringchat.model.User;
 import com.vuvanduong.ringchat.util.DBUtil;
@@ -40,7 +42,7 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder>{
     }
 
     @Override
-    public void onBindViewHolder(@NonNull GroupAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull GroupAdapter.ViewHolder holder, final int position) {
         holder.imgFriendHome.setImageResource(R.drawable.group);
         String time = DBUtil.revertDatetimeMessage(groupChats.get(position).getDatetime());
         holder.txtTimeMessageLast.setText(time);
@@ -59,6 +61,16 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder>{
         holder.imgIconMessageLast.getLayoutParams().height = 0;
         holder.imgIconMessageLast.getLayoutParams().width = 0;
         holder.imgIconMessageLast.setScaleType(ImageView.ScaleType.FIT_XY);
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent conversation = new Intent(v.getContext(), GroupConversationActivity.class);
+                conversation.putExtra("userLogin",userLogin);
+                conversation.putExtra("group",groupChats.get(position));
+                v.getContext().startActivity(conversation);
+            }
+        });
     }
 
     @Override

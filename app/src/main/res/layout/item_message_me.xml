@@ -22,7 +22,7 @@
     <TextView
         android:id="@+id/txtTimeMessageMe"
         android:layout_width="match_parent"
-        android:layout_height="20dp"
+        android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:fontFamily="@font/roboto_regular"
         android:gravity="center"

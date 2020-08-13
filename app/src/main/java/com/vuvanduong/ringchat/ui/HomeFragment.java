@@ -84,6 +84,7 @@ public class HomeFragment extends Fragment {
         loading.setVisibility(View.VISIBLE);
         messages = new ArrayList<>();
         friends = new ArrayList<>();
+
         final Query listChatRoom = conversationLastMessage.getRef()
                 .orderByKey()
                 .startAt("&"+user.getId()+"&")

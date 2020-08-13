@@ -25,7 +25,7 @@
         android:fontFamily="@font/roboto_regular"
         android:layout_alignParentTop="true"
         android:gravity="center"
-        android:layout_height="20dp"
+        android:layout_height="wrap_content"
         android:textSize="12sp"
         android:visibility="gone"/>
     <TextView

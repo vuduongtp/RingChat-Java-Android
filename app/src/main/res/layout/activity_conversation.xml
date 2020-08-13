@@ -96,6 +96,8 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1.5"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="10dp"
             android:background="@null"
             app:srcCompat="@drawable/call" />
     </LinearLayout>
@@ -114,7 +116,6 @@
         android:layout_marginBottom="61dp"/>
 
     <LinearLayout
-        android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:background="@color/white"

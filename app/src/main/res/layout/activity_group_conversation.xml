@@ -8,7 +8,7 @@
     tools:context=".activity.ConversationActivity">
 
     <ProgressBar
-        android:id="@+id/loadingConversation"
+        android:id="@+id/loadingGroupConversation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
@@ -83,12 +83,14 @@
             android:id="@+id/btnAddMemberGroup"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_marginEnd="10dp"
+            android:layout_marginStart="5dp"
             android:layout_weight="1.5"
             android:background="@null"
             app:srcCompat="@drawable/minus" />
     </LinearLayout>
     <TextView
-        android:id="@+id/sectorCut"
+        android:id="@+id/sectorCutGroup"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_below="@+id/layout_header_chatting"
@@ -98,11 +100,10 @@
         android:id="@+id/rvChatGroupConversation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/sectorCut"
+        android:layout_below="@+id/sectorCutGroup"
         android:layout_marginBottom="61dp"/>
 
     <LinearLayout
-        android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:background="@color/white"

@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private final int ME = 0, YOU = 1, LAST_MESSAGE=2;
+    private final int ME = 0, YOU = 1, LAST_MESSAGE=2, GROUP=3;
 
     private ArrayList<Message> messages;
     private Context context;
@@ -49,6 +49,8 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     public int getItemViewType(int position) {
         if (messages.get(position).getIdRoom() != null) {
             return LAST_MESSAGE;
+        }else if (messages.get(position).getType().equalsIgnoreCase("group")) {
+            return GROUP;
         }else if (messages.get(position).getUserID().equals(userLogin.getId())) {
             return ME;
         } else if (!messages.get(position).getUserID().equals(userLogin.getId())) {
@@ -80,6 +82,10 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             case LAST_MESSAGE:
                 View lastMessage = inflater.inflate(R.layout.item_conversation, parent, false);
                 viewHolder = new HolderLastMessage(lastMessage);
+                break;
+            case GROUP:
+                View group = inflater.inflate(R.layout.item_group_message, parent, false);
+                viewHolder = new HolderGroupMessage(group);
                 break;
             default:
                 break;
@@ -133,6 +139,20 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                     }
                 });
                 break;
+            case GROUP:
+                final HolderGroupMessage groupMessage = (HolderGroupMessage) holder;
+                configureViewHolderGroup(groupMessage, position);
+                holder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (groupMessage.txtTimeMessageGroup.getVisibility()==View.GONE){
+                            groupMessage.txtTimeMessageGroup.setVisibility(View.VISIBLE);
+                        }else {
+                            groupMessage.txtTimeMessageGroup.setVisibility(View.GONE);
+                        }
+                    }
+                });
+                break;
             default:
                 break;
         }
@@ -144,7 +164,13 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     }
 
     private void configureViewHolderMe(HolderMe me, int position) {
-        me.txtTimeMessageMe.setText(messages.get(position).getDatetime());
+        String time="";
+        if (isGroup){
+            time = messages.get(position).getDatetime()+"\n"+getNameUser(messages.get(position).getUserID());
+        }else {
+            time = messages.get(position).getDatetime();
+        }
+        me.txtTimeMessageMe.setText(time);
         me.txtContextMessageMe.setText(messages.get(position).getContext());
         if (messages.get(position).getType()==null || messages.get(position).getType().equalsIgnoreCase("message")){
             me.imgIconMessageMe.requestLayout();
@@ -155,7 +181,13 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     }
 
     private void configureViewHolderYou(HolderYou you, int position) {
-        you.txtTimeMessageYou.setText(messages.get(position).getDatetime());
+        String time="";
+        if (isGroup){
+            time = messages.get(position).getDatetime()+"\n"+getNameUser(messages.get(position).getUserID());
+        }else {
+            time = messages.get(position).getDatetime();
+        }
+        you.txtTimeMessageYou.setText(time);
         you.txtContextMessageYou.setText(messages.get(position).getContext());
         if (messages.get(position).getType()==null || messages.get(position).getType().equalsIgnoreCase("message")){
             you.imgIconMessageYou.requestLayout();
@@ -185,6 +217,13 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             lastMessage.imgIconMessageLast.getLayoutParams().width = 0;
             lastMessage.imgIconMessageLast.setScaleType(ImageView.ScaleType.FIT_XY);
         }
+    }
+
+    private void configureViewHolderGroup(HolderGroupMessage groupMessage, int position) {
+        String time = messages.get(position).getDatetime()+"\n"+getNameUser(messages.get(position).getUserID());
+        System.out.println(time);
+        groupMessage.txtTimeMessageGroup.setText(time);
+        groupMessage.txtContextGroupMessage.setText(messages.get(position).getContext());
     }
 
     private class HolderMe extends RecyclerView.ViewHolder {
@@ -233,5 +272,26 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             imgFriendHome = itemView.findViewById(R.id.imgFriendHome);
             imgIconMessageLast = itemView.findViewById(R.id.imgIconMessageLast);
         }
+    }
+
+    private class HolderGroupMessage extends RecyclerView.ViewHolder {
+        TextView txtTimeMessageGroup;
+        TextView txtContextGroupMessage;
+
+        public HolderGroupMessage(@NonNull View itemView) {
+            super(itemView);
+            txtTimeMessageGroup = itemView.findViewById(R.id.txtTimeMessageGroup);
+            txtContextGroupMessage = itemView.findViewById(R.id.txtContextGroupMessage);
+        }
+    }
+
+    private String getNameUser(String id){
+        String fullName="";
+        for (int i = 0 ; i < usersInRoom.size(); i++){
+            if (usersInRoom.get(i).getId().equalsIgnoreCase(id)){
+                fullName = usersInRoom.get(i).getFullname();
+            }
+        }
+        return fullName;
     }
 }
