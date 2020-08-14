@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -24,6 +25,8 @@ import com.vuvanduong.ringchat.config.Constant;
 import com.vuvanduong.ringchat.model.User;
 import com.vuvanduong.ringchat.util.MD5;
 import com.vuvanduong.ringchat.util.SharedPrefs;
+
+import java.io.Serializable;
 
 public class LoginActivity extends AppCompatActivity {
     TextView forgetPass, register, txtErrorLogin;
@@ -108,7 +111,7 @@ public class LoginActivity extends AppCompatActivity {
                                     SharedPrefs.getInstance().put(Constant.PASS_USER_LOGIN, txtPasswordLogin.getText().toString().trim());
 
                                     Intent welcome = new Intent(LoginActivity.this, WelcomeActivity.class);
-                                    welcome.putExtra("user_login",user);
+                                    welcome.putExtra("user_login", (Serializable) user);
                                     welcome.putExtra(Constant.IS_FROM_LOGIN,true);
                                     startActivity(welcome);
                                     finish();

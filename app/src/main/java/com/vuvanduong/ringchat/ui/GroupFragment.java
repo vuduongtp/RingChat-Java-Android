@@ -30,6 +30,7 @@ import com.vuvanduong.ringchat.adapter.SelectFriendAdapter;
 import com.vuvanduong.ringchat.model.GroupChat;
 import com.vuvanduong.ringchat.model.User;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 public class GroupFragment extends Fragment {
@@ -64,7 +65,7 @@ public class GroupFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent addGroup = new Intent(getActivity(), AddGroupActivity.class);
-                addGroup.putExtra("user_login", user);
+                addGroup.putExtra("user_login", (Serializable) user);
                 startActivity(addGroup);
             }
         });
@@ -73,7 +74,7 @@ public class GroupFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent addFriend = new Intent(getActivity(), AddFriendActivity.class);
-                addFriend.putExtra("user_login", user);
+                addFriend.putExtra("user_login", (Serializable) user);
                 startActivity(addFriend);
             }
         });

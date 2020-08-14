@@ -19,6 +19,7 @@ import com.vuvanduong.ringchat.model.GroupChat;
 import com.vuvanduong.ringchat.model.User;
 import com.vuvanduong.ringchat.util.DBUtil;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder>{
@@ -66,7 +67,7 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder>{
             @Override
             public void onClick(View v) {
                 Intent conversation = new Intent(v.getContext(), GroupConversationActivity.class);
-                conversation.putExtra("userLogin",userLogin);
+                conversation.putExtra("userLogin", (Serializable) userLogin);
                 conversation.putExtra("group",groupChats.get(position));
                 v.getContext().startActivity(conversation);
             }

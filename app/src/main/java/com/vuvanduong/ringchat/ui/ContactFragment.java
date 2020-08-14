@@ -30,6 +30,7 @@ import com.vuvanduong.ringchat.model.User;
 import com.vuvanduong.ringchat.util.MD5;
 import com.vuvanduong.ringchat.util.SharedPrefs;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 public class ContactFragment extends Fragment {
@@ -126,7 +127,7 @@ public class ContactFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent addFriend = new Intent(getActivity(), AddFriendActivity.class);
-                addFriend.putExtra("user_login",user);
+                addFriend.putExtra("user_login", (Serializable) user);
                 startActivity(addFriend);
             }
         });

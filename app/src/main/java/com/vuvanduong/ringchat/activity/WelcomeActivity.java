@@ -5,7 +5,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
@@ -18,6 +17,8 @@ import com.vuvanduong.ringchat.config.Constant;
 import com.vuvanduong.ringchat.model.User;
 import com.vuvanduong.ringchat.util.MD5;
 import com.vuvanduong.ringchat.util.SharedPrefs;
+
+import java.io.Serializable;
 
 public class WelcomeActivity extends AppCompatActivity {
     FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -35,7 +36,7 @@ public class WelcomeActivity extends AppCompatActivity {
         if (isFromLogin) {
             user = (User) intent.getSerializableExtra("user_login");
             Intent home = new Intent(WelcomeActivity.this, HomeActivity.class);
-            home.putExtra("user_login",user);
+            home.putExtra("user_login", (Serializable) user);
             startActivity(home);
             finish();
             return;
@@ -60,7 +61,7 @@ public class WelcomeActivity extends AppCompatActivity {
                             SharedPrefs.getInstance().put(Constant.PASS_USER_LOGIN, pass);
 
                             Intent home = new Intent(WelcomeActivity.this, HomeActivity.class);
-                            home.putExtra("user_login",user);
+                            home.putExtra("user_login", (Serializable) user);
                             startActivity(home);
                             finish();
                             return;

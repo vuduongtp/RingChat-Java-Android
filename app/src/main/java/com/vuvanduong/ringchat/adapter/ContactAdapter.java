@@ -19,6 +19,7 @@ import com.vuvanduong.ringchat.R;
 import com.vuvanduong.ringchat.activity.ConversationActivity;
 import com.vuvanduong.ringchat.model.User;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHolder> {
@@ -62,8 +63,8 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
                 public void onClick(View v) {
 //                    Toast.makeText(context, fullName, Toast.LENGTH_SHORT).show();
                     Intent conversation = new Intent(v.getContext(), ConversationActivity.class);
-                    conversation.putExtra("userLogin",userLogin);
-                    conversation.putExtra("friend",users.get(position));
+                    conversation.putExtra("userLogin", (Serializable) userLogin);
+                    conversation.putExtra("friend", (Serializable) users.get(position));
                     v.getContext().startActivity(conversation);
                 }
             });

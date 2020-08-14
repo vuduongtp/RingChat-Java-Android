@@ -29,6 +29,7 @@ import com.vuvanduong.ringchat.adapter.MessageAdapter;
 import com.vuvanduong.ringchat.model.Message;
 import com.vuvanduong.ringchat.model.User;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -66,7 +67,7 @@ public class HomeFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent addFriend = new Intent(getActivity(), AddFriendActivity.class);
-                addFriend.putExtra("user_login", user);
+                addFriend.putExtra("user_login", (Serializable) user);
                 startActivity(addFriend);
             }
         });

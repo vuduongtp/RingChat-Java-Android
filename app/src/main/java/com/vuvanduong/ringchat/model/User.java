@@ -1,9 +1,12 @@
 package com.vuvanduong.ringchat.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.io.Serializable;
 import java.util.Date;
 
-public class User implements Serializable {
+public class User implements Serializable, Parcelable {
     private String id;
     private String email;
     private  String password;
@@ -24,6 +27,28 @@ public class User implements Serializable {
         this.birthday = birthday;
         this.status = status;
     }
+
+    protected User(Parcel in) {
+        id = in.readString();
+        email = in.readString();
+        password = in.readString();
+        lastname = in.readString();
+        firstname = in.readString();
+        image = in.readString();
+        status = in.readString();
+    }
+
+    public static final Creator<User> CREATOR = new Creator<User>() {
+        @Override
+        public User createFromParcel(Parcel in) {
+            return new User(in);
+        }
+
+        @Override
+        public User[] newArray(int size) {
+            return new User[size];
+        }
+    };
 
     public String getId() {
         return id;
@@ -105,5 +130,21 @@ public class User implements Serializable {
                 ", image='" + image + '\'' +
                 ", status='" + status + '\'' +
                 '}';
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
+        dest.writeString(email);
+        dest.writeString(password);
+        dest.writeString(lastname);
+        dest.writeString(firstname);
+        dest.writeString(image);
+        dest.writeString(status);
     }
 }

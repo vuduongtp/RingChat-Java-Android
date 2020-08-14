@@ -30,6 +30,7 @@ import com.vuvanduong.ringchat.model.Message;
 import com.vuvanduong.ringchat.model.User;
 import com.vuvanduong.ringchat.util.DBUtil;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -97,6 +98,24 @@ public class GroupConversationActivity extends AppCompatActivity {
                     groupLastMessage.setValue(newMessage);
                 }
                 txtContextGroupConversation.setText("");
+            }
+        });
+
+        btnAddMemberGroup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+        btnRemoveMemberGroup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent remove = new Intent(GroupConversationActivity.this, RemoveMemberGroupActivity.class);
+                remove.putExtra("user_login", (Serializable) userLogin);
+                remove.putParcelableArrayListExtra("usersInRoom", usersInRoom);
+                remove.putExtra("group",groupChat);
+                startActivity(remove);
             }
         });
     }

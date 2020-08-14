@@ -1,5 +1,7 @@
 package com.vuvanduong.ringchat.model;
 
+import androidx.annotation.NonNull;
+
 import java.io.Serializable;
 
 public class GroupChat implements Serializable {
@@ -67,5 +69,18 @@ public class GroupChat implements Serializable {
 
     public void setGroupName(String groupName) {
         GroupName = groupName;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "GroupChat{" +
+                "IdRoom='" + IdRoom + '\'' +
+                ", UserID='" + UserID + '\'' +
+                ", Context='" + Context + '\'' +
+                ", Datetime='" + Datetime + '\'' +
+                ", Type='" + Type + '\'' +
+                ", GroupName='" + GroupName + '\'' +
+                '}';
     }
 }

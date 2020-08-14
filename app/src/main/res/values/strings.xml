@@ -54,8 +54,13 @@
     <string name="created_group">created group</string>
     <string name="and_add">and add</string>
     <string name="into_group">into group.</string>
+    <string name="from_group">from group.</string>
     <string name="create_group_success">Create group successful.</string>
     <string name="someone">Someone</string>
     <string name="group_name_too_long">Group name is too long. Please type name again.</string>
+    <string name="add_member">Add member</string>
+    <string name="remove_member">Remove member</string>
+    <string name="remove">Remove</string>
+    <string name="removed">removed</string>
 
 </resources>

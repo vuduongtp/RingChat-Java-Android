@@ -21,6 +21,7 @@ import com.vuvanduong.ringchat.model.Message;
 import com.vuvanduong.ringchat.model.User;
 import com.vuvanduong.ringchat.util.DBUtil;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -132,8 +133,8 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                     @Override
                     public void onClick(View v) {
                         Intent conversation = new Intent(v.getContext(), ConversationActivity.class);
-                        conversation.putExtra("userLogin",userLogin);
-                        conversation.putExtra("friend",usersInRoom.get(position));
+                        conversation.putExtra("userLogin", (Serializable) userLogin);
+                        conversation.putExtra("friend", (Serializable) usersInRoom.get(position));
                         System.out.println(usersInRoom.get(position).toString());
                         v.getContext().startActivity(conversation);
                     }
@@ -221,7 +222,6 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     private void configureViewHolderGroup(HolderGroupMessage groupMessage, int position) {
         String time = messages.get(position).getDatetime()+"\n"+getNameUser(messages.get(position).getUserID());
-        System.out.println(time);
         groupMessage.txtTimeMessageGroup.setText(time);
         groupMessage.txtContextGroupMessage.setText(messages.get(position).getContext());
     }
