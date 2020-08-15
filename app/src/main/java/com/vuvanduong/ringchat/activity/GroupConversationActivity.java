@@ -25,6 +25,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.vuvanduong.ringchat.R;
 import com.vuvanduong.ringchat.adapter.MessageAdapter;
+import com.vuvanduong.ringchat.config.Constant;
 import com.vuvanduong.ringchat.model.GroupChat;
 import com.vuvanduong.ringchat.model.Message;
 import com.vuvanduong.ringchat.model.User;
@@ -32,13 +33,14 @@ import com.vuvanduong.ringchat.util.DBUtil;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Objects;
 
 public class GroupConversationActivity extends AppCompatActivity {
     User userLogin;
     RecyclerView rvChatGroupConversation;
     TextView txtNameGroupConversation;
-    ImageButton btnRemoveMemberGroup,btnAddMemberGroup;
+    ImageButton btnRemoveMemberGroup, btnAddMemberGroup;
     Button btnSendMessageGroupConversation;
     EditText txtContextGroupConversation;
     private GroupChat groupChat;
@@ -63,9 +65,9 @@ public class GroupConversationActivity extends AppCompatActivity {
         groupChat = (GroupChat) intent.getSerializableExtra("group");
 
         assert groupChat != null;
-        groupLastMessage = dbReference.child("groupLastMessage/"+groupChat.getIdRoom());
-        groupMessages = dbReference.child("groupMessages/"+groupChat.getIdRoom());
-        groupMembers = dbReference.child("groupMembers/"+groupChat.getIdRoom());
+        groupLastMessage = dbReference.child("groupLastMessages/" + groupChat.getIdRoom());
+        groupMessages = dbReference.child("groupMessages/" + groupChat.getIdRoom());
+        groupMembers = dbReference.child("groupMembers/" + groupChat.getIdRoom());
         usersInRoom = new ArrayList<>();
         loadingConversation = findViewById(R.id.loadingGroupConversation);
         loadingConversation.setVisibility(View.VISIBLE);
@@ -85,7 +87,7 @@ public class GroupConversationActivity extends AppCompatActivity {
         btnSendMessageGroupConversation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!txtContextGroupConversation.getText().toString().trim().equals("")){
+                if (!txtContextGroupConversation.getText().toString().trim().equals("")) {
                     Message newMessage = new Message();
                     newMessage.setType("message");
                     newMessage.setContext(txtContextGroupConversation.getText().toString().trim());
@@ -104,7 +106,11 @@ public class GroupConversationActivity extends AppCompatActivity {
         btnAddMemberGroup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Intent add = new Intent(GroupConversationActivity.this, AddMemberGroupActivity.class);
+                add.putExtra("user_login", (Serializable) userLogin);
+                add.putParcelableArrayListExtra("usersInRoom", usersInRoom);
+                add.putExtra("group", groupChat);
+                startActivityForResult(add, Constant.GET_NEW_MEMBER);
             }
         });
 
@@ -114,10 +120,31 @@ public class GroupConversationActivity extends AppCompatActivity {
                 Intent remove = new Intent(GroupConversationActivity.this, RemoveMemberGroupActivity.class);
                 remove.putExtra("user_login", (Serializable) userLogin);
                 remove.putParcelableArrayListExtra("usersInRoom", usersInRoom);
-                remove.putExtra("group",groupChat);
-                startActivity(remove);
+                remove.putExtra("group", groupChat);
+                startActivityForResult(remove, Constant.GET_MEMBER_REMAIN);
             }
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == Constant.GET_MEMBER_REMAIN && data != null) {
+            usersInRoom = data.getParcelableArrayListExtra("usersInRoom");
+            groupChat = (GroupChat) data.getSerializableExtra("groupChat");
+            assert groupChat != null;
+            txtNameGroupConversation.setText(groupChat.getGroupName());
+        }
+        else if (requestCode == Constant.GET_NEW_MEMBER && data != null) {
+            ArrayList<User> newMembers;
+            newMembers = data.getParcelableArrayListExtra("chosenContact");
+            if(newMembers != null) {
+                usersInRoom.addAll(newMembers);
+            }
+            groupChat = (GroupChat) data.getSerializableExtra("groupChat");
+            assert groupChat != null;
+            txtNameGroupConversation.setText(groupChat.getGroupName());
+        }
     }
 
     private void setControl() {
@@ -138,7 +165,7 @@ public class GroupConversationActivity extends AppCompatActivity {
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, true);
         rvChatGroupConversation.setLayoutManager(layoutManager);
-        messageAdapter = new MessageAdapter(messages, getApplicationContext(), userLogin,usersInRoom,true);
+        messageAdapter = new MessageAdapter(messages, getApplicationContext(), userLogin, usersInRoom, true);
         rvChatGroupConversation.setAdapter(messageAdapter);
 
         rvChatGroupConversation.postDelayed(new Runnable() {
@@ -169,12 +196,12 @@ public class GroupConversationActivity extends AppCompatActivity {
         });
     }
 
-    private void getData(){
+    private void getData() {
         messageReceive = new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                if(dataSnapshot.exists()) {
-                    if (loadingConversation.getVisibility()==View.VISIBLE){
+                if (dataSnapshot.exists()) {
+                    if (loadingConversation.getVisibility() == View.VISIBLE) {
                         loadingConversation.setVisibility(View.GONE);
                     }
                     //get from firebase
@@ -211,7 +238,7 @@ public class GroupConversationActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 final int count = (int) dataSnapshot.getChildrenCount();
-                for (DataSnapshot item : dataSnapshot.getChildren()){
+                for (DataSnapshot item : dataSnapshot.getChildren()) {
                     String userId = item.getKey();
                     Query getUser = users.orderByKey().equalTo(userId);
                     getUser.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -222,7 +249,7 @@ public class GroupConversationActivity extends AppCompatActivity {
                                 assert user != null;
                                 user.setId(item.getKey());
                                 usersInRoom.add(user);
-                                if (count == usersInRoom.size()){
+                                if (count == usersInRoom.size()) {
                                     chatBoxView(200);
                                     groupMessages.addChildEventListener(messageReceive);
                                 }

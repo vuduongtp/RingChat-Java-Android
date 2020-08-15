@@ -48,7 +48,7 @@
         android:orientation="vertical">
 
         <EditText
-            android:id="@+id/txtMemberGroupName"
+            android:id="@+id/txtMemberAddGroupName"
             android:layout_gravity="center"
             android:layout_margin="5dp"
             android:paddingStart="10dp"

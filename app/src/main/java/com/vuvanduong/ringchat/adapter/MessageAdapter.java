@@ -287,9 +287,13 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     private String getNameUser(String id){
         String fullName="";
-        for (int i = 0 ; i < usersInRoom.size(); i++){
-            if (usersInRoom.get(i).getId().equalsIgnoreCase(id)){
-                fullName = usersInRoom.get(i).getFullname();
+        if (id==null){
+            return fullName;
+        }else {
+            for (int i = 0; i < usersInRoom.size(); i++) {
+                if (usersInRoom.get(i).getId().equalsIgnoreCase(id)) {
+                    fullName = usersInRoom.get(i).getFullname();
+                }
             }
         }
         return fullName;

@@ -62,5 +62,6 @@
     <string name="remove_member">Remove member</string>
     <string name="remove">Remove</string>
     <string name="removed">removed</string>
+    <string name="added">added</string>
 
 </resources>

@@ -1,6 +1,7 @@
 package com.vuvanduong.ringchat.ui;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,9 +9,11 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.view.ViewCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -32,6 +35,7 @@ import com.vuvanduong.ringchat.model.User;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class GroupFragment extends Fragment {
     private User user;
@@ -47,6 +51,7 @@ public class GroupFragment extends Fragment {
     private DatabaseReference groupLastMessages = dbReference.child("groupLastMessages");
     private GroupAdapter groupAdapter;
     private ArrayList<GroupChat> groupChats;
+    private int count = 0;
 
     @Nullable
     @Override
@@ -125,7 +130,34 @@ public class GroupFragment extends Fragment {
             }
         });
 
+        rvGroupConversation.setOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                if(IsRecyclerViewAtTop())
+                {
+                    if (count%groupChats.size()==0) {
+                        Toast.makeText(getActivity(), "Recycle", Toast.LENGTH_SHORT).show();
+                    }
+                    count++;
+                }
+            }
+
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+            }
+        });
+
     }
+
+    private boolean IsRecyclerViewAtTop()   {
+        if(rvGroupConversation.getChildCount() == 0)
+            return true;
+        return rvGroupConversation.getChildAt(0).getTop() == 0;
+    }
+
 
     private void setControl(View view) {
         txtUserGroup = view.findViewById(R.id.txtUserGroup);

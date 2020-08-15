@@ -18,6 +18,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.vuvanduong.ringchat.R;
 import com.vuvanduong.ringchat.adapter.SelectFriendAdapter;
+import com.vuvanduong.ringchat.config.Constant;
 import com.vuvanduong.ringchat.model.GroupChat;
 import com.vuvanduong.ringchat.model.Message;
 import com.vuvanduong.ringchat.model.User;
@@ -51,7 +52,6 @@ public class RemoveMemberGroupActivity extends AppCompatActivity {
         userLogin = (User) intent.getSerializableExtra("user_login");
         groupChat = (GroupChat) intent.getSerializableExtra("group");
         usersInRoom = intent.getParcelableArrayListExtra("usersInRoom");
-        System.out.println(groupChat.toString());
 
         setControl();
         setEvent();
@@ -61,6 +61,10 @@ public class RemoveMemberGroupActivity extends AppCompatActivity {
         btnBackToRemoveMember.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Intent intent=new Intent();
+                intent.putExtra("usersInRoom",usersInRoom);
+                intent.putExtra("groupChat",groupChat);
+                setResult(Constant.GET_MEMBER_REMAIN,intent);
                 finish();
             }
         });
@@ -81,6 +85,7 @@ public class RemoveMemberGroupActivity extends AppCompatActivity {
                     String groupName = txtGroupNameRemove.getText().toString().trim();
                     for (int i=0; i<chosenContact.size();i++) {
                         groupMembers.child(groupChat.getIdRoom()).child(chosenContact.get(i).getId()).removeValue();
+                        usersInRoom.remove(chosenContact.get(i));
                         if (i == chosenContact.size() - 1) {
                             nameMembers.append(chosenContact.get(i).getFullname());
                         } else {
@@ -99,6 +104,10 @@ public class RemoveMemberGroupActivity extends AppCompatActivity {
                     message.setDatetime(DBUtil.getStringDateTime());
                     groupMessages.child(groupChat.getIdRoom()).push().setValue(message);
                     Toast.makeText(RemoveMemberGroupActivity.this, context, Toast.LENGTH_SHORT).show();
+                    Intent intent=new Intent();
+                    intent.putExtra("usersInRoom",usersInRoom);
+                    intent.putExtra("groupChat",groupChat);
+                    setResult(Constant.GET_MEMBER_REMAIN,intent);
                     finish();
                 }
             }
