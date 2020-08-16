@@ -23,6 +23,7 @@ import com.vuvanduong.ringchat.model.GroupChat;
 import com.vuvanduong.ringchat.model.Message;
 import com.vuvanduong.ringchat.model.User;
 import com.vuvanduong.ringchat.util.DBUtil;
+import com.vuvanduong.ringchat.util.UserUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -87,16 +88,16 @@ public class RemoveMemberGroupActivity extends AppCompatActivity {
                         groupMembers.child(groupChat.getIdRoom()).child(chosenContact.get(i).getId()).removeValue();
                         usersInRoom.remove(chosenContact.get(i));
                         if (i == chosenContact.size() - 1) {
-                            nameMembers.append(chosenContact.get(i).getFullname());
+                            nameMembers.append(UserUtil.getFullName(chosenContact.get(i)));
                         } else {
-                            nameMembers.append(chosenContact.get(i).getFullname()).append(",");
+                            nameMembers.append(UserUtil.getFullName(chosenContact.get(i))).append(",");
                         }
                     }
                     Message message = new Message();
                     message.setDatetime(DBUtil.getStringDateTimeChatRoom());
                     message.setUserID(userLogin.getId());
                     message.setType("group");
-                    String context = userLogin.getFullname()+" "+getString(R.string.removed)+" "+
+                    String context = UserUtil.getFullName(userLogin)+" "+getString(R.string.removed)+" "+
                             nameMembers+" "+getString(R.string.from_group);
                     message.setContext(context);
                     GroupChat group = new GroupChat(message.getUserID(),message.getContext(),message.getDatetime(),message.getType(),groupName);

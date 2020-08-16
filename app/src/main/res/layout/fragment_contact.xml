@@ -59,11 +59,19 @@
 <!--            android:contentDescription="@string/search" />-->
     </LinearLayout>
 
+    <ProgressBar
+        android:id="@+id/reloadListContact"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_below="@id/header_contact"
+        android:layout_centerInParent="true"
+        android:visibility="gone"/>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvContact"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/header_contact"
+        android:layout_below="@+id/reloadListContact"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHeight_percent=".8"

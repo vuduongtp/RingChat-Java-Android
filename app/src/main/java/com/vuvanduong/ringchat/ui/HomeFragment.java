@@ -28,6 +28,7 @@ import com.vuvanduong.ringchat.activity.AddFriendActivity;
 import com.vuvanduong.ringchat.adapter.MessageAdapter;
 import com.vuvanduong.ringchat.model.Message;
 import com.vuvanduong.ringchat.model.User;
+import com.vuvanduong.ringchat.util.UserUtil;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -41,7 +42,7 @@ public class HomeFragment extends Fragment {
     private TextView txtUserHome, txtEmailHome;
     private ImageButton btnSearchHome;
     private RecyclerView rvConversation;
-    private ProgressBar loading;
+    private ProgressBar loading, reloadListMessage;
     private FirebaseDatabase database = FirebaseDatabase.getInstance();
     private DatabaseReference dbReference = database.getReference();
     private DatabaseReference conversationLastMessage = dbReference.child("conversationLastMessage");
@@ -49,6 +50,7 @@ public class HomeFragment extends Fragment {
     private ArrayList<Message> messages;
     private ArrayList<User> friends;
     private MessageAdapter messageAdapter;
+    private int count = 0;
 
     @Nullable
     @Override
@@ -57,6 +59,8 @@ public class HomeFragment extends Fragment {
 
         assert getArguments() != null;
         user = (User) getArguments().getSerializable("user_login");
+        loading = view.findViewById(R.id.loadingHomeFragment);
+        loading.setVisibility(View.VISIBLE);
         setControl(view);
         setEvent();
         return view;
@@ -72,6 +76,38 @@ public class HomeFragment extends Fragment {
             }
         });
 
+        rvConversation.setOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                if (IsRecyclerViewAtTop()) {
+                    if (messages.size() != 0 && count % messages.size() == 0 && reloadListMessage.getVisibility() == View.GONE) {
+                        messages.clear();
+                        reloadListMessage.setVisibility(View.VISIBLE);
+                        getData();
+                    }
+                    if (messages.size() == 0 && reloadListMessage.getVisibility() == View.GONE) {
+                        messages.clear();
+                        reloadListMessage.setVisibility(View.VISIBLE);
+                        getData();
+                    }
+                    count++;
+                }
+            }
+
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+            }
+        });
+
+    }
+
+    private boolean IsRecyclerViewAtTop() {
+        if (rvConversation.getChildCount() == 0)
+            return true;
+        return rvConversation.getChildAt(0).getTop() == 0;
     }
 
     private void setControl(View view) {
@@ -79,27 +115,33 @@ public class HomeFragment extends Fragment {
         txtEmailHome = view.findViewById(R.id.txtEmailHome);
         btnSearchHome = view.findViewById(R.id.btnSearchHome);
         rvConversation = view.findViewById(R.id.rvConversation);
-        txtUserHome.setText(user.getFullname());
+        txtUserHome.setText(UserUtil.getFullName(user));
         txtEmailHome.setText(user.getEmail());
-        loading = view.findViewById(R.id.loadingHomeFragment);
-        loading.setVisibility(View.VISIBLE);
+        reloadListMessage = view.findViewById(R.id.reloadListMessage);
         messages = new ArrayList<>();
         friends = new ArrayList<>();
 
+        getData();
+    }
+
+    private void getData() {
         final Query listChatRoom = conversationLastMessage.getRef()
                 .orderByKey()
-                .startAt("&"+user.getId()+"&")
+                .startAt("&" + user.getId() + "&")
                 .endAt("\uf8ff");
         listChatRoom.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                if (loading.getVisibility() == View.VISIBLE) {
+                    loading.setVisibility(View.GONE);
+                }
                 //get data when after update meessage
                 if (dataSnapshot.exists()) {// get data whem first open
                     if (!messages.isEmpty()) messages.clear();
                     if (!friends.isEmpty()) friends.clear();
                     for (DataSnapshot item : dataSnapshot.getChildren()) {
                         String[] usersId = Objects.requireNonNull(item.getKey()).split("&");
-                        if (usersId[0].equalsIgnoreCase(user.getId())||usersId[1].equalsIgnoreCase(user.getId())) {
+                        if (usersId[0].equalsIgnoreCase(user.getId()) || usersId[1].equalsIgnoreCase(user.getId())) {
                             String idfriend = "";
                             if (usersId[0].equalsIgnoreCase(user.getId())) {
                                 idfriend = usersId[1];
@@ -121,9 +163,15 @@ public class HomeFragment extends Fragment {
                                         user = item.getValue(User.class);
                                         user.setId(item.getKey());
                                         friends.add(user);
-                                        if (messages.size() == friends.size()){
+                                        if (messages.size() == friends.size()) {
                                             chatBoxView(200);
-                                            loading.setVisibility(View.GONE);
+                                            if (loading.getVisibility() == View.VISIBLE) {
+                                                loading.setVisibility(View.GONE);
+                                            }
+                                            if (reloadListMessage.getVisibility() == View.VISIBLE) {
+                                                reloadListMessage.setVisibility(View.GONE);
+                                            }
+                                            count = 0;
                                         }
                                     }
                                     users.removeEventListener(this);
@@ -145,7 +193,6 @@ public class HomeFragment extends Fragment {
                 Toast.makeText(getActivity(), "Error loading database", Toast.LENGTH_SHORT).show();
             }
         });
-
     }
 
     public void chatBoxView(int delayTime) {
@@ -162,7 +209,7 @@ public class HomeFragment extends Fragment {
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(rvConversation.getContext(),
                 layoutManager.getOrientation());
         rvConversation.addItemDecoration(dividerItemDecoration);
-        messageAdapter = new MessageAdapter(messages, getActivity(), user,friends,false);
+        messageAdapter = new MessageAdapter(messages, getActivity(), user, friends, false);
         rvConversation.setAdapter(messageAdapter);
 
         rvConversation.postDelayed(new Runnable() {

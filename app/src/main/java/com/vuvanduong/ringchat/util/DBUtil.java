@@ -70,6 +70,11 @@ public class DBUtil {
         return formatNew.format(dateTime);
     }
 
+    public static String convertDatetimeToString(Date date){
+        SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+        return format.format(date);
+    }
+
     public static String revertDatetimeMessage(String date){
         Date dateTime = new Date();
         SimpleDateFormat formatNew = new SimpleDateFormat("dd-MM-yyyy HH:mm", Locale.getDefault());

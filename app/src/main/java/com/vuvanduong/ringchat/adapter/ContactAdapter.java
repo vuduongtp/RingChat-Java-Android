@@ -18,6 +18,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.vuvanduong.ringchat.R;
 import com.vuvanduong.ringchat.activity.ConversationActivity;
 import com.vuvanduong.ringchat.model.User;
+import com.vuvanduong.ringchat.util.UserUtil;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -79,7 +80,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
                 }
             });
         }
-        holder.txtNameFriend.setText(users.get(position).getFullname());
+        holder.txtNameFriend.setText(UserUtil.getFullName(users.get(position)));
         holder.txtEmailFriend.setText(users.get(position).getEmail());
     }
 

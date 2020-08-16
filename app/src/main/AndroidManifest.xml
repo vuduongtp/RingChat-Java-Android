@@ -13,7 +13,9 @@
         android:roundIcon="@drawable/logo"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.RemoveMemberGroupActivity"></activity>
+        <activity android:name=".activity.EditPasswordActivity"></activity>
+        <activity android:name=".activity.EditInforActivity" />
+        <activity android:name=".activity.RemoveMemberGroupActivity" />
         <activity android:name=".activity.AddMemberGroupActivity" />
         <activity android:name=".activity.AddGroupActivity" />
         <activity android:name=".activity.GroupConversationActivity" />

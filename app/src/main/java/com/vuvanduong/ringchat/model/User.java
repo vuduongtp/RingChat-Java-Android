@@ -4,7 +4,6 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.io.Serializable;
-import java.util.Date;
 
 public class User implements Serializable, Parcelable {
     private String id;
@@ -12,19 +11,20 @@ public class User implements Serializable, Parcelable {
     private  String password;
     private  String lastname;
     private  String firstname;
-    private Date birthday;
+    private String birthday;
     private String image;
     private  String status;
 
     public User(){
     }
 
-    public User(String email, String password, String lastname, String firstname, Date birthday, String status) {
+    public User(String email, String password, String lastname, String firstname, String birthday, String image, String status) {
         this.email = email;
         this.password = password;
         this.lastname = lastname;
         this.firstname = firstname;
         this.birthday = birthday;
+        this.image = image;
         this.status = status;
     }
 
@@ -34,6 +34,7 @@ public class User implements Serializable, Parcelable {
         password = in.readString();
         lastname = in.readString();
         firstname = in.readString();
+        birthday = in.readString();
         image = in.readString();
         status = in.readString();
     }
@@ -49,6 +50,14 @@ public class User implements Serializable, Parcelable {
             return new User[size];
         }
     };
+
+    public String getBirthday() {
+        return birthday;
+    }
+
+    public void setBirthday(String birthday) {
+        this.birthday = birthday;
+    }
 
     public String getId() {
         return id;
@@ -90,14 +99,6 @@ public class User implements Serializable, Parcelable {
         this.firstname = firstname;
     }
 
-    public Date getBirthday() {
-        return birthday;
-    }
-
-    public void setBirthday(Date birthday) {
-        this.birthday = birthday;
-    }
-
     public String getImage() {
         return image;
     }
@@ -112,10 +113,6 @@ public class User implements Serializable, Parcelable {
 
     public void setStatus(String status) {
         this.status = status;
-    }
-
-    public String getFullname() {
-        return this.firstname+" "+this.lastname;
     }
 
     @Override
@@ -144,6 +141,7 @@ public class User implements Serializable, Parcelable {
         dest.writeString(password);
         dest.writeString(lastname);
         dest.writeString(firstname);
+        dest.writeString(birthday);
         dest.writeString(image);
         dest.writeString(status);
     }

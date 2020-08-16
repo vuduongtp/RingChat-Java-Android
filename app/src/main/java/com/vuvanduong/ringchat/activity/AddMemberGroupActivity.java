@@ -27,6 +27,7 @@ import com.vuvanduong.ringchat.model.GroupChat;
 import com.vuvanduong.ringchat.model.Message;
 import com.vuvanduong.ringchat.model.User;
 import com.vuvanduong.ringchat.util.DBUtil;
+import com.vuvanduong.ringchat.util.UserUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -72,7 +73,6 @@ public class AddMemberGroupActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent=new Intent();
-                intent.putExtra("chosenContact",chosenContact);
                 intent.putExtra("groupChat",groupChat);
                 setResult(Constant.GET_NEW_MEMBER,intent);
                 finish();
@@ -96,16 +96,16 @@ public class AddMemberGroupActivity extends AppCompatActivity {
                     for (int i = 0; i < chosenContact.size(); i++) {
                         groupMembers.child(groupChat.getIdRoom()).child(chosenContact.get(i).getId()).setValue(chosenContact.get(i).getId());
                         if (i == chosenContact.size() - 1) {
-                            nameMembers.append(chosenContact.get(i).getFullname());
+                            nameMembers.append(UserUtil.getFullName(chosenContact.get(i)));
                         } else {
-                            nameMembers.append(chosenContact.get(i).getFullname()).append(",");
+                            nameMembers.append(UserUtil.getFullName(chosenContact.get(i))).append(",");
                         }
                     }
                     Message message = new Message();
                     message.setDatetime(DBUtil.getStringDateTimeChatRoom());
                     message.setUserID(userLogin.getId());
                     message.setType("group");
-                    String context = userLogin.getFullname() + " " + getString(R.string.added) + " " +
+                    String context = UserUtil.getFullName(userLogin) + " " + getString(R.string.added) + " " +
                             nameMembers + " " + getString(R.string.into_group);
                     message.setContext(context);
                     GroupChat group = new GroupChat(message.getUserID(), message.getContext(), message.getDatetime(), message.getType(), groupName);

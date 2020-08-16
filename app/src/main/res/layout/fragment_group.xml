@@ -76,11 +76,19 @@
             android:background="@drawable/ic_search_black_24dp"/>
     </LinearLayout>
 
+    <ProgressBar
+        android:id="@+id/reloadListGroup"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_below="@id/header_group"
+        android:layout_centerInParent="true"
+        android:visibility="gone"/>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvGroupConversation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/header_group"/>
+        android:layout_below="@+id/reloadListGroup"/>
 
     <ImageButton
         android:id="@+id/img_but_add_group"

@@ -45,7 +45,8 @@ public class ContactFragment extends Fragment {
     private ArrayList<User> listFriend;
     private ContactAdapter contactAdapter;
     private View view;
-    private ProgressBar loading;
+    private ProgressBar loading,reloadListContact;
+    private int count = 0;
 
     @Nullable
     @Override
@@ -94,10 +95,10 @@ public class ContactFragment extends Fragment {
         ValueEventListener getUser = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                int count = 0;
+                int count1 = 0;
                 listFriend = new ArrayList<>();
                 for (DataSnapshot item : dataSnapshot.getChildren()) {
-                    count++;
+                    count1++;
                     User user = item.getValue(User.class);
                     assert user != null;
                     user.setId(item.getKey());
@@ -106,9 +107,10 @@ public class ContactFragment extends Fragment {
                             listFriend.add(user);
                         }
                     }
-                    if (dataSnapshot.getChildrenCount() == count){
+                    if (dataSnapshot.getChildrenCount() == count1){
                         setControl(view);
                         setEvent();
+                        count=0;
                     }
                 }
             }
@@ -131,6 +133,38 @@ public class ContactFragment extends Fragment {
                 startActivity(addFriend);
             }
         });
+
+        rvContact.setOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                if (IsRecyclerViewAtTop()) {
+                    if (listFriend.size() != 0 && count % listFriend.size() == 0 && reloadListContact.getVisibility() == View.GONE) {
+                        listFriend.clear();
+                        reloadListContact.setVisibility(View.VISIBLE);
+                        initFriend();
+                    }
+                    if (listFriend.size() == 0 && reloadListContact.getVisibility() == View.GONE) {
+                        listFriend.clear();
+                        reloadListContact.setVisibility(View.VISIBLE);
+                        initFriend();
+                    }
+                    count++;
+                }
+            }
+
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+            }
+        });
+    }
+
+    private boolean IsRecyclerViewAtTop() {
+        if (rvContact.getChildCount() == 0)
+            return true;
+        return rvContact.getChildAt(0).getTop() == 0;
     }
 
     private void initView(){
@@ -147,7 +181,14 @@ public class ContactFragment extends Fragment {
     private void setControl(View view) {
         btnAddContact = view.findViewById(R.id.img_but_add_user);
         rvContact = view.findViewById(R.id.rvContact);
+        reloadListContact = view.findViewById(R.id.reloadListContact);
         initView();
-        loading.setVisibility(View.GONE);
+        if (loading.getVisibility()==View.VISIBLE){
+            loading.setVisibility(View.GONE);
+        }
+        if (reloadListContact.getVisibility()==View.VISIBLE){
+            reloadListContact.setVisibility(View.GONE);
+        }
+
     }
 }

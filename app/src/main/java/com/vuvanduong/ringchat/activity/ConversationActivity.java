@@ -28,6 +28,7 @@ import com.vuvanduong.ringchat.model.ChatRoom;
 import com.vuvanduong.ringchat.model.Message;
 import com.vuvanduong.ringchat.model.User;
 import com.vuvanduong.ringchat.util.DBUtil;
+import com.vuvanduong.ringchat.util.UserUtil;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -105,7 +106,7 @@ public class ConversationActivity extends AppCompatActivity {
         btnSendMessageConversation = findViewById(R.id.btnSendMessageConversation);
         btnBackFromConversation = findViewById(R.id.btnBackFromConversation);
 
-        txtNameFriendConversation.setText(friend.getFullname());
+        txtNameFriendConversation.setText(UserUtil.getFullName(friend));
         if (friend.getStatus()==null || friend.getStatus().equalsIgnoreCase("" )
                 || friend.getStatus().equalsIgnoreCase("Offline")){
             txtStatusConversation.setText("Offline");

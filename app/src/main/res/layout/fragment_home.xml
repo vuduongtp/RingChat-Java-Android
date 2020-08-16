@@ -76,10 +76,18 @@ android:orientation="vertical">
             android:background="@drawable/ic_search_black_24dp" />
     </LinearLayout>
 
+    <ProgressBar
+        android:id="@+id/reloadListMessage"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_below="@id/header_home"
+        android:layout_centerInParent="true"
+        android:visibility="gone"/>
+
     <androidx.recyclerview.widget.RecyclerView
     android:id="@+id/rvConversation"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_below="@+id/header_home"/>
+    android:layout_height="match_parent"
+    android:layout_below="@+id/reloadListMessage"/>
 
 </RelativeLayout>

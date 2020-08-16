@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.DatePickerDialog;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -24,6 +25,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.vuvanduong.ringchat.R;
 import com.vuvanduong.ringchat.config.Constant;
 import com.vuvanduong.ringchat.model.User;
+import com.vuvanduong.ringchat.util.DBUtil;
 import com.vuvanduong.ringchat.util.MD5;
 
 import java.util.Calendar;
@@ -43,6 +45,7 @@ public class RegisterActivity extends AppCompatActivity {
     DatabaseReference dbReference = database.getReference();
     DatabaseReference users = dbReference.child("users");
     String email="";
+    ProgressDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,6 +102,8 @@ public class RegisterActivity extends AppCompatActivity {
         btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                dialog = ProgressDialog.show(RegisterActivity.this, "",
+                        getString(R.string.loading), true);
                 if(txtUsernameRegister.getText().toString().trim().equalsIgnoreCase("")){
                     txtErrorRegister.setText(R.string.err_emty_email);
                 }
@@ -111,7 +116,7 @@ public class RegisterActivity extends AppCompatActivity {
                 else if(txtConfirmPasswordRegister.getText().toString().trim().equalsIgnoreCase("")){
                     txtErrorRegister.setText(R.string.err_emty_confirm_pass);
                 }
-                else if(txtBirthdayRegister.getText().toString().trim().equalsIgnoreCase("")){
+                else if(txtBirthdayRegister.getText().toString().trim().equalsIgnoreCase("") || txtBirthdayRegister.getText().toString().trim().equalsIgnoreCase("Birthday")){
                     txtErrorRegister.setText(R.string.err_emty_birthday);
                 }
                 else if(txtFirstnameRegister.getText().toString().trim().equalsIgnoreCase("")){
@@ -141,9 +146,10 @@ public class RegisterActivity extends AppCompatActivity {
                             userRegister.setPassword(MD5.getMd5(txtPasswordRegister.getText().toString().trim()));
                             userRegister.setFirstname(txtFirstnameRegister.getText().toString().trim());
                             userRegister.setLastname(txtLastnameRegister.getText().toString().trim());
-                            userRegister.setBirthday(birthday);
+                            userRegister.setBirthday(DBUtil.convertDatetimeToString(birthday));
                             users.push().setValue(userRegister);
                             Toast.makeText(RegisterActivity.this,R.string.register_success, Toast.LENGTH_SHORT).show();
+                            dialog.dismiss();
                             finish();
                         }
 

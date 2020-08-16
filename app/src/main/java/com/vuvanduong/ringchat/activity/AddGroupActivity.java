@@ -28,6 +28,7 @@ import com.vuvanduong.ringchat.model.GroupChat;
 import com.vuvanduong.ringchat.model.Message;
 import com.vuvanduong.ringchat.model.User;
 import com.vuvanduong.ringchat.util.DBUtil;
+import com.vuvanduong.ringchat.util.UserUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -96,9 +97,9 @@ public class AddGroupActivity extends AppCompatActivity {
                         groupMembers.child(newKey).child(newUser.getId()).setValue(newUser.getId());
                         if (!newUser.getId().equalsIgnoreCase(user.getId())) {
                             if (i == chosenContact.size() - 1) {
-                                nameMembers.append(newUser.getFullname());
+                                nameMembers.append(UserUtil.getFullName(newUser));
                             } else {
-                                nameMembers.append(newUser.getFullname()).append(",");
+                                nameMembers.append(UserUtil.getFullName(newUser)).append(",");
                             }
                         }
                     }
@@ -106,7 +107,7 @@ public class AddGroupActivity extends AppCompatActivity {
                     message.setDatetime(DBUtil.getStringDateTimeChatRoom());
                     message.setUserID(user.getId());
                     message.setType("group");
-                    String context = user.getFullname()+" "+
+                    String context = UserUtil.getFullName(user)+" "+
                             getString(R.string.created_group)+" "+
                             groupName+" "+getString(R.string.and_add)+" "+
                             nameMembers+" "+getString(R.string.into_group);

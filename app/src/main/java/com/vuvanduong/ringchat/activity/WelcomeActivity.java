@@ -59,6 +59,7 @@ public class WelcomeActivity extends AppCompatActivity {
                             SharedPrefs.getInstance().put(Constant.LASTNAME_USER_LOGIN, user.getLastname());
                             SharedPrefs.getInstance().put(Constant.FIRSTNAME_USER_LOGIN, user.getFirstname());
                             SharedPrefs.getInstance().put(Constant.PASS_USER_LOGIN, pass);
+                            SharedPrefs.getInstance().put(Constant.BIRTHDAY_USER_LOGIN, user.getBirthday());
 
                             Intent home = new Intent(WelcomeActivity.this, HomeActivity.class);
                             home.putExtra("user_login", (Serializable) user);

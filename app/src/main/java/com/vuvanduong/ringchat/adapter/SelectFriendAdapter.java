@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.vuvanduong.ringchat.R;
 import com.vuvanduong.ringchat.model.User;
+import com.vuvanduong.ringchat.util.UserUtil;
 
 import java.util.ArrayList;
 
@@ -44,7 +45,7 @@ public class SelectFriendAdapter extends RecyclerView.Adapter<SelectFriendAdapte
 
     @SuppressLint("ResourceAsColor")
     public void onBindViewHolder(@NonNull SelectFriendAdapter.ViewHolder holder, final int position) {
-        holder.txtNameFriendSelectFriend.setText(dataContacts.get(position).getFullname());
+        holder.txtNameFriendSelectFriend.setText(UserUtil.getFullName(dataContacts.get(position)));
         holder.txtEmailFriendSelectFriend.setText(dataContacts.get(position).getEmail());
         holder.chkSelectFriend.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override

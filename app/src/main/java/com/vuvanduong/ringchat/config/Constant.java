@@ -20,6 +20,7 @@ public class Constant {
     public static final String FIRSTNAME_USER_LOGIN = "firstname_user_login";
     public static final String IS_FROM_LOGIN = "is_from_login";
     public static final String PASS_USER_LOGIN = "pass_user_login";
+    public static final String BIRTHDAY_USER_LOGIN = "birthday_user_login";
     public static final int GET_MEMBER_REMAIN = 1000;
     public static final int GET_NEW_MEMBER = 1001;
 }

@@ -1,5 +1,7 @@
 package com.vuvanduong.ringchat.util;
 
+import com.vuvanduong.ringchat.model.User;
+
 public class UserUtil {
     public static boolean matchString(String s, String p) {
         String us = s.toUpperCase();
@@ -12,5 +14,9 @@ public class UserUtil {
             i = next+1;
         }
         return true;
+    }
+
+    public static String getFullName(User user){
+        return user.getFirstname()+" "+user.getLastname();
     }
 }

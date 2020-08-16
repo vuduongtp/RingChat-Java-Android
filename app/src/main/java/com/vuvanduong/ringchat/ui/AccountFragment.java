@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -15,12 +16,17 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.vuvanduong.ringchat.R;
+import com.vuvanduong.ringchat.activity.AddFriendActivity;
 import com.vuvanduong.ringchat.activity.AddGroupActivity;
+import com.vuvanduong.ringchat.activity.EditInforActivity;
+import com.vuvanduong.ringchat.activity.EditPasswordActivity;
 import com.vuvanduong.ringchat.activity.LoginActivity;
 import com.vuvanduong.ringchat.config.Constant;
 import com.vuvanduong.ringchat.model.User;
 import com.vuvanduong.ringchat.util.SharedPrefs;
+import com.vuvanduong.ringchat.util.UserUtil;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 public class AccountFragment extends Fragment {
@@ -28,6 +34,7 @@ public class AccountFragment extends Fragment {
     private User user;
     TextView txtNameAccount,txtEmailAccount;
     LinearLayout layoutEditInfo,layoutChangePass,layoutLanguage, layoutHelp, layoutAbout, layoutLogout;
+    ImageView btnSearchInAccount;
     
     @Nullable
     @Override
@@ -71,6 +78,33 @@ public class AccountFragment extends Fragment {
             }
         });
 
+        layoutEditInfo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent editInfor = new Intent(getActivity(), EditInforActivity.class);
+                editInfor.putExtra("user_login", (Serializable) user);
+                startActivity(editInfor);
+            }
+        });
+
+        layoutChangePass.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent editPass = new Intent(getActivity(), EditPasswordActivity.class);
+                editPass.putExtra("user_login", (Serializable) user);
+                startActivity(editPass);
+            }
+        });
+
+        btnSearchInAccount.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent search = new Intent(getActivity(), AddFriendActivity.class);
+                search.putExtra("user_login", (Serializable) user);
+                startActivity(search);
+            }
+        });
+
     }
 
     private void setControl(View view) {
@@ -83,7 +117,8 @@ public class AccountFragment extends Fragment {
         layoutHelp = view.findViewById(R.id.layoutHelp);
         layoutAbout = view.findViewById(R.id.layoutAbout);
         layoutLogout = view.findViewById(R.id.layoutLogout);
-        txtNameAccount.setText(user.getFullname());
+        btnSearchInAccount = view.findViewById(R.id.btnSearchInAccount);
+        txtNameAccount.setText(UserUtil.getFullName(user));
         txtEmailAccount.setText(user.getEmail());
 
     }

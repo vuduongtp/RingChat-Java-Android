@@ -20,6 +20,7 @@ import com.vuvanduong.ringchat.activity.ConversationActivity;
 import com.vuvanduong.ringchat.model.Message;
 import com.vuvanduong.ringchat.model.User;
 import com.vuvanduong.ringchat.util.DBUtil;
+import com.vuvanduong.ringchat.util.UserUtil;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -211,7 +212,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             context = context.substring(0, 32) + "...";
         }
         lastMessage.txtContextMessageHome.setText(context);
-        lastMessage.txtNameFriendHome.setText(usersInRoom.get(position).getFullname());
+        lastMessage.txtNameFriendHome.setText(UserUtil.getFullName(usersInRoom.get(position)));
         if (messages.get(position).getType().equalsIgnoreCase("message")) {
             lastMessage.imgIconMessageLast.requestLayout();
             lastMessage.imgIconMessageLast.getLayoutParams().height = 0;
@@ -292,7 +293,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }else {
             for (int i = 0; i < usersInRoom.size(); i++) {
                 if (usersInRoom.get(i).getId().equalsIgnoreCase(id)) {
-                    fullName = usersInRoom.get(i).getFullname();
+                    fullName = UserUtil.getFullName(usersInRoom.get(i));
                 }
             }
         }
