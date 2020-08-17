@@ -23,4 +23,7 @@ public class Constant {
     public static final String BIRTHDAY_USER_LOGIN = "birthday_user_login";
     public static final int GET_MEMBER_REMAIN = 1000;
     public static final int GET_NEW_MEMBER = 1001;
+    public static final int GET_NEW_USER_INFO = 1002;
+    public static final int GET_NEW_USER_PASS = 1003;
+    public static final int LISTEN_REMOVE_MEMBER = 1004;
 }

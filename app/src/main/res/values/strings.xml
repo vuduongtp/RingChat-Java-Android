@@ -73,5 +73,6 @@
     <string name="incorrect_recent_pass">You type incorrect recent password. Please type again.</string>
     <string name="new_pass_not_match">New password not match. Please type again.</string>
     <string name="change_pass_success">Change password successful.</string>
+    <string name="you_not_in_this_group">You have been removed out of this group.</string>
 
 </resources>

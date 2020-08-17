@@ -1,6 +1,7 @@
 package com.vuvanduong.ringchat.activity;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
@@ -26,7 +27,7 @@ import com.vuvanduong.ringchat.util.SharedPrefs;
 
 import java.util.ArrayList;
 
-public class HomeActivity extends AppCompatActivity {
+public class HomeActivity extends AppCompatActivity implements AccountFragment.OnDataPass {
     private User user;
 
     @Override
@@ -45,7 +46,7 @@ public class HomeActivity extends AppCompatActivity {
         bottomNavigationView.setOnNavigationItemSelectedListener(navListener);
         HomeFragment home = new HomeFragment();
         Bundle bundle = new Bundle();
-        bundle.putSerializable("user_login",user);
+        bundle.putSerializable("user_login", user);
         home.setArguments(bundle);
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                 home).commit();
@@ -55,7 +56,7 @@ public class HomeActivity extends AppCompatActivity {
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
             Fragment selectedFragment = null;
-            switch (menuItem.getItemId()){
+            switch (menuItem.getItemId()) {
                 case R.id.nav_home:
                     selectedFragment = new HomeFragment();
                     break;
@@ -72,7 +73,7 @@ public class HomeActivity extends AppCompatActivity {
             }
             assert selectedFragment != null;
             Bundle bundle = new Bundle();
-            bundle.putSerializable("user_login",user);
+            bundle.putSerializable("user_login", user);
             selectedFragment.setArguments(bundle);
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                     selectedFragment).commit();
@@ -80,4 +81,10 @@ public class HomeActivity extends AppCompatActivity {
         }
     };
 
+    @Override
+    public void onDataPass(User data) {
+        if (data != null) {
+            user = data;
+        }
+    }
 }

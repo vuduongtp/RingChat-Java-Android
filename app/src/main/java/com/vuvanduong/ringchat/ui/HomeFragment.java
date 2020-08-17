@@ -51,6 +51,7 @@ public class HomeFragment extends Fragment {
     private ArrayList<User> friends;
     private MessageAdapter messageAdapter;
     private int count = 0;
+    private boolean isFirstLoad = true;
 
     @Nullable
     @Override
@@ -238,5 +239,15 @@ public class HomeFragment extends Fragment {
                 }
             }
         });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (!isFirstLoad){
+            messages.clear();
+            getData();
+        }
+        isFirstLoad=false;
     }
 }

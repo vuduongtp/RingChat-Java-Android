@@ -19,10 +19,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.vuvanduong.ringchat.R;
+import com.vuvanduong.ringchat.config.Constant;
 import com.vuvanduong.ringchat.model.User;
 import com.vuvanduong.ringchat.util.DBUtil;
 import com.vuvanduong.ringchat.util.MD5;
 
+import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -79,6 +81,9 @@ public class EditPasswordActivity extends AppCompatActivity {
                     user.setId(null);
                     users.child(id).setValue(user);
                     Toast.makeText(EditPasswordActivity.this,R.string.change_pass_success, Toast.LENGTH_SHORT).show();
+                    Intent intent=new Intent();
+                    intent.putExtra("userPass",  user.getPassword());
+                    setResult(Constant.GET_NEW_USER_PASS,intent);
                     finish();
                  }
             }

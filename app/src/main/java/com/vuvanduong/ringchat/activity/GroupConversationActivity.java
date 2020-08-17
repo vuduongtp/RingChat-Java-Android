@@ -15,6 +15,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -51,7 +52,7 @@ public class GroupConversationActivity extends AppCompatActivity {
     private MessageAdapter messageAdapter;
     private ArrayList<Message> messages;
     private ArrayList<User> usersInRoom;
-    private ChildEventListener messageReceive;
+    private ChildEventListener messageReceive, removeMember;
     ProgressBar loadingConversation;
     ImageView btnBackFromGroupConversation;
 
@@ -234,6 +235,40 @@ public class GroupConversationActivity extends AppCompatActivity {
             }
         };
 
+        removeMember = new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    String memberRemove = dataSnapshot.getKey();
+                    assert memberRemove != null;
+                    if (memberRemove.equalsIgnoreCase(userLogin.getId())){
+                        Toast.makeText(GroupConversationActivity.this, R.string.you_not_in_this_group, Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+                }
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+
         groupMembers.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -252,6 +287,7 @@ public class GroupConversationActivity extends AppCompatActivity {
                                 if (count == usersInRoom.size()) {
                                     chatBoxView(200);
                                     groupMessages.addChildEventListener(messageReceive);
+                                    groupMembers.addChildEventListener(removeMember);
                                 }
                             }
                         }
@@ -276,5 +312,6 @@ public class GroupConversationActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         groupMessages.removeEventListener(messageReceive);
+        groupMembers.removeEventListener(removeMember);
     }
 }

@@ -28,6 +28,7 @@ import com.vuvanduong.ringchat.util.DBUtil;
 import com.vuvanduong.ringchat.util.MD5;
 import com.vuvanduong.ringchat.util.UserUtil;
 
+import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -93,10 +94,14 @@ public class EditInforActivity extends AppCompatActivity {
                 else {
                     user.setFirstname(txtFirstnameEditInfor.getText().toString().trim());
                     user.setLastname(txtLastnameEditInfor.getText().toString().trim());
-                    user.setBirthday(DBUtil.convertDatetimeToString(birthday));
+                    user.setBirthday(txtBirthdayChangeInfor.getText().toString());
                     user.setId(null);
                     users.child(id).setValue(user);
                     Toast.makeText(EditInforActivity.this,R.string.edit_infor_success, Toast.LENGTH_SHORT).show();
+                    user.setId(id);
+                    Intent intent=new Intent();
+                    intent.putExtra("userEdit", (Serializable) user);
+                    setResult(Constant.GET_NEW_USER_INFO,intent);
                     finish();
                 }
             }

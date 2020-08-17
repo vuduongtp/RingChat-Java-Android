@@ -1,6 +1,7 @@
 package com.vuvanduong.ringchat.ui;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -22,6 +23,7 @@ import com.vuvanduong.ringchat.activity.EditInforActivity;
 import com.vuvanduong.ringchat.activity.EditPasswordActivity;
 import com.vuvanduong.ringchat.activity.LoginActivity;
 import com.vuvanduong.ringchat.config.Constant;
+import com.vuvanduong.ringchat.model.GroupChat;
 import com.vuvanduong.ringchat.model.User;
 import com.vuvanduong.ringchat.util.SharedPrefs;
 import com.vuvanduong.ringchat.util.UserUtil;
@@ -35,6 +37,21 @@ public class AccountFragment extends Fragment {
     TextView txtNameAccount,txtEmailAccount;
     LinearLayout layoutEditInfo,layoutChangePass,layoutLanguage, layoutHelp, layoutAbout, layoutLogout;
     ImageView btnSearchInAccount;
+
+    private OnDataPass dataPasser;
+    public interface OnDataPass {
+        public void onDataPass(User data);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        dataPasser = (OnDataPass) context;
+    }
+
+    public void passData(User data) {
+        dataPasser.onDataPass(data);
+    }
     
     @Nullable
     @Override
@@ -83,7 +100,7 @@ public class AccountFragment extends Fragment {
             public void onClick(View v) {
                 Intent editInfor = new Intent(getActivity(), EditInforActivity.class);
                 editInfor.putExtra("user_login", (Serializable) user);
-                startActivity(editInfor);
+                startActivityForResult(editInfor, Constant.GET_NEW_USER_INFO);
             }
         });
 
@@ -92,7 +109,7 @@ public class AccountFragment extends Fragment {
             public void onClick(View v) {
                 Intent editPass = new Intent(getActivity(), EditPasswordActivity.class);
                 editPass.putExtra("user_login", (Serializable) user);
-                startActivity(editPass);
+                startActivityForResult(editPass, Constant.GET_NEW_USER_PASS);
             }
         });
 
@@ -104,6 +121,27 @@ public class AccountFragment extends Fragment {
                 startActivity(search);
             }
         });
+
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == Constant.GET_NEW_USER_INFO && data != null) {
+            User newUser = (User) data.getSerializableExtra("userEdit");
+            if(newUser != null){
+                user = newUser;
+                setControl(view);
+                passData(user);
+            }
+        }
+        if (requestCode == Constant.GET_NEW_USER_PASS && data != null) {
+            String password = data.getStringExtra("userPass");
+            if(password != null){
+                user.setPassword(password);
+                passData(user);
+            }
+        }
 
     }
 

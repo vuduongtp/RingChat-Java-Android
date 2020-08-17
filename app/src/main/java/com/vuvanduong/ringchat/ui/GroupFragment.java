@@ -28,6 +28,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.vuvanduong.ringchat.R;
 import com.vuvanduong.ringchat.activity.AddFriendActivity;
 import com.vuvanduong.ringchat.activity.AddGroupActivity;
+import com.vuvanduong.ringchat.activity.GroupConversationActivity;
 import com.vuvanduong.ringchat.adapter.GroupAdapter;
 import com.vuvanduong.ringchat.adapter.SelectFriendAdapter;
 import com.vuvanduong.ringchat.model.GroupChat;
@@ -56,6 +57,7 @@ public class GroupFragment extends Fragment {
     private GroupAdapter groupAdapter;
     private ArrayList<GroupChat> groupChats;
     private int count = 0;
+    private boolean isFirstLoad = true;
 
     @Nullable
     @Override
@@ -213,4 +215,13 @@ public class GroupFragment extends Fragment {
         rvGroupConversation.setAdapter(groupAdapter);
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (!isFirstLoad) {
+            groupChats.clear();
+            getData();
+        }
+        isFirstLoad = false;
+    }
 }
