@@ -16,14 +16,18 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.vuvanduong.ringchat.R;
+import com.vuvanduong.ringchat.activity.AboutActivity;
 import com.vuvanduong.ringchat.activity.AddFriendActivity;
-import com.vuvanduong.ringchat.activity.AddGroupActivity;
 import com.vuvanduong.ringchat.activity.EditInforActivity;
 import com.vuvanduong.ringchat.activity.EditPasswordActivity;
+import com.vuvanduong.ringchat.activity.HomeActivity;
 import com.vuvanduong.ringchat.activity.LoginActivity;
+import com.vuvanduong.ringchat.activity.WelcomeActivity;
+import com.vuvanduong.ringchat.app.InitialApp;
 import com.vuvanduong.ringchat.config.Constant;
-import com.vuvanduong.ringchat.model.GroupChat;
 import com.vuvanduong.ringchat.model.User;
 import com.vuvanduong.ringchat.util.SharedPrefs;
 import com.vuvanduong.ringchat.util.UserUtil;
@@ -37,10 +41,13 @@ public class AccountFragment extends Fragment {
     TextView txtNameAccount,txtEmailAccount;
     LinearLayout layoutEditInfo,layoutChangePass,layoutLanguage, layoutHelp, layoutAbout, layoutLogout;
     ImageView btnSearchInAccount;
+    private FirebaseDatabase database = FirebaseDatabase.getInstance();
+    private DatabaseReference dbReference = database.getReference();
+    private DatabaseReference users = dbReference.child("users");
 
     private OnDataPass dataPasser;
     public interface OnDataPass {
-        public void onDataPass(User data);
+        void onDataPass(User data);
     }
 
     @Override
@@ -74,6 +81,13 @@ public class AccountFragment extends Fragment {
                     public void onClick(DialogInterface dialog, int which) {
                         switch (which){
                             case DialogInterface.BUTTON_POSITIVE:
+                                try {
+                                    users = dbReference.child("users/"+user.getId());
+                                    users.child("status").setValue("Offline");
+
+                                } catch (Exception ex) {
+                                    System.err.println(ex.toString());
+                                }
                                 SharedPrefs.getInstance().put(Constant.IS_LOGIN, false);
                                 SharedPrefs.getInstance().put(Constant.IS_SAVE_PASS, true);
                                 Intent login = new Intent(getActivity(), LoginActivity.class);
@@ -119,6 +133,58 @@ public class AccountFragment extends Fragment {
                 Intent search = new Intent(getActivity(), AddFriendActivity.class);
                 search.putExtra("user_login", (Serializable) user);
                 startActivity(search);
+            }
+        });
+
+        layoutAbout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent about = new Intent(getActivity(), AboutActivity.class);
+                startActivity(about);
+            }
+        });
+
+        layoutHelp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which){
+                            case DialogInterface.BUTTON_POSITIVE:
+                                InitialApp.self().clearApplicationData();
+                                try {
+                                    users = dbReference.child("users/"+user.getId());
+                                    users.child("status").setValue("Offline");
+
+                                } catch (Exception ex) {
+                                    System.err.println(ex.toString());
+                                }
+                                Intent login = new Intent(getActivity(), WelcomeActivity.class);
+                                startActivity(login);
+                                Objects.requireNonNull(getActivity()).finishAffinity();
+                                break;
+
+                            case DialogInterface.BUTTON_NEGATIVE:
+                                dialog.dismiss();
+                                break;
+                        }
+                    }
+                };
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setMessage(Objects.requireNonNull(getActivity()).getString(R.string.confirm_clear))
+                        .setPositiveButton(Objects.requireNonNull(getActivity()).getString(R.string.yes), dialogClickListener)
+                        .setNegativeButton(Objects.requireNonNull(getActivity()).getString(R.string.no), dialogClickListener).show();
+            }
+        });
+
+        layoutLanguage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent language = new Intent(getActivity(), DialogLanguage.class);
+                language.putExtra("user_login", (Serializable) user);
+                startActivity(language);
             }
         });
 

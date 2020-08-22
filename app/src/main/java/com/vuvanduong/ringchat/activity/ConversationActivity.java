@@ -1,15 +1,20 @@
 package com.vuvanduong.ringchat.activity;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -24,17 +29,28 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.vuvanduong.ringchat.R;
 import com.vuvanduong.ringchat.adapter.MessageAdapter;
-import com.vuvanduong.ringchat.model.ChatRoom;
+import com.vuvanduong.ringchat.config.Constant;
 import com.vuvanduong.ringchat.model.Message;
 import com.vuvanduong.ringchat.model.User;
+import com.vuvanduong.ringchat.service.LinphoneService;
 import com.vuvanduong.ringchat.util.DBUtil;
 import com.vuvanduong.ringchat.util.UserUtil;
 
+import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
+
+import org.linphone.core.AccountCreator;
+import org.linphone.core.Address;
+import org.linphone.core.CallParams;
+import org.linphone.core.Core;
+import org.linphone.core.CoreListenerStub;
+import org.linphone.core.Factory;
+import org.linphone.core.ProxyConfig;
+import org.linphone.core.RegistrationState;
+import org.linphone.core.TransportType;
+import org.linphone.core.tools.Log;
 
 public class ConversationActivity extends AppCompatActivity {
     User userLogin,friend;
@@ -45,13 +61,18 @@ public class ConversationActivity extends AppCompatActivity {
     private String chatRoom = "";
     private FirebaseDatabase database = FirebaseDatabase.getInstance();
     private DatabaseReference dbReference = database.getReference();
-    private DatabaseReference conversationLastMessage, conversationMessages, allConversationMessages;
+    private DatabaseReference conversationLastMessage, conversationMessages, allConversationMessages, users;
     private MessageAdapter messageAdapter;
     private ArrayList<Message> messages;
     private ArrayList<User> usersInRoom;
-    private ChildEventListener messageReceive;
+    private ChildEventListener messageReceive,friendStatus;
     ProgressBar loadingConversation;
     ImageView btnBackFromConversation;
+    ImageButton img_but_video,img_but_voice;
+    private String impu;
+    private AccountCreator mAccountCreator;
+    private CoreListenerStub mCoreListener;
+    int count =0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,8 +86,87 @@ public class ConversationActivity extends AppCompatActivity {
         usersInRoom.add(friend);
         loadingConversation = findViewById(R.id.loadingConversation);
         loadingConversation.setVisibility(View.VISIBLE);
+        impu = friend.getId()+"@"+Constant.SIP_SERVER;
+
+        mCoreListener = new CoreListenerStub() {
+            @Override
+            public void onRegistrationStateChanged(Core core, ProxyConfig cfg, RegistrationState state, String message) {
+                if (state == RegistrationState.Ok) {
+                    Toast.makeText(ConversationActivity.this, "Register: " + message, Toast.LENGTH_LONG).show();
+                } else if (state == RegistrationState.Failed) {
+                    if (core.getDefaultProxyConfig() != null)
+                        core.setDefaultProxyConfig(null);
+                    Toast.makeText(ConversationActivity.this, "Failure: " + message, Toast.LENGTH_LONG).show();
+                }
+            }
+        };
+
+        friendStatus = new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                if(dataSnapshot.exists()) {
+                    String userStatus = dataSnapshot.getValue(String.class);
+                    assert userStatus != null;
+                    if (Objects.requireNonNull(dataSnapshot.getKey()).equalsIgnoreCase("status")) {
+                        if (userStatus.equalsIgnoreCase("Online")) {
+                            userLogin.setStatus("Online");
+                            txtStatusConversation.setText("Online");
+                            txtStatusConversation.setTextColor(ContextCompat.getColor(ConversationActivity.this, R.color.green));
+                        } else {
+                            userLogin.setStatus("Offline");
+                            txtStatusConversation.setText("Offline");
+                            txtStatusConversation.setTextColor(ContextCompat.getColor(ConversationActivity.this, R.color.red));
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+
+        users = dbReference.child("users/"+friend.getId());
+        users.addChildEventListener(friendStatus);
+
         setControl();
         setEvent();
+    }
+
+    private void configureAccount() {
+        // At least the 3 below values are required
+        mAccountCreator.setUsername(userLogin.getId());
+        mAccountCreator.setDomain(Constant.SIP_SERVER);
+        mAccountCreator.setPassword("123456");
+
+        // By default it will be UDP if not set, but TLS is strongly recommended
+        mAccountCreator.setTransport(TransportType.Tcp);
+        // This will automatically create the proxy config and auth info and add them to the Core
+        ProxyConfig cfg = mAccountCreator.createProxyConfig();
+        cfg.edit();
+        Address proxy = Factory.instance().createAddress("sip:"+Constant.SIP_SERVER);
+        cfg.setServerAddr(proxy.asString());
+        cfg.enableRegister(true);
+        cfg.setExpires(3600);
+        cfg.done();
+        // Make sure the newly created one is the default
+        LinphoneService.getCore().setDefaultProxyConfig(cfg);
     }
 
     private void setEvent() {
@@ -96,6 +196,58 @@ public class ConversationActivity extends AppCompatActivity {
             }
         });
 
+        img_but_video.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (friend.getStatus()==null || !friend.getStatus().equalsIgnoreCase("Online")){
+                    Toast.makeText(ConversationActivity.this, UserUtil.getFullName(friend)+" "+ getString(R.string.friend_is_offline), Toast.LENGTH_SHORT).show();
+                }else {
+                    startVideoCall();
+                }
+            }
+        });
+
+        img_but_voice.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (friend.getStatus()==null || !friend.getStatus().equalsIgnoreCase("Online")){
+                    Toast.makeText(ConversationActivity.this, UserUtil.getFullName(friend)+" "+ getString(R.string.friend_is_offline), Toast.LENGTH_SHORT).show();
+                }else {
+                    startCalling(impu);
+                }
+            }
+        });
+
+    }
+
+    private void startVideoCall() {
+        Core core = LinphoneService.getCore();
+        Address toSipAddress = core.interpretUrl(impu);
+        CallParams params = core.createCallParams(null);
+        params.enableVideo(true);
+        if (core.isNetworkReachable()) {
+            core.inviteAddressWithParams(toSipAddress, params);
+        } else {
+            Toast.makeText(
+                    getBaseContext(),
+                    "Network is unreachable",
+                    Toast.LENGTH_LONG)
+                    .show();
+            Log.e(
+                    "Error: "
+                            + "Network is unreachable");
+        }
+    }
+
+    private void startCalling(String impu) {
+        Core core = LinphoneService.getCore();
+        Address toSipAddress = core.interpretUrl(impu);
+        CallParams params = core.createCallParams(null);
+        try {
+            core.inviteAddressWithParams(toSipAddress, params);
+        } catch (Exception ex) {
+            org.linphone.core.tools.Log.i("Unable to make a call: " + ex.toString());
+        }
     }
 
     private void setControl() {
@@ -105,6 +257,8 @@ public class ConversationActivity extends AppCompatActivity {
         rvChatConversation = findViewById(R.id.rvChatConversation);
         btnSendMessageConversation = findViewById(R.id.btnSendMessageConversation);
         btnBackFromConversation = findViewById(R.id.btnBackFromConversation);
+        img_but_video = findViewById(R.id.img_but_video);
+        img_but_voice = findViewById(R.id.img_but_voice);
 
         txtNameFriendConversation.setText(UserUtil.getFullName(friend));
         if (friend.getStatus()==null || friend.getStatus().equalsIgnoreCase("" )
@@ -131,8 +285,9 @@ public class ConversationActivity extends AppCompatActivity {
 //                    for (DataSnapshot item : dataSnapshot.getChildren()) {
 //                        messages.add(item.getValue(Message.class));
 //                    }
+                    count = (int) dataSnapshot.getChildrenCount();
                     Collections.reverse(messages);
-                    chatBoxView(200);
+                    chatBoxView(800);
                     conversationMessages.addChildEventListener(messageReceive);
                     loadingConversation.setVisibility(View.GONE);
             }
@@ -152,7 +307,13 @@ public class ConversationActivity extends AppCompatActivity {
                     message = dataSnapshot.getValue(Message.class);
                     //add to GUI
                     messageAdapter.addItem(message);
-                    rvChatConversation.smoothScrollToPosition(0);
+                    rvChatConversation.smoothScrollToPosition(Objects.requireNonNull(rvChatConversation.getAdapter()).getItemCount() -1);
+                    txtContextConversation.requestFocus();
+                    if (Objects.requireNonNull(rvChatConversation.getAdapter()).getItemCount()==count) {
+                        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                        assert imm != null;
+                        imm.showSoftInput(txtContextConversation, InputMethodManager.SHOW_IMPLICIT);
+                    }
                 }
             }
 
@@ -204,7 +365,7 @@ public class ConversationActivity extends AppCompatActivity {
     public void chatBoxView(int delayTime) {
         rvChatConversation.setHasFixedSize(false);
 
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, true);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         rvChatConversation.setLayoutManager(layoutManager);
         messageAdapter = new MessageAdapter(messages, getApplicationContext(), userLogin,usersInRoom,false);
         rvChatConversation.setAdapter(messageAdapter);
@@ -213,7 +374,7 @@ public class ConversationActivity extends AppCompatActivity {
             @Override
             public void run() {
                 if (Objects.requireNonNull(rvChatConversation.getAdapter()).getItemCount() > 0) {
-                    rvChatConversation.smoothScrollToPosition(0);
+                    rvChatConversation.smoothScrollToPosition(rvChatConversation.getAdapter().getItemCount() -1);
                 }
             }
         }, delayTime);
@@ -228,10 +389,10 @@ public class ConversationActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             if (Objects.requireNonNull(rvChatConversation.getAdapter()).getItemCount() > 0) {
-                                rvChatConversation.smoothScrollToPosition(0);
+                                rvChatConversation.smoothScrollToPosition(rvChatConversation.getAdapter().getItemCount() -1);
                             }
                         }
-                    }, 200);
+                    }, 800);
                 }
             }
         });
@@ -241,5 +402,33 @@ public class ConversationActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         conversationMessages.removeEventListener(messageReceive);
+        users.removeEventListener(friendStatus);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (LinphoneService.getCore()!=null) {
+            LinphoneService.getCore().addListener(mCoreListener);
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        if (LinphoneService.getCore()!=null) {
+            LinphoneService.getCore().removeListener(mCoreListener);
+        }
+
+        super.onPause();
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        ProxyConfig proxyConfig = LinphoneService.getCore().getDefaultProxyConfig();
+        if (proxyConfig == null) {
+            configureAccount();
+        }
     }
 }

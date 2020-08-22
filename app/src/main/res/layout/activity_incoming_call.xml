@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
 
-    android:background="@drawable/background">
+    android:background="@drawable/background"
+    tools:context=".activity.CallIncomingActivity">
 
     <ImageView
         android:id="@+id/image_caller"
@@ -22,7 +23,7 @@
         android:layout_marginTop="20dp"
         android:layout_marginBottom="50dp"
         android:textColor="#fff"
-        android:text="RingRing"
+        android:text="Connect..."
         android:textSize="35sp" />
 
     <RelativeLayout

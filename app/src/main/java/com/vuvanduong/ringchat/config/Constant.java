@@ -4,7 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Locale;
 
 public class Constant {
-    public static final String SIP_SERVER = "103.40.192.96";
+    public static final String SIP_SERVER = "103.116.105.136";
     private static Locale local= Locale.getDefault();
     public static final SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", local);
     public static final SimpleDateFormat dateMessage = new SimpleDateFormat("dd/MM/yyyy HH:mm", local);
@@ -26,4 +26,5 @@ public class Constant {
     public static final int GET_NEW_USER_INFO = 1002;
     public static final int GET_NEW_USER_PASS = 1003;
     public static final int LISTEN_REMOVE_MEMBER = 1004;
+    public static final String LANGUAGE_CODE = "language";
 }

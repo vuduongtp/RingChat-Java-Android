@@ -75,4 +75,23 @@
     <string name="change_pass_success">Change password successful.</string>
     <string name="you_not_in_this_group">You have been removed out of this group.</string>
 
+    <string name="error_unknown">Unknown error</string>
+    <string name="error_call_declined">Call declined</string>
+    <string name="error_user_busy">User busy</string>
+    <string name="error_user_not_found">User not found</string>
+    <string name="error_incompatible_media">Incompatible media parameters</string>
+    <string name="press_back">Press back again to exit.</string>
+    <string name="friend_is_offline">is offline. Can not make call.</string>
+    <string name="call_declined">Call declined.</string>
+    <string name="miss_call">Missed call.</string>
+    <string name="call">Call</string>
+    <string name="vietnamese">Vietnamese</string>
+    <string name="english">English</string>
+    <string name="save">Save</string>
+    <string name="alert_select_language">Please select your language.</string>
+    <string name="success_language">Change language success.</string>
+    <string name="your_lang">This is current language.</string>
+    <string name="clear_cache">Clear cache</string>
+    <string name="confirm_clear">Are you sure to clear data?</string>
+
 </resources>

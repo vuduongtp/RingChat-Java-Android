@@ -21,11 +21,14 @@
 
     <TextView
         android:id="@+id/txtTimeMessageMe"
+        android:layout_marginEnd="70dp"
+        android:paddingStart="5dp"
+        android:paddingEnd="5dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:fontFamily="@font/roboto_regular"
-        android:gravity="center"
+        android:gravity="end"
         android:textSize="12sp"
         android:visibility="gone"/>
 
@@ -49,7 +52,8 @@
             android:layout_width="25dp"
             android:layout_height="25dp"
             android:padding="3dp"
-            android:src="@null"/>
+            android:layout_margin="5dp"
+            android:visibility="gone"/>
 
         <TextView
             android:id="@+id/txtContextMessageMe"

@@ -6,9 +6,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -55,6 +57,7 @@ public class GroupConversationActivity extends AppCompatActivity {
     private ChildEventListener messageReceive, removeMember;
     ProgressBar loadingConversation;
     ImageView btnBackFromGroupConversation;
+    private boolean isFirstLoad = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,8 +100,11 @@ public class GroupConversationActivity extends AppCompatActivity {
 
                     //them vao firebase
                     groupMessages.push().setValue(newMessage);
-                    newMessage.setDatetime(DBUtil.getStringDateTimeChatRoom());
-                    groupLastMessage.setValue(newMessage);
+                    groupChat.setUserID(userLogin.getId());
+                    groupChat.setContext(txtContextGroupConversation.getText().toString().trim());
+                    groupChat.setType("message");
+                    groupChat.setDatetime(DBUtil.getStringDateTimeChatRoom());
+                    groupLastMessage.setValue(groupChat);
                 }
                 txtContextGroupConversation.setText("");
             }
@@ -135,11 +141,10 @@ public class GroupConversationActivity extends AppCompatActivity {
             groupChat = (GroupChat) data.getSerializableExtra("groupChat");
             assert groupChat != null;
             txtNameGroupConversation.setText(groupChat.getGroupName());
-        }
-        else if (requestCode == Constant.GET_NEW_MEMBER && data != null) {
+        } else if (requestCode == Constant.GET_NEW_MEMBER && data != null) {
             ArrayList<User> newMembers;
             newMembers = data.getParcelableArrayListExtra("chosenContact");
-            if(newMembers != null) {
+            if (newMembers != null) {
                 usersInRoom.addAll(newMembers);
             }
             groupChat = (GroupChat) data.getSerializableExtra("groupChat");
@@ -164,7 +169,7 @@ public class GroupConversationActivity extends AppCompatActivity {
         messages = new ArrayList<>();
         rvChatGroupConversation.setHasFixedSize(false);
 
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, true);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         rvChatGroupConversation.setLayoutManager(layoutManager);
         messageAdapter = new MessageAdapter(messages, getApplicationContext(), userLogin, usersInRoom, true);
         rvChatGroupConversation.setAdapter(messageAdapter);
@@ -173,7 +178,7 @@ public class GroupConversationActivity extends AppCompatActivity {
             @Override
             public void run() {
                 if (Objects.requireNonNull(rvChatGroupConversation.getAdapter()).getItemCount() > 0) {
-                    rvChatGroupConversation.smoothScrollToPosition(0);
+                    rvChatGroupConversation.smoothScrollToPosition(rvChatGroupConversation.getAdapter().getItemCount() - 1);
                 }
             }
         }, delayTime);
@@ -188,10 +193,10 @@ public class GroupConversationActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             if (Objects.requireNonNull(rvChatGroupConversation.getAdapter()).getItemCount() > 0) {
-                                rvChatGroupConversation.smoothScrollToPosition(0);
+                                rvChatGroupConversation.smoothScrollToPosition(rvChatGroupConversation.getAdapter().getItemCount() - 1);
                             }
                         }
-                    }, 200);
+                    }, 800);
                 }
             }
         });
@@ -210,7 +215,14 @@ public class GroupConversationActivity extends AppCompatActivity {
                     message = dataSnapshot.getValue(Message.class);
                     //add to GUI
                     messageAdapter.addItem(message);
-                    rvChatGroupConversation.smoothScrollToPosition(0);
+                    rvChatGroupConversation.smoothScrollToPosition(Objects.requireNonNull(rvChatGroupConversation.getAdapter()).getItemCount() - 1);
+                    txtContextGroupConversation.requestFocus();
+                    if (!isFirstLoad && Objects.requireNonNull(rvChatGroupConversation.getAdapter()).getItemCount() > 5) {
+                        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                        assert imm != null;
+                        imm.showSoftInput(txtContextGroupConversation, InputMethodManager.SHOW_IMPLICIT);
+                        isFirstLoad = true;
+                    }
                 }
             }
 
@@ -251,7 +263,7 @@ public class GroupConversationActivity extends AppCompatActivity {
                 if (dataSnapshot.exists()) {
                     String memberRemove = dataSnapshot.getKey();
                     assert memberRemove != null;
-                    if (memberRemove.equalsIgnoreCase(userLogin.getId())){
+                    if (memberRemove.equalsIgnoreCase(userLogin.getId())) {
                         Toast.makeText(GroupConversationActivity.this, R.string.you_not_in_this_group, Toast.LENGTH_SHORT).show();
                         finish();
                     }
@@ -285,7 +297,7 @@ public class GroupConversationActivity extends AppCompatActivity {
                                 user.setId(item.getKey());
                                 usersInRoom.add(user);
                                 if (count == usersInRoom.size()) {
-                                    chatBoxView(200);
+                                    chatBoxView(500);
                                     groupMessages.addChildEventListener(messageReceive);
                                     groupMembers.addChildEventListener(removeMember);
                                 }

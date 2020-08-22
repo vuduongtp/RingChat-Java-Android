@@ -23,8 +23,18 @@ import com.google.firebase.database.ValueEventListener;
 import com.vuvanduong.ringchat.R;
 import com.vuvanduong.ringchat.config.Constant;
 import com.vuvanduong.ringchat.model.User;
+import com.vuvanduong.ringchat.service.LinphoneService;
 import com.vuvanduong.ringchat.util.MD5;
 import com.vuvanduong.ringchat.util.SharedPrefs;
+
+import org.linphone.core.AccountCreator;
+import org.linphone.core.Address;
+import org.linphone.core.Core;
+import org.linphone.core.CoreListenerStub;
+import org.linphone.core.Factory;
+import org.linphone.core.ProxyConfig;
+import org.linphone.core.RegistrationState;
+import org.linphone.core.TransportType;
 
 import java.io.Serializable;
 
@@ -38,11 +48,31 @@ public class LoginActivity extends AppCompatActivity {
     DatabaseReference dbReference = database.getReference();
     DatabaseReference users = dbReference.child("users");
     ProgressDialog dialog;
+    User userLogin;
+
+    private AccountCreator mAccountCreator;
+    private CoreListenerStub mCoreListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        // Account creator can help you create/config accounts, even not sip.linphone.org ones
+        // As we only want to configure an existing account, no need for server URL to make requests
+        // to know whether or not account exists, etc...
+        mCoreListener = new CoreListenerStub() {
+            @Override
+            public void onRegistrationStateChanged(Core core, ProxyConfig cfg, RegistrationState state, String message) {
+                if (state == RegistrationState.Ok) {
+                    Toast.makeText(LoginActivity.this, "Register: " + message, Toast.LENGTH_LONG).show();
+                } else if (state == RegistrationState.Failed) {
+                    if (core.getDefaultProxyConfig() != null)
+                        core.setDefaultProxyConfig(null);
+                    Toast.makeText(LoginActivity.this, "Failure: " + message, Toast.LENGTH_LONG).show();
+                }
+            }
+        };
 
         addControl();
         addEvent();
@@ -75,6 +105,7 @@ public class LoginActivity extends AppCompatActivity {
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mAccountCreator = LinphoneService.getCore().createAccountCreator(null);
                 dialog = ProgressDialog.show(LoginActivity.this, "",
                         getString(R.string.loading), true);
                 if (txtUsernameLogin.getText().toString().trim().equalsIgnoreCase("")) {
@@ -109,7 +140,9 @@ public class LoginActivity extends AppCompatActivity {
                                     SharedPrefs.getInstance().put(Constant.LASTNAME_USER_LOGIN, user.getLastname());
                                     SharedPrefs.getInstance().put(Constant.FIRSTNAME_USER_LOGIN, user.getFirstname());
                                     SharedPrefs.getInstance().put(Constant.PASS_USER_LOGIN, txtPasswordLogin.getText().toString().trim());
+                                    userLogin = user;
 
+                                    configureAccount();
                                     Intent welcome = new Intent(LoginActivity.this, WelcomeActivity.class);
                                     welcome.putExtra("user_login", (Serializable) user);
                                     welcome.putExtra(Constant.IS_FROM_LOGIN,true);
@@ -151,5 +184,46 @@ public class LoginActivity extends AppCompatActivity {
             txtPasswordLogin.setText(password);
             chkRememberPass.setChecked(false);
         }
+    }
+
+    private void configureAccount() {
+        LinphoneService.getCore().setDefaultProxyConfig(null);
+        LinphoneService.getCore().refreshRegisters();
+        LinphoneService.getCore().clearAllAuthInfo();
+        // At least the 3 below values are required
+        mAccountCreator.setUsername(userLogin.getId());
+        mAccountCreator.setDomain(Constant.SIP_SERVER);
+        mAccountCreator.setPassword("123456");
+
+        // By default it will be UDP if not set, but TLS is strongly recommended
+        mAccountCreator.setTransport(TransportType.Tcp);
+        // This will automatically create the proxy config and auth info and add them to the Core
+        ProxyConfig cfg = mAccountCreator.createProxyConfig();
+        cfg.edit();
+        Address proxy = Factory.instance().createAddress("sip:"+Constant.SIP_SERVER);
+        cfg.setServerAddr(proxy.asString());
+        cfg.enableRegister(true);
+        cfg.setExpires(3600);
+        cfg.done();
+        // Make sure the newly created one is the default
+        LinphoneService.getCore().setDefaultProxyConfig(cfg);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (LinphoneService.getCore()!=null) {
+            LinphoneService.getCore().addListener(mCoreListener);
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        if (LinphoneService.getCore()!=null) {
+            LinphoneService.getCore().removeListener(mCoreListener);
+        }
+
+        super.onPause();
+
     }
 }

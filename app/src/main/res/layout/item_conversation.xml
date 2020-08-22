@@ -18,11 +18,12 @@
     <TextView
         android:id="@+id/txtTimeMessageLast"
         android:layout_width="match_parent"
-        android:layout_height="14dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="-80dp"
         android:fontFamily="@font/roboto_regular"
-        android:paddingEnd="10dp"
-        android:gravity="center"
+        android:paddingEnd="5dp"
+        android:gravity="start"
+        android:paddingStart="5dp"
         android:textSize="12sp"
         android:layout_marginStart="80dp"
         android:textStyle="bold"
@@ -55,7 +56,8 @@
             android:layout_width="25dp"
             android:layout_height="25dp"
             android:padding="3dp"
-            android:src="@null"/>
+            android:src="@null"
+            android:visibility="gone"/>
 
         <TextView
             android:id="@+id/txtContextMessageHome"
