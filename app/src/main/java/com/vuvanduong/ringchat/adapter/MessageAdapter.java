@@ -24,10 +24,13 @@ import com.vuvanduong.ringchat.util.UserUtil;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private final int ME = 0, YOU = 1, LAST_MESSAGE=2, GROUP=3;
+    private final int ME = 0, YOU = 1, LAST_MESSAGE = 2, GROUP = 3;
 
     private ArrayList<Message> messages;
     private Context context;
@@ -40,20 +43,20 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         this.messages = chatMessages;
         this.context = context;
         this.userLogin = userLogin;
-        this.usersInRoom= usersInRoom;
+        this.usersInRoom = usersInRoom;
         this.isGroup = isGroup;
-        if (!isGroup){
-            friend=usersInRoom.get(0);
+        if (!isGroup) {
+            friend = usersInRoom.get(0);
         }
     }
 
     @Override
     public int getItemViewType(int position) {
-        if (messages.get(position).getIdRoom() != null) {
+        if (messages.get(position).getIdRoom() != null && messages.get(position).getIdRoom().length() > 21) {
             return LAST_MESSAGE;
-        }else if (messages.get(position).getType().equalsIgnoreCase("group")) {
+        } else if (messages.get(position).getType().equalsIgnoreCase("group")) {
             return GROUP;
-        }else if (messages.get(position).getUserID().equals(userLogin.getId())) {
+        } else if (messages.get(position).getUserID().equals(userLogin.getId())) {
             return ME;
         } else if (!messages.get(position).getUserID().equals(userLogin.getId())) {
             return YOU;
@@ -105,9 +108,9 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 holder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if (me.txtTimeMessageMe.getVisibility()==View.GONE){
+                        if (me.txtTimeMessageMe.getVisibility() == View.GONE) {
                             me.txtTimeMessageMe.setVisibility(View.VISIBLE);
-                        }else {
+                        } else {
                             me.txtTimeMessageMe.setVisibility(View.GONE);
                         }
                     }
@@ -119,9 +122,9 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 holder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if (you.txtTimeMessageYou.getVisibility()==View.GONE){
+                        if (you.txtTimeMessageYou.getVisibility() == View.GONE) {
                             you.txtTimeMessageYou.setVisibility(View.VISIBLE);
-                        }else {
+                        } else {
                             you.txtTimeMessageYou.setVisibility(View.GONE);
                         }
                     }
@@ -135,8 +138,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                     public void onClick(View v) {
                         Intent conversation = new Intent(v.getContext(), ConversationActivity.class);
                         conversation.putExtra("userLogin", (Serializable) userLogin);
-                        conversation.putExtra("friend", (Serializable) usersInRoom.get(position));
-                        System.out.println(usersInRoom.get(position).toString());
+                        conversation.putExtra("friend", (Serializable) getUser(getFriendId(messages.get(position).getIdRoom())));
                         v.getContext().startActivity(conversation);
                     }
                 });
@@ -147,9 +149,9 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 holder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if (groupMessage.txtTimeMessageGroup.getVisibility()==View.GONE){
+                        if (groupMessage.txtTimeMessageGroup.getVisibility() == View.GONE) {
                             groupMessage.txtTimeMessageGroup.setVisibility(View.VISIBLE);
-                        }else {
+                        } else {
                             groupMessage.txtTimeMessageGroup.setVisibility(View.GONE);
                         }
                     }
@@ -166,10 +168,10 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     }
 
     private void configureViewHolderMe(HolderMe me, int position) {
-        String time="";
-        if (isGroup){
-            time = messages.get(position).getDatetime()+"\n"+getNameUser(messages.get(position).getUserID());
-        }else {
+        String time = "";
+        if (isGroup) {
+            time = messages.get(position).getDatetime() + "\n" + getNameUser(messages.get(position).getUserID());
+        } else {
             time = messages.get(position).getDatetime();
         }
         me.txtTimeMessageMe.setText(time);
@@ -190,18 +192,18 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     }
 
     private void configureViewHolderYou(HolderYou you, int position) {
-        String time="";
-        if (isGroup){
-            time = messages.get(position).getDatetime()+"\n"+getNameUser(messages.get(position).getUserID());
-        }else {
+        String time = "";
+        if (isGroup) {
+            time = messages.get(position).getDatetime() + "\n" + getNameUser(messages.get(position).getUserID());
+        } else {
             time = messages.get(position).getDatetime();
         }
         you.txtTimeMessageYou.setText(time);
         you.txtContextMessageYou.setText(messages.get(position).getContext());
         you.imgIconMessageYou.requestLayout();
-            you.imgIconMessageYou.getLayoutParams().height = 0;
-            you.imgIconMessageYou.getLayoutParams().width = 0;
-            you.imgIconMessageYou.setScaleType(ImageView.ScaleType.FIT_XY);
+        you.imgIconMessageYou.getLayoutParams().height = 0;
+        you.imgIconMessageYou.getLayoutParams().width = 0;
+        you.imgIconMessageYou.setScaleType(ImageView.ScaleType.FIT_XY);
 //        if (messages.get(position).getType()==null || messages.get(position).getType().equalsIgnoreCase("message")){
 //            you.imgIconMessageYou.requestLayout();
 //            you.imgIconMessageYou.getLayoutParams().height = 0;
@@ -223,15 +225,15 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         lastMessage.txtTimeMessageLast.setText(time);
         String context = "";
         if (userLogin.getId().equalsIgnoreCase(messages.get(position).getUserID())) {
-            context = this.context.getString(R.string.you) + ": "+messages.get(position).getContext();
-        }else {
-            context = usersInRoom.get(position).getFirstname() + ": "+messages.get(position).getContext();
+            context = this.context.getString(R.string.you) + ": " + messages.get(position).getContext();
+        } else {
+            context = getFirstNameUser(messages.get(position).getUserID()) + ": " + messages.get(position).getContext();
         }
         if (context.length() > 32) {
             context = context.substring(0, 32) + "...";
         }
         lastMessage.txtContextMessageHome.setText(context);
-        lastMessage.txtNameFriendHome.setText(UserUtil.getFullName(usersInRoom.get(position)));
+        lastMessage.txtNameFriendHome.setText(getNameUser(getFriendId(messages.get(position).getIdRoom())));
         if (messages.get(position).getType().equalsIgnoreCase("message")) {
             lastMessage.imgIconMessageLast.requestLayout();
             lastMessage.imgIconMessageLast.getLayoutParams().height = 0;
@@ -241,7 +243,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     }
 
     private void configureViewHolderGroup(HolderGroupMessage groupMessage, int position) {
-        String time = messages.get(position).getDatetime()+"\n"+getNameUser(messages.get(position).getUserID());
+        String time = messages.get(position).getDatetime() + "\n" + getNameUser(messages.get(position).getUserID());
         groupMessage.txtTimeMessageGroup.setText(time);
         groupMessage.txtContextGroupMessage.setText(messages.get(position).getContext());
     }
@@ -262,7 +264,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     }
 
-   private class HolderYou extends RecyclerView.ViewHolder {
+    private class HolderYou extends RecyclerView.ViewHolder {
         TextView txtTimeMessageYou;
         TextView txtContextMessageYou;
         ImageView imgIconMessageYou;
@@ -305,14 +307,50 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
     }
 
-    private String getNameUser(String id){
-        String fullName="";
-        if (id==null){
+    private String getNameUser(String id) {
+        String fullName = "";
+        if (id == null) {
             return fullName;
-        }else {
+        } else {
             for (int i = 0; i < usersInRoom.size(); i++) {
                 if (usersInRoom.get(i).getId().equalsIgnoreCase(id)) {
                     fullName = UserUtil.getFullName(usersInRoom.get(i));
+                }
+            }
+        }
+        return fullName;
+    }
+
+    private User getUser(String id) {
+        User user = null;
+            for (int i = 0; i < usersInRoom.size(); i++) {
+                if (usersInRoom.get(i).getId().equalsIgnoreCase(id)) {
+                    user = usersInRoom.get(i);
+                    break;
+                }
+            }
+        return user;
+    }
+
+    private String getFriendId(String roomId) {
+        String[] usersId = roomId.split("&");
+        String idfriend = "";
+        if (usersId[0].equalsIgnoreCase(userLogin.getId())) {
+            idfriend = usersId[1];
+        } else {
+            idfriend = usersId[0];
+        }
+        return idfriend;
+    }
+
+    private String getFirstNameUser(String id) {
+        String fullName = "";
+        if (id == null) {
+            return fullName;
+        } else {
+            for (int i = 0; i < usersInRoom.size(); i++) {
+                if (usersInRoom.get(i).getId().equalsIgnoreCase(id)) {
+                    fullName = usersInRoom.get(i).getFirstname();
                 }
             }
         }

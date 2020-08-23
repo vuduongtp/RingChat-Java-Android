@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.common.data.DataHolder;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.vuvanduong.ringchat.R;
@@ -22,6 +23,7 @@ import com.vuvanduong.ringchat.util.UserUtil;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHolder> {
     private ArrayList<User> users ;
@@ -38,6 +40,11 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
         this.isAddFriend = isAddFriend;
         this.userLogin = user;
         userContacts = dbReference.child("contacts/"+user.getId()+"/");
+    }
+
+    public void updateList(List<User> list){
+        this.users = (ArrayList<User>) list;
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -69,8 +76,19 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
                     v.getContext().startActivity(conversation);
                 }
             });
+            holder.btnRemoveFriend.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    userContacts.child(users.get(position).getId()).removeValue();
+                    v.setVisibility(View.GONE);
+                    Toast.makeText(context, R.string.remove_friend_success, Toast.LENGTH_SHORT).show();
+                    users.remove(users.get(position));
+                    notifyDataSetChanged();
+                }
+            });
         }else {
             holder.btnGoToChatFriend.setVisibility(View.GONE);
+            holder.btnRemoveFriend.setVisibility(View.GONE);
             holder.btnAddNewFriend.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -95,7 +113,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         TextView txtStatusFriend,txtNameFriend,txtEmailFriend;
-        ImageView btnGoToChatFriend,btnAddNewFriend;
+        ImageView btnGoToChatFriend,btnAddNewFriend,btnRemoveFriend;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -104,6 +122,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
             txtStatusFriend = itemView.findViewById(R.id.txtStatusFriend);
             txtNameFriend = itemView.findViewById(R.id.txtNameFriend);
             txtEmailFriend = itemView.findViewById(R.id.txtEmailFriend);
+            btnRemoveFriend = itemView.findViewById(R.id.btnRemoveFriend);
         }
     }
 }

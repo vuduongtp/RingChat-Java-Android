@@ -14,15 +14,11 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.vuvanduong.ringchat.R;
 import com.vuvanduong.ringchat.activity.CallIncomingActivity;
 import com.vuvanduong.ringchat.activity.CallOutgoingActivity;
@@ -59,7 +55,7 @@ public class LinphoneService extends Service {
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference dbReference = database.getReference();
     DatabaseReference users = dbReference.child("users");
-    private NotificationManager notifManager;
+    private NotificationManager notifyManager;
     private boolean isGroup = false;
     private String groupName;
     static final int NOTIFY_ID = 1103;
@@ -102,10 +98,11 @@ public class LinphoneService extends Service {
         mCoreListener = new CoreListenerStub() {
             @Override
             public void onRegistrationStateChanged(Core lc, ProxyConfig cfg, RegistrationState cstate, String message) {
-                final String username = cfg.getContact().getUsername();
+                final String username1 = cfg.getContact().getUsername();
                 if (cstate == RegistrationState.Ok) {
                     try {
-                        users = dbReference.child("users/"+username);
+                        username=username1;
+                        users = dbReference.child("users/"+username1);
                         users.child("status").setValue("Online");
 
                     } catch (Exception ex) {
@@ -130,6 +127,7 @@ public class LinphoneService extends Service {
             @Override
             public void onMessageReceived(Core lc, ChatRoom room, ChatMessage message) {
                 if (room != null) {
+                   //System.out.println("coi mess "+message.getCustomHeader("group")+"/"+message.getFromAddress().getUsername());
                     if (message.hasTextContent()) {
                         if (message.getCustomHeader("group") == null) {
                             isGroup = false;
@@ -146,29 +144,24 @@ public class LinphoneService extends Service {
 
                         if (isGroup) {
                             builder.setContentTitle(groupName)  // required
-                                    .setSmallIcon(android.R.drawable.ic_popup_reminder) // required
-                                    .setContentText(room.getPeerAddress().getUsername()
-                                            + ": "
+                                    .setSmallIcon(R.drawable.send) // required
+                                    .setContentText(getString(R.string.someone)+": "
                                             + message.getTextContent())  // required
                                     .setDefaults(Notification.DEFAULT_LIGHTS | Notification.DEFAULT_SOUND)
                                     .setAutoCancel(true)
                                     .setContentIntent(pendingIntent);
-
                         } else if (!message.getFromAddress().getUsername().equals(username)) {
-                            builder.setContentTitle(room.getPeerAddress().getUsername())  // required
-                                    .setSmallIcon(android.R.drawable.ic_popup_reminder) // required
-                                    .setContentText(message.getTextContent())  // required
-                                    .setDefaults(Notification.DEFAULT_LIGHTS | Notification.DEFAULT_SOUND)
-                                    .setAutoCancel(true)
-                                    .setContentIntent(pendingIntent);
+                            if (message.getCustomHeader("group") == null) {
+                                builder.setContentTitle(message.getCustomHeader("fullNameFriend"))  // required
+                                        .setSmallIcon(R.drawable.send) // required
+                                        .setContentText(message.getTextContent())  // required
+                                        .setDefaults(Notification.DEFAULT_LIGHTS | Notification.DEFAULT_SOUND)
+                                        .setAutoCancel(true)
+                                        .setContentIntent(pendingIntent);
+                            }
                         }
                         Notification notification = builder.build();
-                        notifManager.notify(NOTIFY_ID, notification);
-
-                        if (message.getCustomHeader("fromApp") == null && message.getCustomHeader("group") == null && !message.getFromAddress().getUsername().equals(username)) {
-                            String from = message.getFromAddress().getUsername();
-
-                        }
+                        notifyManager.notify(NOTIFY_ID, notification);
                     }
                 }
             }
@@ -177,7 +170,7 @@ public class LinphoneService extends Service {
             @SuppressLint("LongLogTag")
             @Override
             public void onCallStateChanged(Core core, Call call, Call.State state, String message) {
-                Toast.makeText(LinphoneService.this, message, Toast.LENGTH_SHORT).show();
+                //Toast.makeText(LinphoneService.this, message, Toast.LENGTH_SHORT).show();
 
                 if (sInstance == null) {
                     Log.i(
@@ -283,8 +276,8 @@ public class LinphoneService extends Service {
         }
         if (mTimer != null)
             mTimer.cancel();
-        if (notifManager != null)
-            notifManager = null;
+        if (notifyManager != null)
+            notifyManager = null;
 
         // A stopped Core can be started again
         // To ensure resources are freed, we must ensure it will be garbage collected
@@ -339,8 +332,8 @@ public class LinphoneService extends Service {
     }
 
     private void createNotificationChannel() {
-        if (notifManager == null) {
-            notifManager =
+        if (notifyManager == null) {
+            notifyManager =
                     (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         }
 
@@ -348,12 +341,13 @@ public class LinphoneService extends Service {
         // the NotificationChannel class is new and not in the support library
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             int importance = NotificationManager.IMPORTANCE_DEFAULT;
-            NotificationChannel mChannel = notifManager.getNotificationChannel(id);
+            assert notifyManager != null;
+            NotificationChannel mChannel = notifyManager.getNotificationChannel(id);
             if (mChannel == null) {
                 mChannel = new NotificationChannel(id, name, importance);
                 mChannel.setDescription(description);
                 mChannel.setLightColor(Color.GREEN);
-                notifManager.createNotificationChannel(mChannel);
+                notifyManager.createNotificationChannel(mChannel);
             }
         }
     }

@@ -93,5 +93,11 @@
     <string name="your_lang">This is current language.</string>
     <string name="clear_cache">Clear cache</string>
     <string name="confirm_clear">Are you sure to clear data?</string>
+    <string name="confirm_code">Confirm code</string>
+    <string name="confirm_code_empty">Confirm code is empty.</string>
+    <string name="confirm_code_incorrect">Confirm code incorrect.</string>
+    <string name="confirm">Confirm</string>
+    <string name="confirm_hint">Type confirm code you have received from email below.</string>
+    <string name="remove_friend_success">Remove friend successful.</string>
 
 </resources>

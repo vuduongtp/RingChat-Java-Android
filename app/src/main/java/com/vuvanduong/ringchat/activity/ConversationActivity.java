@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -44,6 +45,8 @@ import java.util.Objects;
 import org.linphone.core.AccountCreator;
 import org.linphone.core.Address;
 import org.linphone.core.CallParams;
+import org.linphone.core.ChatMessage;
+import org.linphone.core.ChatRoom;
 import org.linphone.core.Core;
 import org.linphone.core.CoreListenerStub;
 import org.linphone.core.Factory;
@@ -73,6 +76,7 @@ public class ConversationActivity extends AppCompatActivity {
     private AccountCreator mAccountCreator;
     private CoreListenerStub mCoreListener;
     int count =0;
+    boolean isFirstLoad=true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -184,6 +188,22 @@ public class ConversationActivity extends AppCompatActivity {
                     conversationMessages.push().setValue(newMessage);
                     newMessage.setDatetime(DBUtil.getStringDateTimeChatRoom());
                     conversationLastMessage.setValue(newMessage);
+
+                    Core core = LinphoneService.getCore();
+                    String contactUserDomain = Constant.SIP_SERVER;
+                    String contactUserUri = "sip:" + friend.getId() + "@" + contactUserDomain;
+                    Address address = core.interpretUrl(contactUserUri);
+                    ChatRoom chatRoom = core.createChatRoom(address);
+                    if (chatRoom != null) {
+                        ChatMessage chatMessage = chatRoom.createEmptyMessage();
+                        chatMessage.addCustomHeader("fullNameFriend", UserUtil.getFullName(userLogin));
+                        chatMessage.addTextContent(txtContextConversation.getText().toString());
+                        if (chatMessage.getTextContent() != null) {
+                            chatRoom.sendChatMessage(chatMessage);
+                        }
+                    } else {
+                        Log.e("ERROR: ", "Cannot create chat room");
+                    }
                 }
                 txtContextConversation.setText("");
             }
@@ -309,10 +329,14 @@ public class ConversationActivity extends AppCompatActivity {
                     messageAdapter.addItem(message);
                     rvChatConversation.smoothScrollToPosition(Objects.requireNonNull(rvChatConversation.getAdapter()).getItemCount() -1);
                     txtContextConversation.requestFocus();
-                    if (Objects.requireNonNull(rvChatConversation.getAdapter()).getItemCount()==count) {
-                        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    if (isFirstLoad && Objects.requireNonNull(rvChatConversation.getAdapter()).getItemCount()==count-1) {
                         assert imm != null;
                         imm.showSoftInput(txtContextConversation, InputMethodManager.SHOW_IMPLICIT);
+                        isFirstLoad = false;
+                    }if (Objects.requireNonNull(rvChatConversation.getAdapter()).getItemCount()==count){
+                        assert imm != null;
+                        imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT,InputMethodManager.HIDE_IMPLICIT_ONLY);
                     }
                 }
             }

@@ -16,8 +16,8 @@
     <string name="err_emty_pass">Hãy nhập mật khẩu.</string>
     <string name="err_emty_confirm_pass">Hãy xác nhận mật khẩu.</string>
     <string name="err_emty_email">Hãy nhập email.</string>
-    <string name="err_emty_firstname">"Hãy nhập "</string>
-    <string name="err_emty_lastname">Hãy nhập tên.</string>
+    <string name="err_emty_firstname">Hãy nhập  tên.</string>
+    <string name="err_emty_lastname">Hãy nhập họ.</string>
     <string name="err_emty_birthday">Hãy nhập Ngày sinh.</string>
     <string name="err_pass_not_match">Mật khẩu không khớp nhau.</string>
     <string name="err_email_invalid">Email không hợp lệ.</string>
@@ -78,7 +78,7 @@
     <string name="error_unknown">Unknown error</string>
     <string name="error_call_declined">Cuộc gọi đã bị huỷ</string>
     <string name="error_user_busy">Người dùng bận</string>
-    <string name="error_user_not_found">Không tìm thấy người dùng</string>
+    <string name="error_user_not_found">Người dùng không hoạt động</string>
     <string name="press_back">Bấm lại để thoát</string>
     <string name="friend_is_offline">đang offline. Không thể tạo cuộc gọi.</string>
     <string name="call_declined">Cuộc gọi bị huỷ.</string>
@@ -90,4 +90,13 @@
     <string name="save">Lưu</string>
     <string name="alert_select_language">Hãy chọn ngôn ngữ.</string>
     <string name="success_language">Đổi ngôn ngữ thành công.</string>
+    <string name="your_lang">Bạn đang sử dụng ngôn nhữ này.</string>
+    <string name="clear_cache">Xoá bộ nhớ đệm</string>
+    <string name="confirm_clear">Bạn có chắc muốn xoá hết dữ lệu?</string>
+    <string name="confirm_code">Mã xác nhận</string>
+    <string name="confirm_code_empty">Mã xác nhận trống.</string>
+    <string name="confirm_code_incorrect">Mã xác nhận không chính xác.</string>
+    <string name="confirm">Xác nhận</string>
+    <string name="confirm_hint">Nhập mã xác nhận trong email bạn nhận được dưới đây.</string>
+    <string name="remove_friend_success">Huỷ kết bạn thành công.</string>
 </resources>

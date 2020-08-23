@@ -127,9 +127,9 @@ public class HomeFragment extends Fragment {
 
     private void getData() {
         final Query listChatRoom = conversationLastMessage.getRef()
-                .orderByKey()
-                .startAt("&" + user.getId() + "&")
-                .endAt("\uf8ff");
+                .orderByKey();
+//                .startAt("&" + user.getId() + "&")
+//                .endAt("\uf8ff");
         listChatRoom.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -149,7 +149,7 @@ public class HomeFragment extends Fragment {
                             } else {
                                 idfriend = usersId[0];
                             }
-                            Message message;
+                            final Message message;
                             message = item.getValue(Message.class);
                             assert message != null;
                             message.setIdRoom(item.getKey());
@@ -162,6 +162,7 @@ public class HomeFragment extends Fragment {
                                     for (DataSnapshot item : dataSnapshot.getChildren()) {
                                         User user;
                                         user = item.getValue(User.class);
+                                        assert user != null;
                                         user.setId(item.getKey());
                                         friends.add(user);
                                         if (messages.size() == friends.size()) {

@@ -27,4 +27,6 @@ public class Constant {
     public static final int GET_NEW_USER_PASS = 1003;
     public static final int LISTEN_REMOVE_MEMBER = 1004;
     public static final String LANGUAGE_CODE = "language";
+    public static final String EMAIL_SENDER = "mailsenderptithcm@gmail.com";
+    public static final String PASS_EMAIL_SENDER = "ptithcm123";
 }

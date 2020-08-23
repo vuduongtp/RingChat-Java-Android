@@ -12,6 +12,7 @@ import android.graphics.Point;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.TextureView;
 import android.view.View;
@@ -126,6 +127,7 @@ public class CallOutgoingActivity extends AppCompatActivity {
                         pushToDatabase(call);
                         finish();
                     }
+
                     finish();
                 } else if (state == Call.State.StreamsRunning){
                     mCallTimer.setVisibility(View.VISIBLE);
@@ -344,6 +346,19 @@ public class CallOutgoingActivity extends AppCompatActivity {
             chatMessage.setDatetime(DBUtil.getStringDateTimeChatRoom());
             conversationLastMessage.setValue(chatMessage);
         }
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if(core.getCallsNb() > 0) {
+            Call call = core.getCurrentCall();
+            if(call == null){
+                call = core.getCalls()[0];
+            }
+            call.terminate();
+            finish();
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
     @Override

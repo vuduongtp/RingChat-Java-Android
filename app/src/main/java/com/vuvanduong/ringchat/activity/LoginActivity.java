@@ -43,7 +43,7 @@ public class LoginActivity extends AppCompatActivity {
     EditText txtUsernameLogin, txtPasswordLogin;
     Button btnLogin;
     CheckBox chkRememberPass;
-    boolean isSavePass = false;
+    boolean isSavePass = true;
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference dbReference = database.getReference();
     DatabaseReference users = dbReference.child("users");
@@ -175,6 +175,7 @@ public class LoginActivity extends AppCompatActivity {
         btnLogin = findViewById(R.id.btnLogin);
         chkRememberPass = findViewById(R.id.chkRememberPass);
         txtErrorLogin = findViewById(R.id.txtErrorLogin);
+        chkRememberPass.setChecked(true);
 
         boolean isSavePass = SharedPrefs.getInstance().get(Constant.IS_SAVE_PASS, Boolean.class);
         if (isSavePass) {
@@ -182,7 +183,7 @@ public class LoginActivity extends AppCompatActivity {
             String password = SharedPrefs.getInstance().get(Constant.PASSWORD, String.class);
             txtUsernameLogin.setText(email);
             txtPasswordLogin.setText(password);
-            chkRememberPass.setChecked(false);
+            //chkRememberPass.setChecked(false);
         }
     }
 

@@ -78,6 +78,8 @@
                 android:id="@+id/btnGoToChatFriend"
                 android:layout_width="wrap_content"
                 android:layout_gravity="center"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
                 android:layout_height="28dp"
                 app:srcCompat="@drawable/chat" />
 
@@ -85,8 +87,17 @@
                 android:id="@+id/btnAddNewFriend"
                 android:layout_gravity="center"
                 android:layout_width="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
                 android:layout_height="28dp"
                 app:srcCompat="@drawable/addfriend" />
+            <ImageView
+                android:id="@+id/btnRemoveFriend"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:layout_height="28dp"
+                app:srcCompat="@drawable/removefriend" />
         </LinearLayout>
 
     </LinearLayout>

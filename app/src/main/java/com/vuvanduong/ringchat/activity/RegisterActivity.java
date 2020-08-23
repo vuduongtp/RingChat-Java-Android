@@ -7,7 +7,9 @@ import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -26,17 +28,19 @@ import com.vuvanduong.ringchat.R;
 import com.vuvanduong.ringchat.config.Constant;
 import com.vuvanduong.ringchat.model.User;
 import com.vuvanduong.ringchat.util.DBUtil;
+import com.vuvanduong.ringchat.util.GMailSender;
 import com.vuvanduong.ringchat.util.MD5;
 
+import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
 
 public class RegisterActivity extends AppCompatActivity {
     ImageView backToLogin;
-    EditText txtUsernameRegister,txtPasswordRegister,
-            txtConfirmPasswordRegister,txtLastnameRegister,
+    EditText txtUsernameRegister, txtPasswordRegister,
+            txtConfirmPasswordRegister, txtLastnameRegister,
             txtFirstnameRegister;
-    TextView txtErrorRegister,txtBirthdayRegister;
+    TextView txtErrorRegister, txtBirthdayRegister;
     Button btnRegister;
     LinearLayout layoutBirthday;
     Calendar calendar = Calendar.getInstance();
@@ -44,8 +48,10 @@ public class RegisterActivity extends AppCompatActivity {
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference dbReference = database.getReference();
     DatabaseReference users = dbReference.child("users");
-    String email="";
+    String email = "";
     ProgressDialog dialog;
+    User user;
+    String code;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +63,7 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private void addControl() {
-        backToLogin=findViewById(R.id.btnBackToLogin);
+        backToLogin = findViewById(R.id.btnBackToLogin);
         txtUsernameRegister = findViewById(R.id.txtUsernameRegister);
         txtPasswordRegister = findViewById(R.id.txtPasswordRegister);
         txtConfirmPasswordRegister = findViewById(R.id.txtConfirmPasswordRegister);
@@ -104,32 +110,32 @@ public class RegisterActivity extends AppCompatActivity {
             public void onClick(View v) {
                 dialog = ProgressDialog.show(RegisterActivity.this, "",
                         getString(R.string.loading), true);
-                if(txtUsernameRegister.getText().toString().trim().equalsIgnoreCase("")){
+                if (txtUsernameRegister.getText().toString().trim().equalsIgnoreCase("")) {
                     txtErrorRegister.setText(R.string.err_emty_email);
-                }
-                else if(!checkEmailAddress(txtUsernameRegister.getText().toString().trim())){
+                    dialog.dismiss();
+                } else if (!checkEmailAddress(txtUsernameRegister.getText().toString().trim())) {
                     txtErrorRegister.setText(R.string.err_email_invalid);
-                }
-                else if(txtPasswordRegister.getText().toString().trim().equalsIgnoreCase("")){
+                    dialog.dismiss();
+                } else if (txtPasswordRegister.getText().toString().trim().equalsIgnoreCase("")) {
                     txtErrorRegister.setText(R.string.err_emty_pass);
-                }
-                else if(txtConfirmPasswordRegister.getText().toString().trim().equalsIgnoreCase("")){
+                    dialog.dismiss();
+                } else if (txtConfirmPasswordRegister.getText().toString().trim().equalsIgnoreCase("")) {
                     txtErrorRegister.setText(R.string.err_emty_confirm_pass);
-                }
-                else if(txtBirthdayRegister.getText().toString().trim().equalsIgnoreCase("") || txtBirthdayRegister.getText().toString().trim().equalsIgnoreCase("Birthday")){
+                    dialog.dismiss();
+                } else if (birthday==null || txtBirthdayRegister.getText().toString().trim().equalsIgnoreCase("") || txtBirthdayRegister.getText().toString().trim().equalsIgnoreCase("Birthday")) {
                     txtErrorRegister.setText(R.string.err_emty_birthday);
-                }
-                else if(txtFirstnameRegister.getText().toString().trim().equalsIgnoreCase("")){
+                    dialog.dismiss();
+                } else if (txtFirstnameRegister.getText().toString().trim().equalsIgnoreCase("")) {
                     txtErrorRegister.setText(R.string.err_emty_firstname);
-                }
-                else if(txtLastnameRegister.getText().toString().trim().equalsIgnoreCase("")){
+                    dialog.dismiss();
+                } else if (txtLastnameRegister.getText().toString().trim().equalsIgnoreCase("")) {
                     txtErrorRegister.setText(R.string.err_emty_lastname);
-                }
-                else if(!txtConfirmPasswordRegister.getText().toString().trim().equalsIgnoreCase(txtPasswordRegister.getText().toString().trim())){
+                    dialog.dismiss();
+                } else if (!txtConfirmPasswordRegister.getText().toString().trim().equalsIgnoreCase(txtPasswordRegister.getText().toString().trim())) {
                     txtErrorRegister.setText(R.string.err_pass_not_match);
-                }
-                else {
-                    email=txtUsernameRegister.getText().toString().trim();
+                    dialog.dismiss();
+                } else {
+                    email = txtUsernameRegister.getText().toString().trim();
                     ValueEventListener getUser = new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -138,6 +144,7 @@ public class RegisterActivity extends AppCompatActivity {
                                 assert user != null;
                                 if (user.getEmail().equalsIgnoreCase(email)) {
                                     txtErrorRegister.setText(R.string.err_user_exist);
+                                    dialog.dismiss();
                                     return;
                                 }
                             }
@@ -147,15 +154,29 @@ public class RegisterActivity extends AppCompatActivity {
                             userRegister.setFirstname(txtFirstnameRegister.getText().toString().trim());
                             userRegister.setLastname(txtLastnameRegister.getText().toString().trim());
                             userRegister.setBirthday(DBUtil.convertDatetimeToString(birthday));
-                            users.push().setValue(userRegister);
-                            Toast.makeText(RegisterActivity.this,R.string.register_success, Toast.LENGTH_SHORT).show();
-                            dialog.dismiss();
-                            finish();
+                            user = userRegister;
+//                            users.push().setValue(userRegister);
+//                            Toast.makeText(RegisterActivity.this,R.string.register_success, Toast.LENGTH_SHORT).show();
+//                            dialog.dismiss();
+//                            finish();
+
+                            code = DBUtil.getAlphaNumericString(6);
+                            String tieuDe = "Xác nhận đăng ký tài khoản RingChat";
+                            String noiDung = "Mã xác nhận đăng ký tài khoản của bạn là: " + code
+                                    + "\nHãy nhập mã này vào ứng dụng để hoàn tất quá trình đăng ký.";
+                            String emailTo = txtUsernameRegister.getText().toString().trim();
+                            Bundle bundle = new Bundle();
+                            bundle.putString("tieuDe", tieuDe);
+                            bundle.putString("noiDung", noiDung);
+                            bundle.putString("emailTo", emailTo);
+
+                            guiMail myTask = new guiMail();
+                            myTask.execute(bundle);
                         }
 
                         @Override
                         public void onCancelled(@NonNull DatabaseError databaseError) {
-                            System.err.println("db_err: "+databaseError);
+                            System.err.println("db_err: " + databaseError);
                         }
                     };
                     users.addListenerForSingleValueEvent(getUser);
@@ -166,9 +187,41 @@ public class RegisterActivity extends AppCompatActivity {
 
     }
 
-    public static boolean checkEmailAddress(String email){
-    String[] arrCheck = email.split("@");
+    public static boolean checkEmailAddress(String email) {
+        String[] arrCheck = email.split("@");
         return arrCheck.length == 2;
+    }
+
+    class guiMail extends AsyncTask<Bundle, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Bundle... bundles) {
+            Bundle b = bundles[0];
+            String tieuDe = b.getString("tieuDe");
+            String noiDung = b.getString("noiDung");
+            String emailTo = b.getString("emailTo");
+            //System.out.println(tieuDe+"/"+noiDung+"/"+emailTo);
+            try {
+                // System.out.println("chay vo day");
+                GMailSender sender = new GMailSender(Constant.EMAIL_SENDER, Constant.PASS_EMAIL_SENDER);
+                sender.sendMail(tieuDe,
+                        noiDung,
+                        Constant.EMAIL_SENDER,
+                        emailTo);
+                dialog.dismiss();
+                Intent confirm = new Intent(RegisterActivity.this, ConfirmCodeActivity.class);
+                confirm.putExtra("user_register", (Serializable) user);
+                confirm.putExtra("isFromRegister", true);
+                confirm.putExtra("code", code);
+                startActivity(confirm);
+                finish();
+                //System.out.println("chay vo day");
+            } catch (Exception e) {
+                Log.e("SendMail", e.getMessage(), e);
+                dialog.dismiss();
+            }
+            return null;
+        }
     }
 
 

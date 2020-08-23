@@ -32,11 +32,16 @@ import com.vuvanduong.ringchat.config.Constant;
 import com.vuvanduong.ringchat.model.GroupChat;
 import com.vuvanduong.ringchat.model.Message;
 import com.vuvanduong.ringchat.model.User;
+import com.vuvanduong.ringchat.service.LinphoneService;
 import com.vuvanduong.ringchat.util.DBUtil;
+
+import org.linphone.core.Address;
+import org.linphone.core.ChatMessage;
+import org.linphone.core.ChatRoom;
+import org.linphone.core.Core;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Objects;
 
 public class GroupConversationActivity extends AppCompatActivity {
@@ -58,6 +63,8 @@ public class GroupConversationActivity extends AppCompatActivity {
     ProgressBar loadingConversation;
     ImageView btnBackFromGroupConversation;
     private boolean isFirstLoad = false;
+    Core core;
+    int countMess = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +74,7 @@ public class GroupConversationActivity extends AppCompatActivity {
         Intent intent = getIntent();
         userLogin = (User) intent.getSerializableExtra("userLogin");
         groupChat = (GroupChat) intent.getSerializableExtra("group");
+        core = LinphoneService.getCore();
 
         assert groupChat != null;
         groupLastMessage = dbReference.child("groupLastMessages/" + groupChat.getIdRoom());
@@ -105,6 +113,27 @@ public class GroupConversationActivity extends AppCompatActivity {
                     groupChat.setType("message");
                     groupChat.setDatetime(DBUtil.getStringDateTimeChatRoom());
                     groupLastMessage.setValue(groupChat);
+
+                    for (int i = 0; i < usersInRoom.size(); i++) {
+                        if (usersInRoom.get(i).getId().equals(userLogin.getId())) {
+                            continue;
+                        } else {
+                            Address address = core.interpretUrl("sip:" + usersInRoom.get(i).getId() + "@" + Constant.SIP_SERVER);
+                            ChatRoom chatRoom = core.createChatRoom(address);
+                            if (chatRoom != null) {
+                                ChatMessage chatMessage = chatRoom.createEmptyMessage();
+                                chatMessage.addTextContent(txtContextGroupConversation.getText().toString());
+                                chatMessage.addCustomHeader("group", groupChat.getGroupName());
+                                if (chatMessage.getTextContent() != null) {
+                                    chatRoom.sendChatMessage(chatMessage);
+                                } else {
+                                    System.err.println("message = null");
+                                }
+                            } else {
+                                System.err.println("room = null");
+                            }
+                        }
+                    }
                 }
                 txtContextGroupConversation.setText("");
             }
@@ -217,7 +246,7 @@ public class GroupConversationActivity extends AppCompatActivity {
                     messageAdapter.addItem(message);
                     rvChatGroupConversation.smoothScrollToPosition(Objects.requireNonNull(rvChatGroupConversation.getAdapter()).getItemCount() - 1);
                     txtContextGroupConversation.requestFocus();
-                    if (!isFirstLoad && Objects.requireNonNull(rvChatGroupConversation.getAdapter()).getItemCount() > 5) {
+                    if (!isFirstLoad && countMess == Objects.requireNonNull(rvChatGroupConversation.getAdapter()).getItemCount() ) {
                         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                         assert imm != null;
                         imm.showSoftInput(txtContextGroupConversation, InputMethodManager.SHOW_IMPLICIT);
@@ -300,6 +329,18 @@ public class GroupConversationActivity extends AppCompatActivity {
                                     chatBoxView(500);
                                     groupMessages.addChildEventListener(messageReceive);
                                     groupMembers.addChildEventListener(removeMember);
+                                    groupMessages.addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                            countMess = (int) dataSnapshot.getChildrenCount();
+                                            groupMessages.removeEventListener(this);
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                        }
+                                    });
                                 }
                             }
                         }

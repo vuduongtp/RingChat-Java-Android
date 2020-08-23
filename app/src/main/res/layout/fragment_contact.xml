@@ -32,6 +32,7 @@
             android:text="@string/nav_contact" />
 
         <EditText
+            android:id="@+id/txtSearchFriend"
             android:layout_width="0dp"
             android:layout_height="43dp"
             android:ems="10"

@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -90,12 +91,10 @@ public class CallIncomingActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (mAlreadyAcceptedOrDeclinedCall) return;
                 mAlreadyAcceptedOrDeclinedCall = true;
-                Core core = LinphoneService.getCore();
-                if (core.getCallsNb() > 0) {
-                    Call call = core.getCurrentCall();
+                if (LinphoneService.getCore().getCallsNb() > 0) {
+                    Call call = LinphoneService.getCore().getCurrentCall();
                     if (call == null) {
-                        // Current call can be null if paused for example
-                        call = core.getCalls()[0];
+                        call = LinphoneService.getCore().getCalls()[0];
                     }
                     call.terminate();
                 }
@@ -170,6 +169,16 @@ public class CallIncomingActivity extends AppCompatActivity {
                 }
             }
         }
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (LinphoneService.isReady()
+                && (keyCode == KeyEvent.KEYCODE_BACK || keyCode == KeyEvent.KEYCODE_HOME)) {
+            mCall.terminate();
+            finish();
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
     @Override
