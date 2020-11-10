@@ -17,6 +17,7 @@
 
     <TextView
         android:id="@+id/txtv_caller"
+        android:fontFamily="@font/roboto_bold"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
@@ -25,6 +26,18 @@
         android:textColor="#fff"
         android:text="Connect..."
         android:textSize="35sp" />
+
+    <TextView
+        android:id="@+id/txtTypeCall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/roboto_bold"
+        android:layout_below="@+id/txtv_caller"
+        android:layout_marginTop="-50dp"
+        android:layout_centerHorizontal="true"
+        android:textColor="@color/dark_blue"
+        android:text="@string/voice_call"
+        android:textSize="25sp" />
 
     <RelativeLayout
         android:layout_width="wrap_content"

@@ -1,6 +1,8 @@
 package com.vuvanduong.ringchat.adapter;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,12 +20,15 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.vuvanduong.ringchat.R;
 import com.vuvanduong.ringchat.activity.ConversationActivity;
+import com.vuvanduong.ringchat.activity.WelcomeActivity;
+import com.vuvanduong.ringchat.app.InitialApp;
 import com.vuvanduong.ringchat.model.User;
 import com.vuvanduong.ringchat.util.UserUtil;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHolder> {
     private ArrayList<User> users ;
@@ -66,7 +71,27 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
                 holder.txtStatusFriend.setText(users.get(position).getStatus());
             }
             holder.btnAddNewFriend.setVisibility(View.GONE);
-            holder.btnGoToChatFriend.setOnClickListener(new View.OnClickListener() {
+            holder.imgAvatarFriend.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+//                    Toast.makeText(context, fullName, Toast.LENGTH_SHORT).show();
+                    Intent conversation = new Intent(v.getContext(), ConversationActivity.class);
+                    conversation.putExtra("userLogin", (Serializable) userLogin);
+                    conversation.putExtra("friend", (Serializable) users.get(position));
+                    v.getContext().startActivity(conversation);
+                }
+            });
+            holder.txtNameFriend.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+//                    Toast.makeText(context, fullName, Toast.LENGTH_SHORT).show();
+                    Intent conversation = new Intent(v.getContext(), ConversationActivity.class);
+                    conversation.putExtra("userLogin", (Serializable) userLogin);
+                    conversation.putExtra("friend", (Serializable) users.get(position));
+                    v.getContext().startActivity(conversation);
+                }
+            });
+            holder.txtEmailFriend.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
 //                    Toast.makeText(context, fullName, Toast.LENGTH_SHORT).show();
@@ -78,12 +103,30 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
             });
             holder.btnRemoveFriend.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onClick(View v) {
-                    userContacts.child(users.get(position).getId()).removeValue();
-                    v.setVisibility(View.GONE);
-                    Toast.makeText(context, R.string.remove_friend_success, Toast.LENGTH_SHORT).show();
-                    users.remove(users.get(position));
-                    notifyDataSetChanged();
+                public void onClick(final View v) {
+                    DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            switch (which){
+                                case DialogInterface.BUTTON_POSITIVE:
+                                    userContacts.child(users.get(position).getId()).removeValue();
+                                    v.setVisibility(View.GONE);
+                                    Toast.makeText(context, R.string.remove_friend_success, Toast.LENGTH_SHORT).show();
+                                    users.remove(users.get(position));
+                                    notifyDataSetChanged();
+                                    break;
+
+                                case DialogInterface.BUTTON_NEGATIVE:
+                                    dialog.dismiss();
+                                    break;
+                            }
+                        }
+                    };
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+                    builder.setMessage(Objects.requireNonNull(v.getContext()).getString(R.string.confirm_remove_friend))
+                            .setPositiveButton(Objects.requireNonNull(v.getContext()).getString(R.string.yes), dialogClickListener)
+                            .setNegativeButton(Objects.requireNonNull(v.getContext()).getString(R.string.no), dialogClickListener).show();
                 }
             });
         }else {
@@ -113,7 +156,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         TextView txtStatusFriend,txtNameFriend,txtEmailFriend;
-        ImageView btnGoToChatFriend,btnAddNewFriend,btnRemoveFriend;
+        ImageView btnGoToChatFriend,btnAddNewFriend,btnRemoveFriend,imgAvatarFriend;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -123,6 +166,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
             txtNameFriend = itemView.findViewById(R.id.txtNameFriend);
             txtEmailFriend = itemView.findViewById(R.id.txtEmailFriend);
             btnRemoveFriend = itemView.findViewById(R.id.btnRemoveFriend);
+            imgAvatarFriend = itemView.findViewById(R.id.imgAvatarFriend);
         }
     }
 }

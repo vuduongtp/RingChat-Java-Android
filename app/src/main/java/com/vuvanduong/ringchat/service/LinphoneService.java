@@ -127,7 +127,7 @@ public class LinphoneService extends Service {
             @Override
             public void onMessageReceived(Core lc, ChatRoom room, ChatMessage message) {
                 if (room != null) {
-                   //System.out.println("coi mess "+message.getCustomHeader("group")+"/"+message.getFromAddress().getUsername());
+                   System.out.println("coi mess "+message.getCustomHeader("group")+"/"+message.getFromAddress().getUsername());
                     if (message.hasTextContent()) {
                         if (message.getCustomHeader("group") == null) {
                             isGroup = false;

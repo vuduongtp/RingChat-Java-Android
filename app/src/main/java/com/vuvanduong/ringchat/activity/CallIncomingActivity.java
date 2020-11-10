@@ -5,7 +5,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageButton;
@@ -32,7 +31,7 @@ import org.linphone.core.tools.Log;
 
 public class CallIncomingActivity extends AppCompatActivity {
 
-    TextView txtv_caller;
+    TextView txtv_caller,txtTypeCall;
     ImageButton btn_accept;
     ImageButton btn_decline;
     private CoreListenerStub mListenerCallIn;
@@ -53,6 +52,8 @@ public class CallIncomingActivity extends AppCompatActivity {
         btn_decline = findViewById(R.id.btn_decline);
         btn_accept = findViewById(R.id.btn_accept);
         txtv_caller = findViewById(R.id.txtv_caller);
+        txtTypeCall = findViewById(R.id.txtTypeCall);
+
         isFirstAdd = true;
         String idUserCall = LinphoneService.getCore().getCurrentCall().getRemoteAddress().getUsername();
         Query getUser = users.orderByKey().equalTo(idUserCall);
@@ -152,7 +153,7 @@ public class CallIncomingActivity extends AppCompatActivity {
             chatMessage.setDatetime(DBUtil.getStringDateTime());
             conversationMessages.push().setValue(chatMessage);
         } else if (callstatus.equals(Call.Status.AcceptedElsewhere) || callstatus.equals(Call.Status.DeclinedElsewhere)) {
-            return;
+            finish();
         }
     }
 
@@ -164,6 +165,11 @@ public class CallIncomingActivity extends AppCompatActivity {
                         || Call.State.IncomingEarlyMedia == call.getState()) {
                     mCall = call;
 
+                    if (mCall.getRemoteParams().videoEnabled()){
+                        txtTypeCall.setText(R.string.video_call);
+                    }else {
+                        txtTypeCall.setText(R.string.voice_call);
+                    }
                     Log.i(mCall.getRemoteParams().videoEnabled(), "video enabled");
                     break;
                 }
@@ -203,7 +209,6 @@ public class CallIncomingActivity extends AppCompatActivity {
         if (mCall == null) {
             Log.d("Couldn't find incoming call");
             finish();
-            return;
         }
 
     }

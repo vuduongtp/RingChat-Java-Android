@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -20,6 +21,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 import com.vuvanduong.ringchat.R;
 import com.vuvanduong.ringchat.adapter.ContactAdapter;
 import com.vuvanduong.ringchat.config.Constant;
@@ -34,7 +37,7 @@ public class AddFriendActivity extends AppCompatActivity {
     private User userLogin;
     ImageView btnBackToContact;
     EditText txtSearchNewFriend;
-    ImageButton btnSearchNewFriend;
+    ImageButton btnSearchNewFriend,btnQRScan;
     private FirebaseDatabase database = FirebaseDatabase.getInstance();
     private DatabaseReference dbReference = database.getReference();
     private DatabaseReference users = dbReference.child("users");
@@ -120,6 +123,36 @@ public class AddFriendActivity extends AppCompatActivity {
                 users.removeEventListener(getAllUser);
             }
         });
+
+        btnQRScan.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                IntentIntegrator integrator = new IntentIntegrator(AddFriendActivity.this);
+                integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE_TYPES);
+                integrator.setPrompt("Scan QR Code");
+                integrator.setCameraId(0);
+                integrator.setBeepEnabled(false);
+                integrator.setBarcodeImageEnabled(false);
+                integrator.initiateScan();
+            }
+        });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+        if(result != null) {
+            if(result.getContents() == null) {
+                Log.e("Scan*******", "Cancelled scan");
+
+            } else {
+                Log.e("Scan", "Scanned");
+                Toast.makeText(this, "Scanned: " + result.getContents(), Toast.LENGTH_LONG).show();
+            }
+        } else {
+            // This is important, otherwise the result will not be passed to the fragment
+            super.onActivityResult(requestCode, resultCode, data);
+        }
     }
 
     public void initView(){
@@ -139,6 +172,7 @@ public class AddFriendActivity extends AppCompatActivity {
         btnBackToContact = findViewById(R.id.btnBackToContact);
         txtSearchNewFriend = findViewById(R.id.txtSearchNewFriend);
         btnSearchNewFriend = findViewById(R.id.btnSearchNewFriend);
+        btnQRScan = findViewById(R.id.btnQRScan);
         userFind = new ArrayList<>();
         loading = findViewById(R.id.loadingAddContact);
     }

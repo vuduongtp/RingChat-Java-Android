@@ -1,23 +1,49 @@
 package com.vuvanduong.ringchat.ui;
 
+import android.Manifest;
+import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.graphics.drawable.RoundedBitmapDrawable;
 import androidx.fragment.app.Fragment;
 
+import com.cloudinary.android.MediaManager;
+import com.cloudinary.android.callback.ErrorInfo;
+import com.cloudinary.android.callback.UploadCallback;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
 import com.vuvanduong.ringchat.R;
 import com.vuvanduong.ringchat.activity.AboutActivity;
 import com.vuvanduong.ringchat.activity.AddFriendActivity;
@@ -29,23 +55,81 @@ import com.vuvanduong.ringchat.activity.WelcomeActivity;
 import com.vuvanduong.ringchat.app.InitialApp;
 import com.vuvanduong.ringchat.config.Constant;
 import com.vuvanduong.ringchat.model.User;
+import com.vuvanduong.ringchat.util.ImageUtils;
 import com.vuvanduong.ringchat.util.SharedPrefs;
 import com.vuvanduong.ringchat.util.UserUtil;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class AccountFragment extends Fragment {
     private View view;
     private User user;
-    TextView txtNameAccount,txtEmailAccount;
-    LinearLayout layoutEditInfo,layoutChangePass,layoutLanguage, layoutHelp, layoutAbout, layoutLogout;
-    ImageView btnSearchInAccount;
+    TextView txtNameAccount, txtEmailAccount;
+    LinearLayout layoutEditInfo, layoutChangePass, layoutLanguage, layoutHelp, layoutAbout, layoutLogout;
+    ImageView btnSearchInAccount, imgMyAvatarAccount, imgQRGen;
     private FirebaseDatabase database = FirebaseDatabase.getInstance();
     private DatabaseReference dbReference = database.getReference();
     private DatabaseReference users = dbReference.child("users");
 
+    private static final int PERMISSION_CODE = 1;
+    private static final int PICK_IMAGE = 1;
+    private Map<String, String> config = new HashMap<String, String>();
+    int rotationInDegrees = 0, rotation = 0;
+    ProgressDialog dialog;
+
+    private void configCloudinary() {
+        config.put("cloud_name", "vuduongtp");
+        config.put("api_key", "987439358416729");
+        config.put("api_secret", "Uj9Jes5zUjtAnYLXd81uR5qnGts");
+        MediaManager.init(Objects.requireNonNull(getActivity()), config);
+    }
+
+    private void requestPermission() {
+        if (ContextCompat.checkSelfPermission
+                (Objects.requireNonNull(getActivity()),
+                        Manifest.permission.READ_EXTERNAL_STORAGE
+                ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            accessTheGallery();
+        } else {
+            ActivityCompat.requestPermissions(
+                    Objects.requireNonNull(getActivity()),
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                    PERMISSION_CODE
+            );
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == PERMISSION_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                accessTheGallery();
+            } else {
+                Toast.makeText(Objects.requireNonNull(getActivity()), "permission denied", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    public void accessTheGallery() {
+        Intent i = new Intent(
+                Intent.ACTION_PICK,
+                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+        );
+        i.setType("image/*");
+        startActivityForResult(i, PICK_IMAGE);
+    }
+
     private OnDataPass dataPasser;
+
     public interface OnDataPass {
         void onDataPass(User data);
     }
@@ -59,7 +143,7 @@ public class AccountFragment extends Fragment {
     public void passData(User data) {
         dataPasser.onDataPass(data);
     }
-    
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -79,10 +163,10 @@ public class AccountFragment extends Fragment {
                 DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        switch (which){
+                        switch (which) {
                             case DialogInterface.BUTTON_POSITIVE:
                                 try {
-                                    users = dbReference.child("users/"+user.getId());
+                                    users = dbReference.child("users/" + user.getId());
                                     users.child("status").setValue("Offline");
 
                                 } catch (Exception ex) {
@@ -136,6 +220,41 @@ public class AccountFragment extends Fragment {
             }
         });
 
+        imgMyAvatarAccount.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                requestPermission();
+            }
+        });
+
+        imgQRGen.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    dialog = ProgressDialog.show(getActivity(), "",
+                            "", true);
+                    if (user.getId() == null || user.getId().equals("")) {
+                        return;
+                    }
+                    Bitmap bitmap = TextToImageEncode(user.getId());
+                    Dialog settingsDialog = new Dialog(Objects.requireNonNull(getActivity()));
+                    Objects.requireNonNull(settingsDialog.getWindow()).requestFeature(Window.FEATURE_NO_TITLE);
+                    settingsDialog.setContentView(getLayoutInflater().inflate(R.layout.qrcode_dialog
+                            , null));
+                    settingsDialog.show();
+                    ImageView imageQR = settingsDialog.findViewById(R.id.imageQRDialog);
+                    TextView QRDialogFullName = settingsDialog.findViewById(R.id.QRDialogFullName);
+
+                    imageQR.setImageBitmap(bitmap);
+                    QRDialogFullName.setText(UserUtil.getFullName(user));
+                    dialog.dismiss();
+                } catch (WriterException e) {
+                    e.printStackTrace();
+                    dialog.dismiss();
+                }
+            }
+        });
+
         layoutAbout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -150,11 +269,11 @@ public class AccountFragment extends Fragment {
                 DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        switch (which){
+                        switch (which) {
                             case DialogInterface.BUTTON_POSITIVE:
                                 InitialApp.self().clearApplicationData();
                                 try {
-                                    users = dbReference.child("users/"+user.getId());
+                                    users = dbReference.child("users/" + user.getId());
                                     users.child("status").setValue("Offline");
 
                                 } catch (Exception ex) {
@@ -190,12 +309,32 @@ public class AccountFragment extends Fragment {
 
     }
 
+    private Bitmap TextToImageEncode(String value) throws WriterException {
+        Bitmap bmp = null;
+        QRCodeWriter writer = new QRCodeWriter();
+        try {
+            BitMatrix bitMatrix = writer.encode(value, BarcodeFormat.QR_CODE, 512, 512);
+            int width = bitMatrix.getWidth();
+            int height = bitMatrix.getHeight();
+            bmp = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
+            for (int x = 0; x < width; x++) {
+                for (int y = 0; y < height; y++) {
+                    bmp.setPixel(x, y, bitMatrix.get(x, y) ? Color.rgb(7, 121, 228) : Color.WHITE);
+                }
+            }
+
+        } catch (WriterException e) {
+            e.printStackTrace();
+        }
+        return bmp;
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == Constant.GET_NEW_USER_INFO && data != null) {
             User newUser = (User) data.getSerializableExtra("userEdit");
-            if(newUser != null){
+            if (newUser != null) {
                 user = newUser;
                 setControl(view);
                 passData(user);
@@ -203,12 +342,113 @@ public class AccountFragment extends Fragment {
         }
         if (requestCode == Constant.GET_NEW_USER_PASS && data != null) {
             String password = data.getStringExtra("userPass");
-            if(password != null){
+            if (password != null) {
                 user.setPassword(password);
                 passData(user);
             }
         }
 
+        if (requestCode == PICK_IMAGE && data != null) {
+            try {
+                ExifInterface exif = new ExifInterface(getRealPathFromUri(data.getData(), Objects.requireNonNull(getActivity())));
+                rotation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+                rotationInDegrees = ImageUtils.exifToDegrees(rotation);
+                InputStream inputStream = Objects.requireNonNull(getActivity()).getContentResolver().openInputStream(Objects.requireNonNull(data.getData()));
+                new ImageProcessUpload().execute(inputStream);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private String getRealPathFromUri(Uri imageUri, Activity activity) {
+        Cursor cursor = activity.getContentResolver().query(imageUri, null, null, null, null);
+        if (cursor == null) {
+            return imageUri.getPath();
+        } else {
+            cursor.moveToFirst();
+            int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+            return cursor.getString(idx);
+        }
+    }
+
+    private class ImageProcessUpload extends AsyncTask<InputStream, Void, Bitmap> {
+        protected Bitmap doInBackground(InputStream... inputStream) {
+            try {
+                Bitmap imgBitmap = BitmapFactory.decodeStream(inputStream[0]);
+                Bitmap liteImage = ImageUtils.getResizedBitmap(imgBitmap, ImageUtils.AVATAR_WIDTH);
+                liteImage = ImageUtils.cropToSquare(liteImage);
+                Matrix matrix = new Matrix();
+                if (rotation != 0f) {
+                    matrix.preRotate(rotationInDegrees);
+                }
+                rotation = 0;
+                rotationInDegrees = 0;
+                liteImage = Bitmap.createBitmap(liteImage, 0, 0, liteImage.getWidth(), liteImage.getHeight(), matrix, true);
+
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                liteImage.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                byte[] byteArray = stream.toByteArray();
+                if (uploadByteToCloudinary(byteArray)) {
+                    return liteImage;
+//                String imageBase64 = ImageUtils.encodeBase64(liteImage);
+//                return ImageUtils.convertStringBase64ToBitmap(imageBase64);
+                } else return null;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+
+        protected void onProgressUpdate() {
+        }
+
+        protected void onPostExecute(Bitmap result) {
+            if (result != null) {
+                RoundedBitmapDrawable roundImage = ImageUtils.roundedImage(Objects.requireNonNull(getActivity()), result);
+                imgMyAvatarAccount.setImageDrawable(roundImage);
+                Toast.makeText(getActivity(), "Success", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private boolean uploadByteToCloudinary(byte[] image) {
+        try {
+            MediaManager.get().upload(image)
+                    .option("tags", "profile")
+                    .option("folder", "profile")
+                    .callback(new UploadCallback() {
+                        @Override
+                        public void onStart(String requestId) {
+                            dialog = ProgressDialog.show(getActivity(), "",
+                                    "", true);
+                        }
+
+                        @Override
+                        public void onProgress(String requestId, long bytes, long totalBytes) {
+                        }
+
+                        @Override
+                        public void onSuccess(String requestId, Map resultData) {
+                            dialog.dismiss();
+                            users = dbReference.child("users/" + user.getId());
+                            users.child("image").setValue(Objects.requireNonNull(resultData.get("url")).toString());
+                        }
+
+                        @Override
+                        public void onError(String requestId, ErrorInfo error) {
+                            dialog.dismiss();
+                        }
+
+                        @Override
+                        public void onReschedule(String requestId, ErrorInfo error) {
+                        }
+                    }).dispatch();
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     private void setControl(View view) {
@@ -217,13 +457,17 @@ public class AccountFragment extends Fragment {
         txtEmailAccount = view.findViewById(R.id.txtEmailAccount);
         layoutEditInfo = view.findViewById(R.id.layoutEditInfo);
         layoutChangePass = view.findViewById(R.id.layoutChangePass);
-        layoutLanguage  = view.findViewById(R.id.layoutLanguage);
+        layoutLanguage = view.findViewById(R.id.layoutLanguage);
         layoutHelp = view.findViewById(R.id.layoutHelp);
         layoutAbout = view.findViewById(R.id.layoutAbout);
         layoutLogout = view.findViewById(R.id.layoutLogout);
         btnSearchInAccount = view.findViewById(R.id.btnSearchInAccount);
+        imgMyAvatarAccount = view.findViewById(R.id.imgMyAvatarAccount);
+        imgQRGen = view.findViewById(R.id.imgQRGen);
         txtNameAccount.setText(UserUtil.getFullName(user));
         txtEmailAccount.setText(user.getEmail());
+
+        configCloudinary();
 
     }
 }

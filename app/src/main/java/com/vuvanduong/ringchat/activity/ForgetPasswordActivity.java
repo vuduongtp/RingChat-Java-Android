@@ -25,7 +25,10 @@ import com.vuvanduong.ringchat.model.User;
 import com.vuvanduong.ringchat.util.DBUtil;
 import com.vuvanduong.ringchat.util.GMailSender;
 import com.vuvanduong.ringchat.util.MD5;
+import com.vuvanduong.ringchat.util.UserUtil;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 
 public class ForgetPasswordActivity extends AppCompatActivity {
@@ -86,9 +89,25 @@ public class ForgetPasswordActivity extends AppCompatActivity {
                                 if (userGet.getEmail().equalsIgnoreCase(txtUsernameForgetPass.getText().toString().trim())) {
                                     user = userGet;
                                     code = DBUtil.getAlphaNumericString(6);
-                                    String tieuDe = "Đổi lại mật khẩu RingChat";
-                                    String noiDung = "Mã xác nhận đổi lại mật khẩu của bạn là: " + code
-                                            + "\nHãy nhập mã này vào ứng dụng để hoàn tất quá trình đổi mật khẩu.";
+
+                                    String tContents = "";
+                                    try {
+                                        InputStream stream = getAssets().open("confirmemail.html");
+
+                                        int size = stream.available();
+                                        byte[] buffer = new byte[size];
+                                        stream.read(buffer);
+                                        stream.close();
+                                        tContents = new String(buffer);
+                                    } catch (IOException e) {
+                                        System.err.println(e.toString());
+                                    }
+                                    String replace = tContents.replace("%", "phantram");
+                                    replace = replace.replace("phantrams", "%s");
+                                    String noiDung = String.format(replace, UserUtil.getFullName(user), code);
+                                    noiDung = noiDung.replace("phantram", "%");
+
+                                    String tieuDe = "Xác nhận đổi lại mật khẩu RingChat";
                                     String emailTo = txtUsernameForgetPass.getText().toString().trim();
                                     Bundle bundle = new Bundle();
                                     bundle.putString("tieuDe", tieuDe);

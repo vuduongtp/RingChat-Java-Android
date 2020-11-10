@@ -16,7 +16,7 @@
         android:id="@+id/texture_local_preview"
         android:layout_width="150dp"
         android:layout_height="200dp"
-        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"/>
 
     <ImageView
@@ -32,8 +32,8 @@
         android:id="@+id/text_callee"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
         android:layout_centerHorizontal="true"
-        android:layout_above="@id/call_timer"
         android:text="Connect..."
         android:textColor="#fff"
         android:textSize="30sp"/>
@@ -45,7 +45,7 @@
         android:layout_centerHorizontal="true"
         android:layout_margin="20dp"
         android:textColor="#fff"
-        android:layout_centerInParent="true"
+        android:layout_below="@+id/text_callee"
         android:visibility="invisible"/>
 
     <ImageButton

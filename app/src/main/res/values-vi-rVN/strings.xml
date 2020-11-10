@@ -99,4 +99,7 @@
     <string name="confirm">Xác nhận</string>
     <string name="confirm_hint">Nhập mã xác nhận trong email bạn nhận được dưới đây.</string>
     <string name="remove_friend_success">Huỷ kết bạn thành công.</string>
+    <string name="confirm_remove_friend">Bạn có chắc muốn huỷ kết bạn với người này?</string>
+    <string name="voice_call">Cuộc gọi âm thanh</string>
+    <string name="video_call">Cuộc gọi video</string>
 </resources>

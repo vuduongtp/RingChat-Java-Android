@@ -61,10 +61,8 @@ public class CallOutgoingActivity extends AppCompatActivity {
     private int mPreviewX, mPreviewY;
     private AudioManager mAudioManager;
     private CoreListenerStub mCoreListener;
-    private boolean mIsMuted = false;
     private boolean mIsUsingSpeaker = false;
     private boolean mIsVisible = true;
-    private boolean mIsVideoCall = false;
     private boolean isCallIncommingActivity = CallIncomingActivity.isCallIncommingActivity;
 
     String chatRoom;

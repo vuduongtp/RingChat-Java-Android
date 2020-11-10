@@ -30,7 +30,10 @@ import com.vuvanduong.ringchat.model.User;
 import com.vuvanduong.ringchat.util.DBUtil;
 import com.vuvanduong.ringchat.util.GMailSender;
 import com.vuvanduong.ringchat.util.MD5;
+import com.vuvanduong.ringchat.util.UserUtil;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
@@ -122,7 +125,7 @@ public class RegisterActivity extends AppCompatActivity {
                 } else if (txtConfirmPasswordRegister.getText().toString().trim().equalsIgnoreCase("")) {
                     txtErrorRegister.setText(R.string.err_emty_confirm_pass);
                     dialog.dismiss();
-                } else if (birthday==null || txtBirthdayRegister.getText().toString().trim().equalsIgnoreCase("") || txtBirthdayRegister.getText().toString().trim().equalsIgnoreCase("Birthday")) {
+                } else if (birthday == null || txtBirthdayRegister.getText().toString().trim().equalsIgnoreCase("") || txtBirthdayRegister.getText().toString().trim().equalsIgnoreCase("Birthday")) {
                     txtErrorRegister.setText(R.string.err_emty_birthday);
                     dialog.dismiss();
                 } else if (txtFirstnameRegister.getText().toString().trim().equalsIgnoreCase("")) {
@@ -159,11 +162,25 @@ public class RegisterActivity extends AppCompatActivity {
 //                            Toast.makeText(RegisterActivity.this,R.string.register_success, Toast.LENGTH_SHORT).show();
 //                            dialog.dismiss();
 //                            finish();
+                            String tContents = "";
+                            try {
+                                InputStream stream = getAssets().open("confirmemail.html");
 
+                                int size = stream.available();
+                                byte[] buffer = new byte[size];
+                                stream.read(buffer);
+                                stream.close();
+                                tContents = new String(buffer);
+                            } catch (IOException e) {
+                                System.err.println(e.toString());
+                            }
                             code = DBUtil.getAlphaNumericString(6);
+                            String replace = tContents.replace("%", "phantram");
+                            replace = replace.replace("phantrams", "%s");
+                            String noiDung = String.format(replace, UserUtil.getFullName(user), code);
+                            noiDung = noiDung.replace("phantram", "%");
+
                             String tieuDe = "Xác nhận đăng ký tài khoản RingChat";
-                            String noiDung = "Mã xác nhận đăng ký tài khoản của bạn là: " + code
-                                    + "\nHãy nhập mã này vào ứng dụng để hoàn tất quá trình đăng ký.";
                             String emailTo = txtUsernameRegister.getText().toString().trim();
                             Bundle bundle = new Bundle();
                             bundle.putString("tieuDe", tieuDe);

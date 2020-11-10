@@ -99,5 +99,8 @@
     <string name="confirm">Confirm</string>
     <string name="confirm_hint">Type confirm code you have received from email below.</string>
     <string name="remove_friend_success">Remove friend successful.</string>
+    <string name="confirm_remove_friend">Are you sure remove this friend?</string>
+    <string name="voice_call">Voice call</string>
+    <string name="video_call">Voice call</string>
 
 </resources>
