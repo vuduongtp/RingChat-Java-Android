@@ -49,7 +49,6 @@ import com.vuvanduong.ringchat.activity.AboutActivity;
 import com.vuvanduong.ringchat.activity.AddFriendActivity;
 import com.vuvanduong.ringchat.activity.EditInforActivity;
 import com.vuvanduong.ringchat.activity.EditPasswordActivity;
-import com.vuvanduong.ringchat.activity.HomeActivity;
 import com.vuvanduong.ringchat.activity.LoginActivity;
 import com.vuvanduong.ringchat.activity.WelcomeActivity;
 import com.vuvanduong.ringchat.app.InitialApp;
@@ -60,8 +59,6 @@ import com.vuvanduong.ringchat.util.SharedPrefs;
 import com.vuvanduong.ringchat.util.UserUtil;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -230,27 +227,27 @@ public class AccountFragment extends Fragment {
         imgQRGen.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //ProgressDialog progressDialog=new ProgressDialog(getActivity());
+                //progressDialog.show();
                 try {
-                    dialog = ProgressDialog.show(getActivity(), "",
-                            "", true);
                     if (user.getId() == null || user.getId().equals("")) {
                         return;
                     }
                     Bitmap bitmap = TextToImageEncode(user.getId());
-                    Dialog settingsDialog = new Dialog(Objects.requireNonNull(getActivity()));
-                    Objects.requireNonNull(settingsDialog.getWindow()).requestFeature(Window.FEATURE_NO_TITLE);
-                    settingsDialog.setContentView(getLayoutInflater().inflate(R.layout.qrcode_dialog
+                    Dialog QRDialog = new Dialog(Objects.requireNonNull(getActivity()));
+                    Objects.requireNonNull(QRDialog.getWindow()).requestFeature(Window.FEATURE_NO_TITLE);
+                    QRDialog.setContentView(getLayoutInflater().inflate(R.layout.qrcode_dialog
                             , null));
-                    settingsDialog.show();
-                    ImageView imageQR = settingsDialog.findViewById(R.id.imageQRDialog);
-                    TextView QRDialogFullName = settingsDialog.findViewById(R.id.QRDialogFullName);
+                    QRDialog.show();
+                    ImageView imageQR = QRDialog.findViewById(R.id.imageQRDialog);
+                    TextView QRDialogFullName = QRDialog.findViewById(R.id.QRDialogFullName);
 
                     imageQR.setImageBitmap(bitmap);
                     QRDialogFullName.setText(UserUtil.getFullName(user));
-                    dialog.dismiss();
+                    //progressDialog.dismiss();
                 } catch (WriterException e) {
                     e.printStackTrace();
-                    dialog.dismiss();
+                    //progressDialog.dismiss();
                 }
             }
         });
@@ -372,8 +369,8 @@ public class AccountFragment extends Fragment {
         }
     }
 
-    private class ImageProcessUpload extends AsyncTask<InputStream, Void, Bitmap> {
-        protected Bitmap doInBackground(InputStream... inputStream) {
+    private class ImageProcessUpload extends AsyncTask<InputStream, Void, Void> {
+        protected Void doInBackground(InputStream... inputStream) {
             try {
                 Bitmap imgBitmap = BitmapFactory.decodeStream(inputStream[0]);
                 Bitmap liteImage = ImageUtils.getResizedBitmap(imgBitmap, ImageUtils.AVATAR_WIDTH);
@@ -389,30 +386,32 @@ public class AccountFragment extends Fragment {
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
                 liteImage.compress(Bitmap.CompressFormat.PNG, 100, stream);
                 byte[] byteArray = stream.toByteArray();
-                if (uploadByteToCloudinary(byteArray)) {
-                    return liteImage;
+                uploadByteToCloudinary(byteArray);
+//                if (uploadByteToCloudinary(byteArray)) {
+//                    return liteImage;
 //                String imageBase64 = ImageUtils.encodeBase64(liteImage);
 //                return ImageUtils.convertStringBase64ToBitmap(imageBase64);
-                } else return null;
+ //               } else return null;
             } catch (Exception e) {
                 e.printStackTrace();
-                return null;
+//                return null;
             }
+            return null;
         }
 
         protected void onProgressUpdate() {
         }
 
-        protected void onPostExecute(Bitmap result) {
-            if (result != null) {
-                RoundedBitmapDrawable roundImage = ImageUtils.roundedImage(Objects.requireNonNull(getActivity()), result);
-                imgMyAvatarAccount.setImageDrawable(roundImage);
-                Toast.makeText(getActivity(), "Success", Toast.LENGTH_SHORT).show();
-            }
+        protected void onPostExecute() {
+//            if (result != null) {
+//                RoundedBitmapDrawable roundImage = ImageUtils.roundedImage(Objects.requireNonNull(getActivity()), result);
+//                imgMyAvatarAccount.setImageDrawable(roundImage);
+//                Toast.makeText(getActivity(), "Success", Toast.LENGTH_SHORT).show();
+//            }
         }
     }
 
-    private boolean uploadByteToCloudinary(byte[] image) {
+    private void uploadByteToCloudinary(final byte[] image) {
         try {
             MediaManager.get().upload(image)
                     .option("tags", "profile")
@@ -430,9 +429,14 @@ public class AccountFragment extends Fragment {
 
                         @Override
                         public void onSuccess(String requestId, Map resultData) {
-                            dialog.dismiss();
+                            Bitmap bitmap = BitmapFactory.decodeByteArray(image, 0, image.length);
+                            RoundedBitmapDrawable roundImage = ImageUtils.roundedImage(Objects.requireNonNull(getActivity()), bitmap);
+                            imgMyAvatarAccount.setImageDrawable(roundImage);
+
                             users = dbReference.child("users/" + user.getId());
                             users.child("image").setValue(Objects.requireNonNull(resultData.get("url")).toString());
+                            Toast.makeText(getActivity(), "Success", Toast.LENGTH_SHORT).show();
+                            dialog.dismiss();
                         }
 
                         @Override
@@ -444,10 +448,8 @@ public class AccountFragment extends Fragment {
                         public void onReschedule(String requestId, ErrorInfo error) {
                         }
                     }).dispatch();
-            return true;
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
         }
     }
 

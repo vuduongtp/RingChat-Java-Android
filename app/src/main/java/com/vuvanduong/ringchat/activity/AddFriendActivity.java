@@ -27,10 +27,12 @@ import com.vuvanduong.ringchat.R;
 import com.vuvanduong.ringchat.adapter.ContactAdapter;
 import com.vuvanduong.ringchat.config.Constant;
 import com.vuvanduong.ringchat.model.User;
+import com.vuvanduong.ringchat.ui.DialogLanguage;
 import com.vuvanduong.ringchat.util.DBUtil;
 import com.vuvanduong.ringchat.util.SharedPrefs;
 import com.vuvanduong.ringchat.util.UserUtil;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 public class AddFriendActivity extends AppCompatActivity {
@@ -147,6 +149,9 @@ public class AddFriendActivity extends AppCompatActivity {
 
             } else {
                 Log.e("Scan", "Scanned");
+                Intent user_profile = new Intent(AddFriendActivity.this, UserProfileActivity.class);
+                //language.putExtra("user_login", (Serializable) user);
+                startActivity(user_profile);
                 Toast.makeText(this, "Scanned: " + result.getContents(), Toast.LENGTH_LONG).show();
             }
         } else {
