@@ -435,6 +435,7 @@ public class AccountFragment extends Fragment {
 
                             users = dbReference.child("users/" + user.getId());
                             users.child("image").setValue(Objects.requireNonNull(resultData.get("url")).toString());
+                            user.setImage(Objects.requireNonNull(resultData.get("url")).toString());
                             Toast.makeText(getActivity(), "Success", Toast.LENGTH_SHORT).show();
                             dialog.dismiss();
                         }

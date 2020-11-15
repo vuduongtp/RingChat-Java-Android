@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,6 +26,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.vuvanduong.ringchat.R;
 import com.vuvanduong.ringchat.activity.AddFriendActivity;
+import com.vuvanduong.ringchat.activity.UserProfileActivity;
 import com.vuvanduong.ringchat.adapter.MessageAdapter;
 import com.vuvanduong.ringchat.model.Message;
 import com.vuvanduong.ringchat.model.User;
@@ -52,6 +54,7 @@ public class HomeFragment extends Fragment {
     private MessageAdapter messageAdapter;
     private int count = 0;
     private boolean isFirstLoad = true;
+    private ImageView img_avt_friend;
 
     @Nullable
     @Override
@@ -74,6 +77,18 @@ public class HomeFragment extends Fragment {
                 Intent addFriend = new Intent(getActivity(), AddFriendActivity.class);
                 addFriend.putExtra("user_login", (Serializable) user);
                 startActivity(addFriend);
+            }
+        });
+
+        img_avt_friend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent user_profile = new Intent(getActivity(), UserProfileActivity.class);
+                user_profile.putExtra("user_login", (Serializable) user);
+                user_profile.putExtra("user_scan", (Serializable) user);
+                user_profile.putExtra("isScanFriend", false);
+                user_profile.putExtra("isUserLogin", true);
+                startActivity(user_profile);
             }
         });
 
@@ -116,6 +131,7 @@ public class HomeFragment extends Fragment {
         txtEmailHome = view.findViewById(R.id.txtEmailHome);
         btnSearchHome = view.findViewById(R.id.btnSearchHome);
         rvConversation = view.findViewById(R.id.rvConversation);
+        img_avt_friend = view.findViewById(R.id.img_avt_friend);
         txtUserHome.setText(UserUtil.getFullName(user));
         txtEmailHome.setText(user.getEmail());
         reloadListMessage = view.findViewById(R.id.reloadListMessage);

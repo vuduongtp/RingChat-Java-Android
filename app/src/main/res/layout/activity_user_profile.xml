@@ -9,7 +9,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        android:background="@drawable/backgroung2"
+        android:background="@drawable/anhbia"
         android:paddingHorizontal="30dp"
         android:paddingVertical="15dp"
         android:textColor="#fff"
@@ -20,6 +20,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0" />
+
 
     <ImageView
         android:id="@+id/imgProfileAvatar"
@@ -38,7 +39,7 @@
         android:layout_height="35dp"
         android:fontFamily="@font/roboto_bold"
         android:gravity="center"
-        android:textColor="@color/colorMain"
+        android:textColor="@color/black"
         android:textSize="25sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -46,6 +47,24 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imgProfileAvatar"
         app:layout_constraintVertical_bias="0.02"
+        tools:ignore="RtlCompat,RtlHardcoded" />
+
+    <TextView
+        android:id="@+id/txtUserProfileInfo"
+        android:layout_width="wrap_content"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/roboto_regular"
+        android:gravity="left"
+        android:textColor="@color/gray"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.495"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txtNameUserProfile"
+        app:layout_constraintVertical_bias="0.06"
         tools:ignore="RtlCompat,RtlHardcoded" />
 
     <ImageView
@@ -68,7 +87,7 @@
         app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/txtNameUserProfile"
-        app:layout_constraintVertical_bias="0.4">
+        app:layout_constraintVertical_bias="0.695">
 
         <ImageView
             android:id="@+id/btnProfileChat"

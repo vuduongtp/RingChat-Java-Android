@@ -1,3 +1,4 @@
+
 package com.vuvanduong.ringchat.activity;
 
 import androidx.annotation.NonNull;
@@ -20,6 +21,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
@@ -149,10 +151,50 @@ public class AddFriendActivity extends AppCompatActivity {
 
             } else {
                 Log.e("Scan", "Scanned");
-                Intent user_profile = new Intent(AddFriendActivity.this, UserProfileActivity.class);
-                //language.putExtra("user_login", (Serializable) user);
-                startActivity(user_profile);
-                Toast.makeText(this, "Scanned: " + result.getContents(), Toast.LENGTH_LONG).show();
+                String resultString = result.getContents();
+                if (resultString.length() != 20 || resultString.equalsIgnoreCase(userLogin.getId())){
+                    Toast.makeText(this, result.getContents()+ " not found.", Toast.LENGTH_LONG).show();
+                    return;
+                }
+                Query getUser = users.orderByKey().equalTo(resultString);
+
+                ValueEventListener getAllUser = new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        for (DataSnapshot item : dataSnapshot.getChildren()) {
+                            if (item != null){
+                                User userScan = item.getValue(User.class);
+                                assert userScan != null;
+                                userScan.setId(item.getKey());
+
+                                boolean isScanFriend =false;
+                                for (String id : idFriends){
+                                    if (id.equalsIgnoreCase(userScan.getId())) {
+                                        isScanFriend = true;
+                                        break;
+                                    }
+                                }
+
+                                Intent user_profile = new Intent(AddFriendActivity.this, UserProfileActivity.class);
+                                user_profile.putExtra("user_login", (Serializable) userLogin);
+                                user_profile.putExtra("user_scan", (Serializable) userScan);
+                                user_profile.putExtra("isScanFriend", isScanFriend);
+                                startActivity(user_profile);
+                            }else {
+                                Toast.makeText(AddFriendActivity.this, R.string.user_not_found, Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+                        }
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                        System.err.println("db_err: "+databaseError);
+                    }
+                };
+                getUser.addListenerForSingleValueEvent(getAllUser);
+                getUser.removeEventListener(getAllUser);
             }
         } else {
             // This is important, otherwise the result will not be passed to the fragment
