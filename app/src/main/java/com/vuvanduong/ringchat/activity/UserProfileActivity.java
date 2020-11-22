@@ -64,31 +64,23 @@ public class UserProfileActivity extends AppCompatActivity {
             btnProfileUnfriend.setVisibility(View.GONE);
         }
 
+        if (isFriend){
+            btnProfileAddFriend.setVisibility(View.GONE);
+        }else {
+            btnProfileChat.setVisibility(View.GONE);
+            btnProfileUnfriend.setVisibility(View.GONE);
+        }
+
         txtNameUserProfile.setText(UserUtil.getFullName(userScan));
         String info = getResources().getString(R.string.firstname) + " : "+ userScan.getFirstname() + "\n"
                 +getResources().getString(R.string.lastname) + " : "+ userScan.getLastname() + "\n"
                 +getResources().getString(R.string.birthday) + " : "+ userScan.getBirthday() + "\n";
         txtUserProfileInfo.setText(info);
         if (!userScan.getImage().equalsIgnoreCase("")) {
-            Picasso.with(getBaseContext()).load(userScan.getImage()).into(new Target() {
-                @Override
-                public void onPrepareLoad(Drawable arg0) {
-
-                }
-
-                @Override
-                public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom arg1) {
-                    RoundedBitmapDrawable avatar = ImageUtils.roundedImage(UserProfileActivity.this, bitmap);
-                    imgProfileAvatar.setImageDrawable(avatar);
-                }
-
-                @Override
-                public void onBitmapFailed(Drawable arg0) {
-
-                }
-            });
-        }else {
-            imgProfileAvatar.setImageDrawable(getResources().getDrawable(R.drawable.user));
+            Picasso.with(this)
+                    .load(userScan.getImage())
+                    .placeholder(R.drawable.user)
+                    .into(imgProfileAvatar);
         }
     }
 

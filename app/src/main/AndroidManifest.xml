@@ -17,7 +17,17 @@
         android:roundIcon="@drawable/logo"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.UserProfileActivity"></activity>
+        <receiver
+            android:name=".service.NetworkChangeReceiver"
+            android:enabled="true"
+            android:exported="false"></receiver>
+
+        <service
+            android:name=".service.NetworkChangeService"
+            android:enabled="true"
+            android:exported="false" />
+
+        <activity android:name=".activity.UserProfileActivity" />
         <activity android:name=".activity.ResetPasswordActivity" />
         <activity android:name=".activity.ConfirmCodeActivity" />
         <activity android:name=".activity.AboutActivity" />

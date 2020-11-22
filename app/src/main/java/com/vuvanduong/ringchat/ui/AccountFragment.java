@@ -19,6 +19,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -86,7 +87,11 @@ public class AccountFragment extends Fragment {
         config.put("cloud_name", "vuduongtp");
         config.put("api_key", "987439358416729");
         config.put("api_secret", "Uj9Jes5zUjtAnYLXd81uR5qnGts");
-        MediaManager.init(Objects.requireNonNull(getActivity()), config);
+        try {
+            MediaManager.init(Objects.requireNonNull(getActivity()), config);
+        }catch (IllegalStateException ex){
+            Log.e("exist","cloudinary");
+        }
     }
 
     private void requestPermission() {
@@ -387,14 +392,8 @@ public class AccountFragment extends Fragment {
                 liteImage.compress(Bitmap.CompressFormat.PNG, 100, stream);
                 byte[] byteArray = stream.toByteArray();
                 uploadByteToCloudinary(byteArray);
-//                if (uploadByteToCloudinary(byteArray)) {
-//                    return liteImage;
-//                String imageBase64 = ImageUtils.encodeBase64(liteImage);
-//                return ImageUtils.convertStringBase64ToBitmap(imageBase64);
- //               } else return null;
             } catch (Exception e) {
                 e.printStackTrace();
-//                return null;
             }
             return null;
         }
@@ -403,11 +402,6 @@ public class AccountFragment extends Fragment {
         }
 
         protected void onPostExecute() {
-//            if (result != null) {
-//                RoundedBitmapDrawable roundImage = ImageUtils.roundedImage(Objects.requireNonNull(getActivity()), result);
-//                imgMyAvatarAccount.setImageDrawable(roundImage);
-//                Toast.makeText(getActivity(), "Success", Toast.LENGTH_SHORT).show();
-//            }
         }
     }
 

@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
@@ -16,8 +17,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.vuvanduong.ringchat.R;
 import com.vuvanduong.ringchat.config.Constant;
+import com.vuvanduong.ringchat.database.DatabaseHelper;
 import com.vuvanduong.ringchat.model.User;
 import com.vuvanduong.ringchat.service.LinphoneService;
+import com.vuvanduong.ringchat.service.NetworkChangeService;
 import com.vuvanduong.ringchat.util.MD5;
 import com.vuvanduong.ringchat.util.SharedPrefs;
 import android.os.Handler;
@@ -27,6 +30,7 @@ import org.linphone.core.CoreListenerStub;
 import org.linphone.core.ProxyConfig;
 import org.linphone.core.RegistrationState;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Locale;
 
@@ -37,6 +41,17 @@ public class WelcomeActivity extends AppCompatActivity {
     private Handler mHandler;
     User user;
     private CoreListenerStub mCoreListener;
+
+    private void openDatabase() throws java.sql.SQLException {
+        DatabaseHelper myDbHelper = new DatabaseHelper(WelcomeActivity.this);
+        try {
+            myDbHelper.createDataBase();
+
+        } catch (IOException ioe) {
+            throw new Error("Unable to create database");
+        }
+        Log.e("database","create database success");
+    }
 
     private void setLanguage(String local, String country)  {
         Resources res = getResources();
@@ -53,6 +68,15 @@ public class WelcomeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome);
+
+        try {
+            openDatabase();
+        } catch (java.sql.SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
+        Intent netWorkService = new Intent(this, NetworkChangeService.class);
+        startService(netWorkService);
 
         Locale current = getResources().getConfiguration().locale;
         String language = SharedPrefs.getInstance().get(Constant.LANGUAGE_CODE, String.class);
