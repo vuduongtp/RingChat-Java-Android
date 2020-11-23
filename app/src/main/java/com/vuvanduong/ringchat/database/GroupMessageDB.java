@@ -11,19 +11,19 @@ import com.vuvanduong.ringchat.model.Message;
 
 import java.util.ArrayList;
 
-public class ConversationMessageDB {
+public class GroupMessageDB {
     SQLiteDatabase database;
     DatabaseHelper dbHelper;
-    public final static String CONVERSATIONMESSAGES = "conversationMessages";
+    public final static String GROUPMESSAGE = "groupMessage";
     public final static String MESSAGEID = "messageid";
-    public final static String CONVERSATIONID = "conversationid";
+    public final static String GROUPID = "groupid";
     public final static String CONTEXT = "context";
     public final static String DATETIME = "datetime";
     public final static String TYPE = "type";
     public final static String USERID = "userid";
     public final static String URL = "url";
 
-    public ConversationMessageDB(Context context) {
+    public GroupMessageDB(Context context) {
         dbHelper = new DatabaseHelper(context);
         try {
             database = dbHelper.getWritableDatabase();
@@ -35,31 +35,31 @@ public class ConversationMessageDB {
     public long insert(Message message) {
         ContentValues values = new ContentValues();
         values.put(MESSAGEID, message.getMessageId());
-        values.put(CONVERSATIONID, message.getIdRoom());
+        values.put(GROUPID, message.getIdRoom());
         values.put(CONTEXT, message.getContext());
         values.put(DATETIME, message.getDatetime());
         values.put(TYPE, message.getType());
         values.put(USERID, message.getUserID());
         values.put(URL, "");
-        return database.insert(CONVERSATIONMESSAGES, null, values);
+        return database.insert(GROUPMESSAGE, null, values);
     }
 
-    public long deleteAll(String conversationid) {
-        return database.delete(CONVERSATIONMESSAGES, CONVERSATIONID + "='" + conversationid + "'", null);
+    public long deleteAll(String groupid) {
+        return database.delete(GROUPMESSAGE,GROUPID +"='"+groupid+"'", null);
     }
 
-    public ArrayList<Message> getAllMessageOfRoom(String room) {
-        String selectQuery = "SELECT * FROM " + CONVERSATIONMESSAGES + " WHERE " + CONVERSATIONID + " LIKE '%" + room + "%' ORDER BY " + CONVERSATIONID + " ASC";
-        Log.e("select", selectQuery);
+    public ArrayList<Message> getAllMessageOfRoom(String groupid) {
+        String selectQuery = "SELECT * FROM " + GROUPMESSAGE+ " WHERE "+ GROUPID+" ='"+groupid+"' ORDER BY "+MESSAGEID+" ASC";
+        Log.e("select",selectQuery);
         Cursor cursor = database.rawQuery(selectQuery, null);
-        Log.e("count", "" + cursor.getCount());
+        Log.e("count",""+cursor.getCount());
         ArrayList<Message> messages = new ArrayList<>();
-        if (cursor != null && cursor.getCount() != 0) {
+        if (cursor != null && cursor.getCount()!=0) {
             cursor.moveToFirst();
             for (int i = 0; i < cursor.getCount(); i++) {
                 Message message = new Message();
                 message.setMessageId(cursor.getString(cursor.getColumnIndex(MESSAGEID)));
-                message.setIdRoom(cursor.getString(cursor.getColumnIndex(CONVERSATIONID)));
+                message.setIdRoom(cursor.getString(cursor.getColumnIndex(GROUPID)));
                 message.setContext(cursor.getString(cursor.getColumnIndex(CONTEXT)));
                 message.setDatetime(cursor.getString(cursor.getColumnIndex(DATETIME)));
                 message.setType(cursor.getString(cursor.getColumnIndex(TYPE)));
@@ -73,18 +73,18 @@ public class ConversationMessageDB {
         return messages;
     }
 
-    public ArrayList<Message> getAllMessagePending(String room) {
-        String selectQuery = "SELECT * FROM " + CONVERSATIONMESSAGES + " WHERE " + TYPE + "='Pending' ORDER BY " + CONVERSATIONID + " ASC";
-        Log.e("select", selectQuery);
+    public ArrayList<Message> getAllMessagePending(String groupid) {
+        String selectQuery = "SELECT * FROM " + GROUPMESSAGE+ " WHERE "+ TYPE+" ='Pending' ORDER BY "+MESSAGEID+" ASC";
+        Log.e("select",selectQuery);
         Cursor cursor = database.rawQuery(selectQuery, null);
-        Log.e("count", "" + cursor.getCount());
+        Log.e("count",""+cursor.getCount());
         ArrayList<Message> messages = new ArrayList<>();
-        if (cursor != null && cursor.getCount() != 0) {
+        if (cursor != null && cursor.getCount()!=0) {
             cursor.moveToFirst();
             for (int i = 0; i < cursor.getCount(); i++) {
                 Message message = new Message();
                 message.setMessageId(cursor.getString(cursor.getColumnIndex(MESSAGEID)));
-                message.setIdRoom(cursor.getString(cursor.getColumnIndex(CONVERSATIONID)));
+                message.setIdRoom(cursor.getString(cursor.getColumnIndex(GROUPID)));
                 message.setContext(cursor.getString(cursor.getColumnIndex(CONTEXT)));
                 message.setDatetime(cursor.getString(cursor.getColumnIndex(DATETIME)));
                 message.setType(cursor.getString(cursor.getColumnIndex(TYPE)));

@@ -2,6 +2,7 @@ package com.vuvanduong.ringchat.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -92,11 +93,12 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        rvConversation.setOnScrollListener(new RecyclerView.OnScrollListener() {
+        rvConversation.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
-            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-                if (IsRecyclerViewAtTop()) {
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                System.out.println("dy:"+dy);
+                System.out.println("dx:"+dx);
+                if (dy > 0) { //check for scroll down
                     if (messages.size() != 0 && count % messages.size() == 0 && reloadListMessage.getVisibility() == View.GONE) {
                         messages.clear();
                         reloadListMessage.setVisibility(View.VISIBLE);
@@ -110,12 +112,29 @@ public class HomeFragment extends Fragment {
                     count++;
                 }
             }
-
-            @Override
-            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-
-            }
+ //           @Override
+//            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+//                super.onScrollStateChanged(recyclerView, newState);
+//                if (IsRecyclerViewAtTop()) {
+//                    if (messages.size() != 0 && count % messages.size() == 0 && reloadListMessage.getVisibility() == View.GONE) {
+//                        messages.clear();
+//                        reloadListMessage.setVisibility(View.VISIBLE);
+//                        getData();
+//                    }
+//                    if (messages.size() == 0 && reloadListMessage.getVisibility() == View.GONE) {
+//                        messages.clear();
+//                        reloadListMessage.setVisibility(View.VISIBLE);
+//                        getData();
+//                    }
+//                    count++;
+//                }
+//            }
+//
+//            @Override
+//            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+//                super.onScrolled(recyclerView, dx, dy);
+//
+//            }
         });
 
     }

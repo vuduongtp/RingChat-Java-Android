@@ -7,6 +7,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -22,6 +23,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.vuvanduong.ringchat.R;
 import com.vuvanduong.ringchat.config.Constant;
+import com.vuvanduong.ringchat.database.UserDB;
+import com.vuvanduong.ringchat.database.UserLoginDB;
 import com.vuvanduong.ringchat.model.User;
 import com.vuvanduong.ringchat.service.LinphoneService;
 import com.vuvanduong.ringchat.util.MD5;
@@ -49,6 +52,7 @@ public class LoginActivity extends AppCompatActivity {
     DatabaseReference users = dbReference.child("users");
     ProgressDialog dialog;
     User userLogin;
+    UserDB userDB;
 
     private AccountCreator mAccountCreator;
     private CoreListenerStub mCoreListener;
@@ -74,6 +78,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         };
 
+        userDB = new UserDB(this);
         addControl();
         addEvent();
     }
@@ -132,6 +137,8 @@ public class LoginActivity extends AppCompatActivity {
                                 User user = item.getValue(User.class);
                                 assert user != null;
                                 user.setId(item.getKey());
+                                long rs = userDB.insert(user);
+                                Log.e("LoginActivity: ",rs+"");
                                 if (user.getEmail().equalsIgnoreCase(email)&&user.getPassword().equalsIgnoreCase(MD5.getMd5(pass))) {
                                     SharedPrefs.getInstance().put(Constant.IS_LOGIN, true);
                                     SharedPrefs.getInstance().put(Constant.EMAIL_USER_LOGIN, user.getEmail());

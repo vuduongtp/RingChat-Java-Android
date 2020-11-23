@@ -16,6 +16,7 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import com.vuvanduong.ringchat.R;
 import com.vuvanduong.ringchat.model.User;
+import com.vuvanduong.ringchat.util.CircleTransform;
 import com.vuvanduong.ringchat.util.ImageUtils;
 import com.vuvanduong.ringchat.util.UserUtil;
 
@@ -80,6 +81,7 @@ public class UserProfileActivity extends AppCompatActivity {
             Picasso.with(this)
                     .load(userScan.getImage())
                     .placeholder(R.drawable.user)
+                    .transform(new CircleTransform())
                     .into(imgProfileAvatar);
         }
     }

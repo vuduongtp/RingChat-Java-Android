@@ -18,6 +18,8 @@ import com.google.firebase.database.ValueEventListener;
 import com.vuvanduong.ringchat.R;
 import com.vuvanduong.ringchat.config.Constant;
 import com.vuvanduong.ringchat.database.DatabaseHelper;
+import com.vuvanduong.ringchat.database.UserDB;
+import com.vuvanduong.ringchat.database.UserLoginDB;
 import com.vuvanduong.ringchat.model.User;
 import com.vuvanduong.ringchat.service.LinphoneService;
 import com.vuvanduong.ringchat.service.NetworkChangeService;
@@ -41,6 +43,8 @@ public class WelcomeActivity extends AppCompatActivity {
     private Handler mHandler;
     User user;
     private CoreListenerStub mCoreListener;
+    UserDB userDB;
+    UserLoginDB userLoginDB;
 
     private void openDatabase() throws java.sql.SQLException {
         DatabaseHelper myDbHelper = new DatabaseHelper(WelcomeActivity.this);
@@ -74,6 +78,8 @@ public class WelcomeActivity extends AppCompatActivity {
         } catch (java.sql.SQLException throwables) {
             throwables.printStackTrace();
         }
+        userDB = new UserDB(this);
+        userLoginDB = new UserLoginDB(this);
 
         Intent netWorkService = new Intent(this, NetworkChangeService.class);
         startService(netWorkService);
@@ -128,6 +134,8 @@ public class WelcomeActivity extends AppCompatActivity {
         boolean isFromLogin = intent.getBooleanExtra(Constant.IS_FROM_LOGIN,false);
         if (isFromLogin) {
             user = (User) intent.getSerializableExtra("user_login");
+            long rs = userLoginDB.login(user);
+            Log.e("WelcomeActivity: ",rs+"login");
             Intent home = new Intent(WelcomeActivity.this, HomeActivity.class);
             home.putExtra("user_login", (Serializable) user);
             startActivity(home);
@@ -144,6 +152,8 @@ public class WelcomeActivity extends AppCompatActivity {
                         User userCheck = item.getValue(User.class);
                         assert userCheck != null;
                         userCheck.setId(item.getKey());
+                        long rs = userDB.insert(userCheck);
+                        Log.e("WelcomeActivity: ",rs+"");
                         if (userCheck.getEmail().equalsIgnoreCase(email)&&userCheck.getPassword().equalsIgnoreCase(MD5.getMd5(pass))) {
                             SharedPrefs.getInstance().put(Constant.IS_LOGIN, true);
                             SharedPrefs.getInstance().put(Constant.MY_AVATAR, userCheck.getImage());

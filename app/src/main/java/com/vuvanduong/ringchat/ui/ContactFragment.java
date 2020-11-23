@@ -134,11 +134,11 @@ public class ContactFragment extends Fragment {
             }
         });
 
-        rvContact.setOnScrollListener(new RecyclerView.OnScrollListener() {
+        rvContact.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
-                if (IsRecyclerViewAtTop()) {
+                if (!recyclerView.canScrollVertically(-1) && newState==0) { //check for scroll down
                     if (listFriend.size() != 0 && count % listFriend.size() == 0 && reloadListContact.getVisibility() == View.GONE) {
                         listFriend.clear();
                         reloadListContact.setVisibility(View.VISIBLE);
@@ -153,11 +153,30 @@ public class ContactFragment extends Fragment {
                 }
             }
 
-            @Override
-            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
 
-            }
+            //            @Override
+//            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+//                super.onScrollStateChanged(recyclerView, newState);
+//                if (IsRecyclerViewAtTop()) {
+//                    if (listFriend.size() != 0 && count % listFriend.size() == 0 && reloadListContact.getVisibility() == View.GONE) {
+//                        listFriend.clear();
+//                        reloadListContact.setVisibility(View.VISIBLE);
+//                        initFriend();
+//                    }
+//                    if (listFriend.size() == 0 && reloadListContact.getVisibility() == View.GONE) {
+//                        listFriend.clear();
+//                        reloadListContact.setVisibility(View.VISIBLE);
+//                        initFriend();
+//                    }
+//                    count++;
+//                }
+//            }
+//
+//            @Override
+//            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+//                super.onScrolled(recyclerView, dx, dy);
+//
+//            }
         });
 
         txtSearchFriend.addTextChangedListener(new TextWatcher() {
