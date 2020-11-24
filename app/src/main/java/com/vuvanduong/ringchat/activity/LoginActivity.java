@@ -150,6 +150,7 @@ public class LoginActivity extends AppCompatActivity {
                                     userLogin = user;
 
                                     configureAccount();
+                                    dialog.dismiss();
                                     Intent welcome = new Intent(LoginActivity.this, WelcomeActivity.class);
                                     welcome.putExtra("user_login", (Serializable) user);
                                     welcome.putExtra(Constant.IS_FROM_LOGIN,true);
@@ -220,9 +221,9 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (LinphoneService.getCore()!=null) {
-            LinphoneService.getCore().addListener(mCoreListener);
-        }
+//        if (LinphoneService.getCore()!=null) {
+//            LinphoneService.getCore().addListener(mCoreListener);
+//        }
     }
 
     @Override

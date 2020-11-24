@@ -28,12 +28,14 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 import com.vuvanduong.ringchat.R;
 import com.vuvanduong.ringchat.adapter.MessageAdapter;
 import com.vuvanduong.ringchat.config.Constant;
 import com.vuvanduong.ringchat.model.Message;
 import com.vuvanduong.ringchat.model.User;
 import com.vuvanduong.ringchat.service.LinphoneService;
+import com.vuvanduong.ringchat.util.CircleTransform;
 import com.vuvanduong.ringchat.util.DBUtil;
 import com.vuvanduong.ringchat.util.UserUtil;
 
@@ -70,7 +72,7 @@ public class ConversationActivity extends AppCompatActivity {
     private ArrayList<User> usersInRoom;
     private ChildEventListener messageReceive,friendStatus;
     ProgressBar loadingConversation;
-    ImageView btnBackFromConversation;
+    ImageView btnBackFromConversation, imgAvatarFriendConversation;
     ImageButton img_but_video,img_but_voice;
     private String impu;
     private AccountCreator mAccountCreator;
@@ -91,6 +93,12 @@ public class ConversationActivity extends AppCompatActivity {
         loadingConversation = findViewById(R.id.loadingConversation);
         loadingConversation.setVisibility(View.VISIBLE);
         impu = friend.getId()+"@"+Constant.SIP_SERVER;
+        imgAvatarFriendConversation = findViewById(R.id.imgAvatarFriendConversation);
+        Picasso.with(this)
+                .load(friend.getImage())
+                .placeholder(R.drawable.user)
+                .transform(new CircleTransform())
+                .into(imgAvatarFriendConversation);
 
         mCoreListener = new CoreListenerStub() {
             @Override

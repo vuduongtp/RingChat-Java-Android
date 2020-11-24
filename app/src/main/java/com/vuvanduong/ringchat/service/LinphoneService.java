@@ -251,6 +251,7 @@ public class LinphoneService extends Service {
 
     @Override
     public void onDestroy() {
+        super.onDestroy();
         //set offline
         if (mCore.getDefaultProxyConfig() != null) {
             String username = mCore.getDefaultProxyConfig().getContact().getUsername();
@@ -285,7 +286,6 @@ public class LinphoneService extends Service {
         // Don't forget to free the singleton as well
         sInstance = null;
 
-        super.onDestroy();
     }
 
     @Override
@@ -357,4 +357,5 @@ public class LinphoneService extends Service {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
     }
+
 }

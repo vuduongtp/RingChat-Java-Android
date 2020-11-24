@@ -25,12 +25,14 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 import com.vuvanduong.ringchat.R;
 import com.vuvanduong.ringchat.activity.AddFriendActivity;
 import com.vuvanduong.ringchat.activity.UserProfileActivity;
 import com.vuvanduong.ringchat.adapter.MessageAdapter;
 import com.vuvanduong.ringchat.model.Message;
 import com.vuvanduong.ringchat.model.User;
+import com.vuvanduong.ringchat.util.CircleTransform;
 import com.vuvanduong.ringchat.util.UserUtil;
 
 import java.io.Serializable;
@@ -95,10 +97,9 @@ public class HomeFragment extends Fragment {
 
         rvConversation.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                System.out.println("dy:"+dy);
-                System.out.println("dx:"+dx);
-                if (dy > 0) { //check for scroll down
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                if (!recyclerView.canScrollVertically(-1) && newState==0) { //check for scroll down
                     if (messages.size() != 0 && count % messages.size() == 0 && reloadListMessage.getVisibility() == View.GONE) {
                         messages.clear();
                         reloadListMessage.setVisibility(View.VISIBLE);
@@ -112,37 +113,7 @@ public class HomeFragment extends Fragment {
                     count++;
                 }
             }
- //           @Override
-//            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
-//                super.onScrollStateChanged(recyclerView, newState);
-//                if (IsRecyclerViewAtTop()) {
-//                    if (messages.size() != 0 && count % messages.size() == 0 && reloadListMessage.getVisibility() == View.GONE) {
-//                        messages.clear();
-//                        reloadListMessage.setVisibility(View.VISIBLE);
-//                        getData();
-//                    }
-//                    if (messages.size() == 0 && reloadListMessage.getVisibility() == View.GONE) {
-//                        messages.clear();
-//                        reloadListMessage.setVisibility(View.VISIBLE);
-//                        getData();
-//                    }
-//                    count++;
-//                }
-//            }
-//
-//            @Override
-//            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-//                super.onScrolled(recyclerView, dx, dy);
-//
-//            }
         });
-
-    }
-
-    private boolean IsRecyclerViewAtTop() {
-        if (rvConversation.getChildCount() == 0)
-            return true;
-        return rvConversation.getChildAt(0).getTop() == 0;
     }
 
     private void setControl(View view) {
@@ -156,6 +127,12 @@ public class HomeFragment extends Fragment {
         reloadListMessage = view.findViewById(R.id.reloadListMessage);
         messages = new ArrayList<>();
         friends = new ArrayList<>();
+
+        Picasso.with(getActivity())
+                .load(user.getImage())
+                .placeholder(R.drawable.user)
+                .transform(new CircleTransform())
+                .into(img_avt_friend);
 
         getData();
     }

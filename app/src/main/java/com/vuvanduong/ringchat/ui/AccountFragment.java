@@ -45,6 +45,7 @@ import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
+import com.squareup.picasso.Picasso;
 import com.vuvanduong.ringchat.R;
 import com.vuvanduong.ringchat.activity.AboutActivity;
 import com.vuvanduong.ringchat.activity.AddFriendActivity;
@@ -55,6 +56,9 @@ import com.vuvanduong.ringchat.activity.WelcomeActivity;
 import com.vuvanduong.ringchat.app.InitialApp;
 import com.vuvanduong.ringchat.config.Constant;
 import com.vuvanduong.ringchat.model.User;
+import com.vuvanduong.ringchat.service.LinphoneService;
+import com.vuvanduong.ringchat.service.NetworkChangeService;
+import com.vuvanduong.ringchat.util.CircleTransform;
 import com.vuvanduong.ringchat.util.ImageUtils;
 import com.vuvanduong.ringchat.util.SharedPrefs;
 import com.vuvanduong.ringchat.util.UserUtil;
@@ -176,7 +180,12 @@ public class AccountFragment extends Fragment {
                                 }
                                 SharedPrefs.getInstance().put(Constant.IS_LOGIN, false);
                                 SharedPrefs.getInstance().put(Constant.IS_SAVE_PASS, true);
-                                Intent login = new Intent(getActivity(), LoginActivity.class);
+                                Intent linphone = new Intent(getActivity(), LinphoneService.class);
+                                getActivity().stopService(linphone);
+                                Intent network = new Intent(getActivity(), NetworkChangeService.class);
+                                getActivity().stopService(network);
+
+                                Intent login = new Intent(getActivity(), WelcomeActivity.class);
                                 startActivity(login);
                                 Objects.requireNonNull(getActivity()).finish();
                                 break;
@@ -463,6 +472,11 @@ public class AccountFragment extends Fragment {
         imgQRGen = view.findViewById(R.id.imgQRGen);
         txtNameAccount.setText(UserUtil.getFullName(user));
         txtEmailAccount.setText(user.getEmail());
+        Picasso.with(getActivity())
+                .load(user.getImage())
+                .placeholder(R.drawable.user)
+                .transform(new CircleTransform())
+                .into(imgMyAvatarAccount);
 
         configCloudinary();
 

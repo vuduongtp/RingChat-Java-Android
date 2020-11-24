@@ -13,8 +13,10 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.squareup.picasso.Picasso;
 import com.vuvanduong.ringchat.R;
 import com.vuvanduong.ringchat.model.User;
+import com.vuvanduong.ringchat.util.CircleTransform;
 import com.vuvanduong.ringchat.util.UserUtil;
 
 import java.util.ArrayList;
@@ -58,6 +60,11 @@ public class SelectFriendAdapter extends RecyclerView.Adapter<SelectFriendAdapte
                 }
             }
         });
+        Picasso.with(this.context)
+                .load(dataContacts.get(position).getImage())
+                .placeholder(R.drawable.user)
+                .transform(new CircleTransform())
+                .into(holder.imgAvatarSelectFriend);
     }
 
     public int getItemCount() {

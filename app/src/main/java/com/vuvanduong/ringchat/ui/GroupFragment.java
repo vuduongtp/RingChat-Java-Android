@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,6 +26,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 import com.vuvanduong.ringchat.R;
 import com.vuvanduong.ringchat.activity.AddFriendActivity;
 import com.vuvanduong.ringchat.activity.AddGroupActivity;
@@ -34,6 +36,7 @@ import com.vuvanduong.ringchat.adapter.SelectFriendAdapter;
 import com.vuvanduong.ringchat.model.GroupChat;
 import com.vuvanduong.ringchat.model.Message;
 import com.vuvanduong.ringchat.model.User;
+import com.vuvanduong.ringchat.util.CircleTransform;
 import com.vuvanduong.ringchat.util.UserUtil;
 
 import java.io.Serializable;
@@ -58,6 +61,7 @@ public class GroupFragment extends Fragment {
     private ArrayList<GroupChat> groupChats;
     private int count = 0;
     private boolean isFirstLoad = true;
+    private ImageView imgMyAvatar;
 
     @Nullable
     @Override
@@ -93,14 +97,11 @@ public class GroupFragment extends Fragment {
         initView();
         getData();
 
-
-
-        rvGroupConversation.setOnScrollListener(new RecyclerView.OnScrollListener() {
+        rvGroupConversation.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
-                if(IsRecyclerViewAtTop())
-                {
+                if (!recyclerView.canScrollVertically(-1) && newState==0) { //check for scroll down
                     if (groupChats.size()!=0&&count%groupChats.size()==0 && reloadListGroup.getVisibility()==View.GONE) {
                         groupChats.clear();
                         reloadListGroup.setVisibility(View.VISIBLE);
@@ -113,12 +114,6 @@ public class GroupFragment extends Fragment {
                     }
                     count++;
                 }
-            }
-
-            @Override
-            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-
             }
         });
 
@@ -201,6 +196,12 @@ public class GroupFragment extends Fragment {
         loading = view.findViewById(R.id.loadingGroupFragment);
         loading.setVisibility(View.VISIBLE);
         reloadListGroup= view.findViewById(R.id.reloadListGroup);
+        imgMyAvatar = view.findViewById(R.id.imgMyAvatar);
+        Picasso.with(getActivity())
+                .load(user.getImage())
+                .placeholder(R.drawable.user)
+                .transform(new CircleTransform())
+                .into(imgMyAvatar);
         groupChats = new ArrayList<>();
     }
 

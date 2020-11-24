@@ -15,10 +15,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.squareup.picasso.Picasso;
 import com.vuvanduong.ringchat.R;
 import com.vuvanduong.ringchat.activity.ConversationActivity;
 import com.vuvanduong.ringchat.model.Message;
 import com.vuvanduong.ringchat.model.User;
+import com.vuvanduong.ringchat.util.CircleTransform;
 import com.vuvanduong.ringchat.util.DBUtil;
 import com.vuvanduong.ringchat.util.UserUtil;
 
@@ -179,6 +181,13 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         me.imgIconMessageMe.requestLayout();
         me.imgIconMessageMe.getLayoutParams().height = 0;
         me.imgIconMessageMe.getLayoutParams().width = 0;
+
+        Picasso.with(this.context)
+                .load(userLogin.getImage())
+                .placeholder(R.drawable.user)
+                .transform(new CircleTransform())
+                .into(me.imgAvatarMeMessage);
+
 //        if (messages.get(position).getType()==null || messages.get(position).getType().equalsIgnoreCase("message")){
 //            me.imgIconMessageMe.requestLayout();
 //            me.imgIconMessageMe.getLayoutParams().height = 0;
@@ -195,8 +204,18 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         String time = "";
         if (isGroup) {
             time = messages.get(position).getDatetime() + "\n" + getNameUser(messages.get(position).getUserID());
+            Picasso.with(this.context)
+                    .load(usersInRoom.get(position).getImage())
+                    .placeholder(R.drawable.user)
+                    .transform(new CircleTransform())
+                    .into(you.imgAvatarFriendYou);
         } else {
             time = messages.get(position).getDatetime();
+            Picasso.with(this.context)
+                    .load(friend.getImage())
+                    .placeholder(R.drawable.user)
+                    .transform(new CircleTransform())
+                    .into(you.imgAvatarFriendYou);
         }
         you.txtTimeMessageYou.setText(time);
         you.txtContextMessageYou.setText(messages.get(position).getContext());
@@ -204,6 +223,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         you.imgIconMessageYou.getLayoutParams().height = 0;
         you.imgIconMessageYou.getLayoutParams().width = 0;
         you.imgIconMessageYou.setScaleType(ImageView.ScaleType.FIT_XY);
+
 //        if (messages.get(position).getType()==null || messages.get(position).getType().equalsIgnoreCase("message")){
 //            you.imgIconMessageYou.requestLayout();
 //            you.imgIconMessageYou.getLayoutParams().height = 0;
@@ -240,6 +260,11 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             lastMessage.imgIconMessageLast.getLayoutParams().width = 0;
             lastMessage.imgIconMessageLast.setScaleType(ImageView.ScaleType.FIT_XY);
         }
+        Picasso.with(this.context)
+                .load(getUser(getFriendId(messages.get(position).getIdRoom())).getImage())
+                .placeholder(R.drawable.user)
+                .transform(new CircleTransform())
+                .into(lastMessage.imgFriendHome);
     }
 
     private void configureViewHolderGroup(HolderGroupMessage groupMessage, int position) {

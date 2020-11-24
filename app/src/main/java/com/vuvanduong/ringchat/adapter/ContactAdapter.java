@@ -18,11 +18,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.gms.common.data.DataHolder;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.squareup.picasso.Picasso;
 import com.vuvanduong.ringchat.R;
 import com.vuvanduong.ringchat.activity.ConversationActivity;
 import com.vuvanduong.ringchat.activity.WelcomeActivity;
 import com.vuvanduong.ringchat.app.InitialApp;
 import com.vuvanduong.ringchat.model.User;
+import com.vuvanduong.ringchat.util.CircleTransform;
 import com.vuvanduong.ringchat.util.UserUtil;
 
 import java.io.Serializable;
@@ -143,6 +145,11 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
         }
         holder.txtNameFriend.setText(UserUtil.getFullName(users.get(position)));
         holder.txtEmailFriend.setText(users.get(position).getEmail());
+        Picasso.with(context)
+                .load(users.get(position).getImage())
+                .placeholder(R.drawable.user)
+                .transform(new CircleTransform())
+                .into(holder.imgAvatarFriend);
     }
 
     @Override
