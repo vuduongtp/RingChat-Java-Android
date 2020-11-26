@@ -10,6 +10,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.cloudinary.android.MediaManager;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -34,7 +35,10 @@ import org.linphone.core.RegistrationState;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
 
 public class WelcomeActivity extends AppCompatActivity {
     FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -45,6 +49,18 @@ public class WelcomeActivity extends AppCompatActivity {
     private CoreListenerStub mCoreListener;
     UserDB userDB;
     UserLoginDB userLoginDB;
+    private Map<String, String> config = new HashMap<String, String>();
+
+    private void configCloudinary() {
+        config.put("cloud_name", "vuduongtp");
+        config.put("api_key", "987439358416729");
+        config.put("api_secret", "Uj9Jes5zUjtAnYLXd81uR5qnGts");
+        try {
+            MediaManager.init(Objects.requireNonNull(WelcomeActivity.this), config);
+        }catch (IllegalStateException ex){
+            Log.e("exist","cloudinary");
+        }
+    }
 
     private void openDatabase() throws java.sql.SQLException {
         DatabaseHelper myDbHelper = new DatabaseHelper(WelcomeActivity.this);
@@ -80,9 +96,6 @@ public class WelcomeActivity extends AppCompatActivity {
         }
         userDB = new UserDB(this);
         userLoginDB = new UserLoginDB(this);
-
-        Intent netWorkService = new Intent(this, NetworkChangeService.class);
-        startService(netWorkService);
 
         Locale current = getResources().getConfiguration().locale;
         String language = SharedPrefs.getInstance().get(Constant.LANGUAGE_CODE, String.class);
@@ -164,6 +177,11 @@ public class WelcomeActivity extends AppCompatActivity {
                             SharedPrefs.getInstance().put(Constant.PASS_USER_LOGIN, pass);
                             SharedPrefs.getInstance().put(Constant.BIRTHDAY_USER_LOGIN, userCheck.getBirthday());
                             user = userCheck;
+
+                            Intent netWorkService = new Intent(WelcomeActivity.this, NetworkChangeService.class);
+                            startService(netWorkService);
+                            configCloudinary();
+
                             SipRegister();
                             finish();
                             return;

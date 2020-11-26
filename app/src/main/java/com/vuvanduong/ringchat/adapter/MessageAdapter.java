@@ -1,11 +1,17 @@
 package com.vuvanduong.ringchat.adapter;
 
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,6 +24,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.Picasso;
 import com.vuvanduong.ringchat.R;
 import com.vuvanduong.ringchat.activity.ConversationActivity;
+import com.vuvanduong.ringchat.activity.EditPasswordActivity;
+import com.vuvanduong.ringchat.activity.ViewImageActivity;
+import com.vuvanduong.ringchat.config.Constant;
 import com.vuvanduong.ringchat.model.Message;
 import com.vuvanduong.ringchat.model.User;
 import com.vuvanduong.ringchat.util.CircleTransform;
@@ -40,6 +49,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private User friend;
     private ArrayList<User> usersInRoom;
     private boolean isGroup;
+    private int maxSizeImage;
 
     public MessageAdapter(ArrayList<Message> chatMessages, Context context, User userLogin, ArrayList<User> usersInRoom, boolean isGroup) {
         this.messages = chatMessages;
@@ -50,6 +60,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         if (!isGroup) {
             friend = usersInRoom.get(0);
         }
+        maxSizeImage = Constant.getMaxWidthScreen(context);
     }
 
     @Override
@@ -117,6 +128,15 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                         }
                     }
                 });
+
+                ((HolderMe) holder).imgIconMessageMe.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent viewImage = new Intent(context, ViewImageActivity.class);
+                        viewImage.putExtra("url", messages.get(position).getContext());
+                        context.startActivity(viewImage);
+                    }
+                });
                 break;
             case YOU:
                 final HolderYou you = (HolderYou) holder;
@@ -171,23 +191,46 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     private void configureViewHolderMe(HolderMe me, int position) {
         String time = "";
-        if (isGroup) {
-            time = messages.get(position).getDatetime() + "\n" + getNameUser(messages.get(position).getUserID());
-        } else {
+        if (messages.get(position).getType().equalsIgnoreCase("image")){
             time = messages.get(position).getDatetime();
+            me.txtTimeMessageMe.setText(time);
+            me.imgIconMessageMe.setVisibility(View.VISIBLE);
+            Log.e("image",messages.get(position).getContext());
+            Picasso.with(this.context)
+                    .load(userLogin.getImage())
+                    .placeholder(R.drawable.user)
+                    .transform(new CircleTransform())
+                    .into(me.imgAvatarMeMessage);
+            Picasso.with(this.context)
+                    .load(R.drawable.emptyimage)
+                    .resize(maxSizeImage,maxSizeImage)
+                    .centerInside()
+                    .into(me.imgIconMessageMe);
+            Picasso.with(this.context)
+                    .load(messages.get(position).getContext())
+                    .resize(maxSizeImage,maxSizeImage)
+                    .centerInside()
+                    .into(me.imgIconMessageMe);
+
+        }else {
+            if (isGroup) {
+                time = messages.get(position).getDatetime() + "\n" + getNameUser(messages.get(position).getUserID());
+            } else {
+                time = messages.get(position).getDatetime();
+            }
+            me.txtTimeMessageMe.setText(time);
+            me.txtContextMessageMe.setText(messages.get(position).getContext());
+            me.imgIconMessageMe.requestLayout();
+            me.imgIconMessageMe.getLayoutParams().height = 0;
+            me.imgIconMessageMe.getLayoutParams().width = 0;
+
+            Picasso.with(this.context)
+                    .load(userLogin.getImage())
+                    .placeholder(R.drawable.user)
+                    .transform(new CircleTransform())
+                    .into(me.imgAvatarMeMessage);
+
         }
-        me.txtTimeMessageMe.setText(time);
-        me.txtContextMessageMe.setText(messages.get(position).getContext());
-        me.imgIconMessageMe.requestLayout();
-        me.imgIconMessageMe.getLayoutParams().height = 0;
-        me.imgIconMessageMe.getLayoutParams().width = 0;
-
-        Picasso.with(this.context)
-                .load(userLogin.getImage())
-                .placeholder(R.drawable.user)
-                .transform(new CircleTransform())
-                .into(me.imgAvatarMeMessage);
-
 //        if (messages.get(position).getType()==null || messages.get(position).getType().equalsIgnoreCase("message")){
 //            me.imgIconMessageMe.requestLayout();
 //            me.imgIconMessageMe.getLayoutParams().height = 0;
@@ -202,27 +245,51 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     private void configureViewHolderYou(HolderYou you, int position) {
         String time = "";
-        if (isGroup) {
-            time = messages.get(position).getDatetime() + "\n" + getNameUser(messages.get(position).getUserID());
-            Picasso.with(this.context)
-                    .load(usersInRoom.get(position).getImage())
-                    .placeholder(R.drawable.user)
-                    .transform(new CircleTransform())
-                    .into(you.imgAvatarFriendYou);
-        } else {
+        if (messages.get(position).getType().equalsIgnoreCase("image")){
             time = messages.get(position).getDatetime();
+            you.txtTimeMessageYou.setText(time);
+            you.imgIconMessageYou.setVisibility(View.VISIBLE);
+            Log.e("image",messages.get(position).getContext());
             Picasso.with(this.context)
                     .load(friend.getImage())
                     .placeholder(R.drawable.user)
                     .transform(new CircleTransform())
                     .into(you.imgAvatarFriendYou);
+            Picasso.with(this.context)
+                    .load(R.drawable.emptyimage)
+                    .resize(maxSizeImage,maxSizeImage)
+                    .centerInside()
+                    .into(you.imgIconMessageYou);
+            Picasso.with(this.context)
+                    .load(messages.get(position).getContext())
+                    .resize(maxSizeImage,maxSizeImage)
+                    .centerInside()
+                    .into(you.imgIconMessageYou);
+
+        }else {
+            if (isGroup) {
+                time = messages.get(position).getDatetime() + "\n" + getNameUser(messages.get(position).getUserID());
+                Picasso.with(this.context)
+                        .load(usersInRoom.get(position).getImage())
+                        .placeholder(R.drawable.user)
+                        .transform(new CircleTransform())
+                        .into(you.imgAvatarFriendYou);
+            } else {
+                time = messages.get(position).getDatetime();
+                Picasso.with(this.context)
+                        .load(friend.getImage())
+                        .placeholder(R.drawable.user)
+                        .transform(new CircleTransform())
+                        .into(you.imgAvatarFriendYou);
+            }
+            you.txtTimeMessageYou.setText(time);
+            you.txtContextMessageYou.setText(messages.get(position).getContext());
+            you.imgIconMessageYou.requestLayout();
+            you.imgIconMessageYou.getLayoutParams().height = 0;
+            you.imgIconMessageYou.getLayoutParams().width = 0;
+            you.imgIconMessageYou.setScaleType(ImageView.ScaleType.FIT_XY);
+
         }
-        you.txtTimeMessageYou.setText(time);
-        you.txtContextMessageYou.setText(messages.get(position).getContext());
-        you.imgIconMessageYou.requestLayout();
-        you.imgIconMessageYou.getLayoutParams().height = 0;
-        you.imgIconMessageYou.getLayoutParams().width = 0;
-        you.imgIconMessageYou.setScaleType(ImageView.ScaleType.FIT_XY);
 
 //        if (messages.get(position).getType()==null || messages.get(position).getType().equalsIgnoreCase("message")){
 //            you.imgIconMessageYou.requestLayout();

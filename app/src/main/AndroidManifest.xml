@@ -17,10 +17,12 @@
         android:roundIcon="@drawable/logo"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".activity.ViewImageActivity"></activity>
+
         <receiver
             android:name=".service.NetworkChangeReceiver"
             android:enabled="true"
-            android:exported="false"></receiver>
+            android:exported="false" />
 
         <service
             android:name=".service.NetworkChangeService"

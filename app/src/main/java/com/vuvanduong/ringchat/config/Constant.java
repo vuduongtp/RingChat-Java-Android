@@ -1,5 +1,8 @@
 package com.vuvanduong.ringchat.config;
 
+import android.content.Context;
+import android.view.WindowManager;
+
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
@@ -29,4 +32,10 @@ public class Constant {
     public static final String LANGUAGE_CODE = "language";
     public static final String EMAIL_SENDER = "mailsenderptithcm@gmail.com";
     public static final String PASS_EMAIL_SENDER = "ptithcm123";
+    public static final int IMAGE_SIZE_DISPLAY = 500;
+
+    public static int getMaxWidthScreen(Context context){
+        WindowManager mWinMgr = (WindowManager)context.getSystemService(Context.WINDOW_SERVICE);
+        return mWinMgr.getDefaultDisplay().getWidth()/2;
+    }
 }

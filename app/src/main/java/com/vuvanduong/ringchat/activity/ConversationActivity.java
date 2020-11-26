@@ -3,14 +3,28 @@ package com.vuvanduong.ringchat.activity;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.drawable.RoundedBitmapDrawable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.Manifest;
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.provider.MediaStore;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -21,6 +35,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.cloudinary.android.MediaManager;
+import com.cloudinary.android.callback.ErrorInfo;
+import com.cloudinary.android.callback.UploadCallback;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -37,11 +54,16 @@ import com.vuvanduong.ringchat.model.User;
 import com.vuvanduong.ringchat.service.LinphoneService;
 import com.vuvanduong.ringchat.util.CircleTransform;
 import com.vuvanduong.ringchat.util.DBUtil;
+import com.vuvanduong.ringchat.util.ImageUtils;
 import com.vuvanduong.ringchat.util.UserUtil;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Objects;
 
 import org.linphone.core.AccountCreator;
@@ -62,7 +84,7 @@ public class ConversationActivity extends AppCompatActivity {
     TextView txtStatusConversation,txtNameFriendConversation;
     EditText txtContextConversation;
     RecyclerView rvChatConversation;
-    Button btnSendMessageConversation;
+    Button btnSendMessageConversation, btnSendImageMessageConversation;
     private String chatRoom = "";
     private FirebaseDatabase database = FirebaseDatabase.getInstance();
     private DatabaseReference dbReference = database.getReference();
@@ -79,6 +101,11 @@ public class ConversationActivity extends AppCompatActivity {
     private CoreListenerStub mCoreListener;
     int count =0;
     boolean isFirstLoad=true;
+
+    private static final int PERMISSION_CODE = 2;
+    private static final int PICK_IMAGE = 2;
+    int rotationInDegrees = 0, rotation = 0;
+    ProgressDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -246,6 +273,151 @@ public class ConversationActivity extends AppCompatActivity {
             }
         });
 
+        btnSendImageMessageConversation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                requestPermission();
+            }
+        });
+
+    }
+
+    private void requestPermission() {
+        if (ContextCompat.checkSelfPermission
+                (Objects.requireNonNull(ConversationActivity.this),
+                        Manifest.permission.READ_EXTERNAL_STORAGE
+                ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            accessTheGallery();
+        } else {
+            ActivityCompat.requestPermissions(
+                    Objects.requireNonNull(ConversationActivity.this),
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                    PERMISSION_CODE
+            );
+        }
+    }
+
+    public void accessTheGallery() {
+        Intent i = new Intent(
+                Intent.ACTION_PICK,
+                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+        );
+        i.setType("image/*");
+        startActivityForResult(i, PICK_IMAGE);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == PERMISSION_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                accessTheGallery();
+            } else {
+                Toast.makeText(Objects.requireNonNull(ConversationActivity.this), "Permission denied", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PICK_IMAGE && data != null) {
+            try {
+                dialog = ProgressDialog.show(ConversationActivity.this, "",
+                        "", true);
+                dialog.show();
+                ExifInterface exif = new ExifInterface(getRealPathFromUri(data.getData(), Objects.requireNonNull(ConversationActivity.this)));
+                rotation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+                rotationInDegrees = ImageUtils.exifToDegrees(rotation);
+                InputStream inputStream = Objects.requireNonNull(ConversationActivity.this).getContentResolver().openInputStream(Objects.requireNonNull(data.getData()));
+                new ImageProcessUpload().execute(inputStream);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private String getRealPathFromUri(Uri imageUri, Activity activity) {
+        Cursor cursor = activity.getContentResolver().query(imageUri, null, null, null, null);
+        if (cursor == null) {
+            return imageUri.getPath();
+        } else {
+            cursor.moveToFirst();
+            int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+            return cursor.getString(idx);
+        }
+    }
+
+    private class ImageProcessUpload extends AsyncTask<InputStream, Void, Void> {
+        protected Void doInBackground(InputStream... inputStream) {
+            try {
+                Bitmap imgBitmap = BitmapFactory.decodeStream(inputStream[0]);
+                Bitmap liteImage = ImageUtils.getResizedBitmap(imgBitmap, ImageUtils.PHOTO_MAX_SIZE);
+                //liteImage = ImageUtils.cropToSquare(liteImage);
+                Matrix matrix = new Matrix();
+                if (rotation != 0f) {
+                    matrix.preRotate(rotationInDegrees);
+                }
+                rotation = 0;
+                rotationInDegrees = 0;
+                liteImage = Bitmap.createBitmap(liteImage, 0, 0, liteImage.getWidth(), liteImage.getHeight(), matrix, true);
+
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                liteImage.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                byte[] byteArray = stream.toByteArray();
+                uploadByteToCloudinary(byteArray);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+    }
+
+    private void uploadByteToCloudinary(final byte[] image) {
+        try {
+            MediaManager.get().upload(image)
+                    .option("tags", "message")
+                    .option("folder", "message")
+                    .callback(new UploadCallback() {
+                        @Override
+                        public void onStart(String requestId) {
+                        }
+
+                        @Override
+                        public void onProgress(String requestId, long bytes, long totalBytes) {
+                        }
+
+                        @Override
+                        public void onSuccess(String requestId, Map resultData) {
+                            Message newMessage = new Message();
+                            newMessage.setType("image");
+                            newMessage.setContext(resultData.get("url").toString());
+                            newMessage.setDatetime(DBUtil.getStringDateTime());
+                            newMessage.setUserID(userLogin.getId());
+
+                            //them vao firebase
+                            conversationMessages.push().setValue(newMessage);
+                            newMessage.setDatetime(DBUtil.getStringDateTimeChatRoom());
+                            newMessage.setContext(UserUtil.getFullName(userLogin)+" "+getString(R.string.sent_a_image));
+                            conversationLastMessage.setValue(newMessage);
+                            dialog.dismiss();
+                        }
+
+                        @Override
+                        public void onError(String requestId, ErrorInfo error) {
+                            Log.e("upload_image",error.toString());
+                            dialog.dismiss();
+                        }
+
+                        @Override
+                        public void onReschedule(String requestId, ErrorInfo error) {
+                        }
+                    }).dispatch();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void startVideoCall() {
@@ -287,6 +459,7 @@ public class ConversationActivity extends AppCompatActivity {
         btnBackFromConversation = findViewById(R.id.btnBackFromConversation);
         img_but_video = findViewById(R.id.img_but_video);
         img_but_voice = findViewById(R.id.img_but_voice);
+        btnSendImageMessageConversation = findViewById(R.id.btnSendImageMessageConversation);
 
         txtNameFriendConversation.setText(UserUtil.getFullName(friend));
         if (friend.getStatus()==null || friend.getStatus().equalsIgnoreCase("" )

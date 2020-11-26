@@ -102,4 +102,7 @@
     <string name="confirm_remove_friend">Bạn có chắc muốn huỷ kết bạn với người này?</string>
     <string name="voice_call">Cuộc gọi âm thanh</string>
     <string name="video_call">Cuộc gọi video</string>
+    <string name="permission_denied">Vui lòng cấp quyền</string>
+    <string name="QR_scan">Quét mã QR</string>
+    <string name="sent_a_image">đã gửi một hình ảnh.</string>
 </resources>

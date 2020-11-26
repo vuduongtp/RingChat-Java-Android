@@ -102,5 +102,8 @@
     <string name="confirm_remove_friend">Are you sure remove this friend?</string>
     <string name="voice_call">Voice call</string>
     <string name="video_call">Voice call</string>
+    <string name="permission_denied">Permission denied</string>
+    <string name="QR_scan">Scan QR Code</string>
+    <string name="sent_a_image">sent a image.</string>
 
 </resources>

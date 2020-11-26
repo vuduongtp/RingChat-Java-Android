@@ -83,20 +83,8 @@ public class AccountFragment extends Fragment {
 
     private static final int PERMISSION_CODE = 1;
     private static final int PICK_IMAGE = 1;
-    private Map<String, String> config = new HashMap<String, String>();
     int rotationInDegrees = 0, rotation = 0;
     ProgressDialog dialog;
-
-    private void configCloudinary() {
-        config.put("cloud_name", "vuduongtp");
-        config.put("api_key", "987439358416729");
-        config.put("api_secret", "Uj9Jes5zUjtAnYLXd81uR5qnGts");
-        try {
-            MediaManager.init(Objects.requireNonNull(getActivity()), config);
-        }catch (IllegalStateException ex){
-            Log.e("exist","cloudinary");
-        }
-    }
 
     private void requestPermission() {
         if (ContextCompat.checkSelfPermission
@@ -120,7 +108,7 @@ public class AccountFragment extends Fragment {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 accessTheGallery();
             } else {
-                Toast.makeText(Objects.requireNonNull(getActivity()), "permission denied", Toast.LENGTH_SHORT).show();
+                Toast.makeText(Objects.requireNonNull(getActivity()), getString(R.string.permission_denied), Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -477,8 +465,6 @@ public class AccountFragment extends Fragment {
                 .placeholder(R.drawable.user)
                 .transform(new CircleTransform())
                 .into(imgMyAvatarAccount);
-
-        configCloudinary();
 
     }
 }
