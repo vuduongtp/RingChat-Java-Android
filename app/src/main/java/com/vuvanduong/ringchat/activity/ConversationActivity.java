@@ -569,6 +569,7 @@ public class ConversationActivity extends AppCompatActivity {
 
     public void chatBoxView(int delayTime) {
         rvChatConversation.setHasFixedSize(false);
+        rvChatConversation.setItemViewCacheSize(30);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         rvChatConversation.setLayoutManager(layoutManager);

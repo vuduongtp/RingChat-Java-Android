@@ -31,6 +31,7 @@ import com.vuvanduong.ringchat.model.Message;
 import com.vuvanduong.ringchat.model.User;
 import com.vuvanduong.ringchat.util.CircleTransform;
 import com.vuvanduong.ringchat.util.DBUtil;
+import com.vuvanduong.ringchat.util.RoundedCornersTransform;
 import com.vuvanduong.ringchat.util.UserUtil;
 
 import java.io.Serializable;
@@ -117,67 +118,23 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         switch (holder.getItemViewType()) {
             case ME:
                 final HolderMe me = (HolderMe) holder;
+                holder.setIsRecyclable(false);
                 configureViewHolderMe(me, position);
-                holder.itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (me.txtTimeMessageMe.getVisibility() == View.GONE) {
-                            me.txtTimeMessageMe.setVisibility(View.VISIBLE);
-                        } else {
-                            me.txtTimeMessageMe.setVisibility(View.GONE);
-                        }
-                    }
-                });
-
-                ((HolderMe) holder).imgIconMessageMe.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent viewImage = new Intent(context, ViewImageActivity.class);
-                        viewImage.putExtra("url", messages.get(position).getContext());
-                        context.startActivity(viewImage);
-                    }
-                });
                 break;
             case YOU:
                 final HolderYou you = (HolderYou) holder;
+                holder.setIsRecyclable(false);
                 configureViewHolderYou(you, position);
-                holder.itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (you.txtTimeMessageYou.getVisibility() == View.GONE) {
-                            you.txtTimeMessageYou.setVisibility(View.VISIBLE);
-                        } else {
-                            you.txtTimeMessageYou.setVisibility(View.GONE);
-                        }
-                    }
-                });
                 break;
             case LAST_MESSAGE:
                 final HolderLastMessage lastMessage = (HolderLastMessage) holder;
+                holder.setIsRecyclable(false);
                 configureViewHolderLastMessage(lastMessage, position);
-                holder.itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent conversation = new Intent(v.getContext(), ConversationActivity.class);
-                        conversation.putExtra("userLogin", (Serializable) userLogin);
-                        conversation.putExtra("friend", (Serializable) getUser(getFriendId(messages.get(position).getIdRoom())));
-                        v.getContext().startActivity(conversation);
-                    }
-                });
                 break;
             case GROUP:
                 final HolderGroupMessage groupMessage = (HolderGroupMessage) holder;
+                holder.setIsRecyclable(false);
                 configureViewHolderGroup(groupMessage, position);
-                holder.itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (groupMessage.txtTimeMessageGroup.getVisibility() == View.GONE) {
-                            groupMessage.txtTimeMessageGroup.setVisibility(View.VISIBLE);
-                        } else {
-                            groupMessage.txtTimeMessageGroup.setVisibility(View.GONE);
-                        }
-                    }
-                });
                 break;
             default:
                 break;
@@ -189,7 +146,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         return messages.size();
     }
 
-    private void configureViewHolderMe(HolderMe me, int position) {
+    private void configureViewHolderMe(final HolderMe me, final int position) {
         String time = "";
         if (messages.get(position).getType().equalsIgnoreCase("image")){
             time = messages.get(position).getDatetime();
@@ -205,11 +162,13 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                     .load(R.drawable.emptyimage)
                     .resize(maxSizeImage,maxSizeImage)
                     .centerInside()
+                    .transform(new RoundedCornersTransform(30,0))
                     .into(me.imgIconMessageMe);
             Picasso.with(this.context)
                     .load(messages.get(position).getContext())
                     .resize(maxSizeImage,maxSizeImage)
                     .centerInside()
+                    .transform(new RoundedCornersTransform(30,0))
                     .into(me.imgIconMessageMe);
 
         }else {
@@ -231,6 +190,25 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                     .into(me.imgAvatarMeMessage);
 
         }
+        me.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (me.txtTimeMessageMe.getVisibility() == View.GONE) {
+                    me.txtTimeMessageMe.setVisibility(View.VISIBLE);
+                } else {
+                    me.txtTimeMessageMe.setVisibility(View.GONE);
+                }
+            }
+        });
+
+        me.imgIconMessageMe.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent viewImage = new Intent(context, ViewImageActivity.class);
+                viewImage.putExtra("url", messages.get(position).getContext());
+                context.startActivity(viewImage);
+            }
+        });
 //        if (messages.get(position).getType()==null || messages.get(position).getType().equalsIgnoreCase("message")){
 //            me.imgIconMessageMe.requestLayout();
 //            me.imgIconMessageMe.getLayoutParams().height = 0;
@@ -243,7 +221,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 //        }
     }
 
-    private void configureViewHolderYou(HolderYou you, int position) {
+    private void configureViewHolderYou(final HolderYou you, final int position) {
         String time = "";
         if (messages.get(position).getType().equalsIgnoreCase("image")){
             time = messages.get(position).getDatetime();
@@ -259,21 +237,31 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                     .load(R.drawable.emptyimage)
                     .resize(maxSizeImage,maxSizeImage)
                     .centerInside()
+                    .transform(new RoundedCornersTransform(30,0))
                     .into(you.imgIconMessageYou);
             Picasso.with(this.context)
                     .load(messages.get(position).getContext())
                     .resize(maxSizeImage,maxSizeImage)
                     .centerInside()
+                    .transform(new RoundedCornersTransform(30,0))
                     .into(you.imgIconMessageYou);
 
         }else {
             if (isGroup) {
                 time = messages.get(position).getDatetime() + "\n" + getNameUser(messages.get(position).getUserID());
-                Picasso.with(this.context)
-                        .load(usersInRoom.get(position).getImage())
-                        .placeholder(R.drawable.user)
-                        .transform(new CircleTransform())
-                        .into(you.imgAvatarFriendYou);
+                if (messages.get(position).getUserID().equalsIgnoreCase(userLogin.getId())){
+                    Picasso.with(this.context)
+                            .load(userLogin.getImage())
+                            .placeholder(R.drawable.user)
+                            .transform(new CircleTransform())
+                            .into(you.imgAvatarFriendYou);
+                }else {
+                    Picasso.with(this.context)
+                            .load(getUser(messages.get(position).getUserID()).getImage())
+                            .placeholder(R.drawable.user)
+                            .transform(new CircleTransform())
+                            .into(you.imgAvatarFriendYou);
+                }
             } else {
                 time = messages.get(position).getDatetime();
                 Picasso.with(this.context)
@@ -290,6 +278,25 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             you.imgIconMessageYou.setScaleType(ImageView.ScaleType.FIT_XY);
 
         }
+        you.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (you.txtTimeMessageYou.getVisibility() == View.GONE) {
+                    you.txtTimeMessageYou.setVisibility(View.VISIBLE);
+                } else {
+                    you.txtTimeMessageYou.setVisibility(View.GONE);
+                }
+            }
+        });
+
+        you.imgIconMessageYou.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent viewImage = new Intent(context, ViewImageActivity.class);
+                viewImage.putExtra("url", messages.get(position).getContext());
+                context.startActivity(viewImage);
+            }
+        });
 
 //        if (messages.get(position).getType()==null || messages.get(position).getType().equalsIgnoreCase("message")){
 //            you.imgIconMessageYou.requestLayout();
@@ -307,7 +314,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 //        }
     }
 
-    private void configureViewHolderLastMessage(HolderLastMessage lastMessage, int position) {
+    private void configureViewHolderLastMessage(HolderLastMessage lastMessage, final int position) {
         String time = DBUtil.revertDatetimeMessage(messages.get(position).getDatetime());
         lastMessage.txtTimeMessageLast.setText(time);
         String context = "";
@@ -332,12 +339,31 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 .placeholder(R.drawable.user)
                 .transform(new CircleTransform())
                 .into(lastMessage.imgFriendHome);
+        lastMessage.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent conversation = new Intent(v.getContext(), ConversationActivity.class);
+                conversation.putExtra("userLogin", (Serializable) userLogin);
+                conversation.putExtra("friend", (Serializable) getUser(getFriendId(messages.get(position).getIdRoom())));
+                v.getContext().startActivity(conversation);
+            }
+        });
     }
 
-    private void configureViewHolderGroup(HolderGroupMessage groupMessage, int position) {
+    private void configureViewHolderGroup(final HolderGroupMessage groupMessage, int position) {
         String time = messages.get(position).getDatetime() + "\n" + getNameUser(messages.get(position).getUserID());
         groupMessage.txtTimeMessageGroup.setText(time);
         groupMessage.txtContextGroupMessage.setText(messages.get(position).getContext());
+        groupMessage.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (groupMessage.txtTimeMessageGroup.getVisibility() == View.GONE) {
+                    groupMessage.txtTimeMessageGroup.setVisibility(View.VISIBLE);
+                } else {
+                    groupMessage.txtTimeMessageGroup.setVisibility(View.GONE);
+                }
+            }
+        });
     }
 
     private class HolderMe extends RecyclerView.ViewHolder {
