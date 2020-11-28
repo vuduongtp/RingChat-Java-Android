@@ -7,13 +7,6 @@
     android:background="@color/white"
     tools:context=".activity.ConversationActivity">
 
-    <ProgressBar
-        android:id="@+id/loadingConversation"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:visibility="gone"/>
-
     <LinearLayout
         android:id="@+id/layout_header_chatting"
         android:layout_width="match_parent"
@@ -107,12 +100,18 @@
         android:layout_height="1dp"
         android:layout_below="@+id/layout_header_chatting"
         android:background="@color/light_gray" />
+    <ProgressBar
+        android:id="@+id/loadingConversation"
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:layout_below="@+id/sectorCut"
+        android:visibility="gone"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvChatConversation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/sectorCut"
+        android:layout_below="@+id/loadingConversation"
         android:layout_marginBottom="61dp"/>
 
     <LinearLayout

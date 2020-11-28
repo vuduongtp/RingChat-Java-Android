@@ -30,6 +30,7 @@ import com.vuvanduong.ringchat.R;
 import com.vuvanduong.ringchat.activity.AddFriendActivity;
 import com.vuvanduong.ringchat.activity.UserProfileActivity;
 import com.vuvanduong.ringchat.adapter.MessageAdapter;
+import com.vuvanduong.ringchat.config.Constant;
 import com.vuvanduong.ringchat.model.Message;
 import com.vuvanduong.ringchat.model.User;
 import com.vuvanduong.ringchat.util.CircleTransform;
@@ -91,7 +92,7 @@ public class HomeFragment extends Fragment {
                 user_profile.putExtra("user_scan", (Serializable) user);
                 user_profile.putExtra("isScanFriend", false);
                 user_profile.putExtra("isUserLogin", true);
-                startActivity(user_profile);
+                startActivityForResult(user_profile, Constant.GET_GET_AVATAR);
             }
         });
 
@@ -253,6 +254,21 @@ public class HomeFragment extends Fragment {
             }
         });
     }
+
+//    @Override
+//    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//        if (requestCode == Constant.GET_GET_AVATAR && data != null) {
+//            String newUser = data.getStringExtra("avatar");
+//            if (newUser != null) {
+//                Picasso.with(getActivity())
+//                        .load(user.getImage())
+//                        .placeholder(R.drawable.user)
+//                        .transform(new CircleTransform())
+//                        .into(img_avt_friend);
+//            }
+//        }
+//    }
 
     @Override
     public void onResume() {

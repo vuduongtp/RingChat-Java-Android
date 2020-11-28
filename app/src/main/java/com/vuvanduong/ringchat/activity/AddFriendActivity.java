@@ -153,7 +153,7 @@ public class AddFriendActivity extends AppCompatActivity {
                 Log.e("Scan", "Scanned");
                 String resultString = result.getContents();
                 if (resultString.length() != 20 || resultString.equalsIgnoreCase(userLogin.getId())){
-                    Toast.makeText(this, result.getContents()+ " not found.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, getString(R.string.user_not_found), Toast.LENGTH_LONG).show();
                     return;
                 }
                 Query getUser = users.orderByKey().equalTo(resultString);

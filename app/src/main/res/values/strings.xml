@@ -105,5 +105,6 @@
     <string name="permission_denied">Permission denied</string>
     <string name="QR_scan">Scan QR Code</string>
     <string name="sent_a_image">sent a image.</string>
-
+    <string name="set_avatar_success">Set avatar successful.</string>
+    <string name="change_avatar">Change avatar</string>
 </resources>

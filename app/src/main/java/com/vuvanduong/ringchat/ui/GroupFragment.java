@@ -31,8 +31,10 @@ import com.vuvanduong.ringchat.R;
 import com.vuvanduong.ringchat.activity.AddFriendActivity;
 import com.vuvanduong.ringchat.activity.AddGroupActivity;
 import com.vuvanduong.ringchat.activity.GroupConversationActivity;
+import com.vuvanduong.ringchat.activity.UserProfileActivity;
 import com.vuvanduong.ringchat.adapter.GroupAdapter;
 import com.vuvanduong.ringchat.adapter.SelectFriendAdapter;
+import com.vuvanduong.ringchat.config.Constant;
 import com.vuvanduong.ringchat.model.GroupChat;
 import com.vuvanduong.ringchat.model.Message;
 import com.vuvanduong.ringchat.model.User;
@@ -91,6 +93,18 @@ public class GroupFragment extends Fragment {
                 Intent addFriend = new Intent(getActivity(), AddFriendActivity.class);
                 addFriend.putExtra("user_login", (Serializable) user);
                 startActivity(addFriend);
+            }
+        });
+
+        imgMyAvatar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent user_profile = new Intent(getActivity(), UserProfileActivity.class);
+                user_profile.putExtra("user_login", (Serializable) user);
+                user_profile.putExtra("user_scan", (Serializable) user);
+                user_profile.putExtra("isScanFriend", false);
+                user_profile.putExtra("isUserLogin", true);
+                startActivityForResult(user_profile, Constant.GET_GET_AVATAR);
             }
         });
 

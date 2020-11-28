@@ -20,7 +20,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.Picasso;
 import com.vuvanduong.ringchat.R;
+import com.vuvanduong.ringchat.activity.AddFriendActivity;
 import com.vuvanduong.ringchat.activity.ConversationActivity;
+import com.vuvanduong.ringchat.activity.UserProfileActivity;
 import com.vuvanduong.ringchat.activity.WelcomeActivity;
 import com.vuvanduong.ringchat.app.InitialApp;
 import com.vuvanduong.ringchat.model.User;
@@ -77,10 +79,11 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
                 @Override
                 public void onClick(View v) {
 //                    Toast.makeText(context, fullName, Toast.LENGTH_SHORT).show();
-                    Intent conversation = new Intent(v.getContext(), ConversationActivity.class);
-                    conversation.putExtra("userLogin", (Serializable) userLogin);
-                    conversation.putExtra("friend", (Serializable) users.get(position));
-                    v.getContext().startActivity(conversation);
+                    Intent user_profile = new Intent(v.getContext(), UserProfileActivity.class);
+                    user_profile.putExtra("user_login", (Serializable) userLogin);
+                    user_profile.putExtra("user_scan", (Serializable) users.get(position));
+                    user_profile.putExtra("isScanFriend", true);
+                    v.getContext().startActivity(user_profile);
                 }
             });
             holder.txtNameFriend.setOnClickListener(new View.OnClickListener() {

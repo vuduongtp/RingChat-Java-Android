@@ -33,9 +33,6 @@ public class Constant {
     public static final String EMAIL_SENDER = "mailsenderptithcm@gmail.com";
     public static final String PASS_EMAIL_SENDER = "ptithcm123";
     public static final int IMAGE_SIZE_DISPLAY = 500;
+    public static final int GET_GET_AVATAR = 1006;
 
-    public static int getMaxWidthScreen(Context context){
-        WindowManager mWinMgr = (WindowManager)context.getSystemService(Context.WINDOW_SERVICE);
-        return mWinMgr.getDefaultDisplay().getWidth()/2;
-    }
 }

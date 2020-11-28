@@ -4,7 +4,9 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.drawable.ColorDrawable;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -61,7 +63,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         if (!isGroup) {
             friend = usersInRoom.get(0);
         }
-        maxSizeImage = Constant.getMaxWidthScreen(context);
+        maxSizeImage = (Resources.getSystem().getDisplayMetrics().widthPixels)/2;
     }
 
     @Override
@@ -80,6 +82,12 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     public void addItem(Message message) {
         this.messages.add(message);
+        notifyItemInserted(messages.size()-1);
+    }
+
+    public void addArrayItem(ArrayList<Message> messages) {
+        if (!this.messages.isEmpty())this.messages.clear();
+        this.messages.addAll(messages);
         notifyDataSetChanged();
     }
 
@@ -209,16 +217,6 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 context.startActivity(viewImage);
             }
         });
-//        if (messages.get(position).getType()==null || messages.get(position).getType().equalsIgnoreCase("message")){
-//            me.imgIconMessageMe.requestLayout();
-//            me.imgIconMessageMe.getLayoutParams().height = 0;
-//            me.imgIconMessageMe.getLayoutParams().width = 0;
-//            me.imgIconMessageMe.setScaleType(ImageView.ScaleType.FIT_XY);
-//        }else if (messages.get(position).getType().equalsIgnoreCase("Declined") || messages.get(position).getType().equalsIgnoreCase("Missed")){
-//            me.imgIconMessageMe.setImageResource(R.drawable.ic_call_missed_black_24dp);
-//        }else if (messages.get(position).getType().equalsIgnoreCase("Success")){
-//            me.imgIconMessageMe.setImageResource(R.drawable.ic_phone_in_talk_black_24dp);
-//        }
     }
 
     private void configureViewHolderYou(final HolderYou you, final int position) {
@@ -298,20 +296,6 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             }
         });
 
-//        if (messages.get(position).getType()==null || messages.get(position).getType().equalsIgnoreCase("message")){
-//            you.imgIconMessageYou.requestLayout();
-//            you.imgIconMessageYou.getLayoutParams().height = 0;
-//            you.imgIconMessageYou.getLayoutParams().width = 0;
-//            you.imgIconMessageYou.setScaleType(ImageView.ScaleType.FIT_XY);
-//        }
-//        else if (messages.get(position).getType().equalsIgnoreCase("Declined")
-//                || messages.get(position).getType().equalsIgnoreCase("Missed")
-//                || messages.get(position).getContext().equalsIgnoreCase("Missed call.")
-//                || messages.get(position).getContext().equalsIgnoreCase("Cuộc gọi nhỡ.")){
-//            you.imgIconMessageYou.setImageResource(R.drawable.ic_call_missed_black_24dp);
-//        }else if (messages.get(position).getType().equalsIgnoreCase("Success")){
-//            you.imgIconMessageYou.setImageResource(R.drawable.ic_phone_in_talk_black_24dp);
-//        }
     }
 
     private void configureViewHolderLastMessage(HolderLastMessage lastMessage, final int position) {

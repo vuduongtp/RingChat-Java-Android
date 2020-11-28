@@ -75,7 +75,7 @@ public class AccountFragment extends Fragment {
     private View view;
     private User user;
     TextView txtNameAccount, txtEmailAccount;
-    LinearLayout layoutEditInfo, layoutChangePass, layoutLanguage, layoutHelp, layoutAbout, layoutLogout;
+    LinearLayout layoutEditInfo, layoutChangePass, layoutLanguage, layoutHelp, layoutAbout, layoutLogout, layoutChangeAvatar;
     ImageView btnSearchInAccount, imgMyAvatarAccount, imgQRGen;
     private FirebaseDatabase database = FirebaseDatabase.getInstance();
     private DatabaseReference dbReference = database.getReference();
@@ -220,6 +220,13 @@ public class AccountFragment extends Fragment {
         });
 
         imgMyAvatarAccount.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                requestPermission();
+            }
+        });
+
+        layoutChangeAvatar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 requestPermission();
@@ -427,7 +434,7 @@ public class AccountFragment extends Fragment {
                             users = dbReference.child("users/" + user.getId());
                             users.child("image").setValue(Objects.requireNonNull(resultData.get("url")).toString());
                             user.setImage(Objects.requireNonNull(resultData.get("url")).toString());
-                            Toast.makeText(getActivity(), "Success", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getActivity(),  getString(R.string.set_avatar_success), Toast.LENGTH_SHORT).show();
                             dialog.dismiss();
                         }
 
@@ -457,6 +464,7 @@ public class AccountFragment extends Fragment {
         layoutLogout = view.findViewById(R.id.layoutLogout);
         btnSearchInAccount = view.findViewById(R.id.btnSearchInAccount);
         imgMyAvatarAccount = view.findViewById(R.id.imgMyAvatarAccount);
+        layoutChangeAvatar = view.findViewById(R.id.layoutChangeAvatar);
         imgQRGen = view.findViewById(R.id.imgQRGen);
         txtNameAccount.setText(UserUtil.getFullName(user));
         txtEmailAccount.setText(user.getEmail());

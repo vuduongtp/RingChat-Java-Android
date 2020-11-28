@@ -105,4 +105,5 @@
     <string name="permission_denied">Vui lòng cấp quyền</string>
     <string name="QR_scan">Quét mã QR</string>
     <string name="sent_a_image">đã gửi một hình ảnh.</string>
+    <string name="set_avatar_success">Đổi ảnh đại diện thành công.</string>
 </resources>

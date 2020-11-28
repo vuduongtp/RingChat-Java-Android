@@ -21,9 +21,11 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 import com.vuvanduong.ringchat.R;
 import com.vuvanduong.ringchat.config.Constant;
 import com.vuvanduong.ringchat.model.User;
+import com.vuvanduong.ringchat.util.CircleTransform;
 import com.vuvanduong.ringchat.util.DBUtil;
 import com.vuvanduong.ringchat.util.MD5;
 import com.vuvanduong.ringchat.util.UserUtil;
@@ -131,5 +133,10 @@ public class EditInforActivity extends AppCompatActivity {
         txtBirthdayChangeInfor.setText(user.getBirthday());
         txtFirstnameEditInfor.setText(user.getFirstname());
         txtLastnameEditInfor.setText(user.getLastname());
+        Picasso.with(EditInforActivity.this)
+                .load(user.getImage())
+                .placeholder(R.drawable.user)
+                .transform(new CircleTransform())
+                .into(imageAvatarChangeInfor);
     }
 }
