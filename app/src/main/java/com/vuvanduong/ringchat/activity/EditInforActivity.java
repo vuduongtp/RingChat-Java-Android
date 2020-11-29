@@ -28,6 +28,7 @@ import com.vuvanduong.ringchat.model.User;
 import com.vuvanduong.ringchat.util.CircleTransform;
 import com.vuvanduong.ringchat.util.DBUtil;
 import com.vuvanduong.ringchat.util.MD5;
+import com.vuvanduong.ringchat.util.NetworkUtil;
 import com.vuvanduong.ringchat.util.UserUtil;
 
 import java.io.Serializable;
@@ -94,6 +95,10 @@ public class EditInforActivity extends AppCompatActivity {
                     txtErrorChangeInfor.setText(R.string.err_emty_lastname);
                 }
                 else {
+                    if (NetworkUtil.getConnectivityStatusString(EditInforActivity.this) == NetworkUtil.NETWORK_STATUS_NOT_CONNECTED){
+                        Toast.makeText(EditInforActivity.this, getString(R.string.network_disconnect), Toast.LENGTH_SHORT).show();
+                        return;
+                    }
                     user.setFirstname(txtFirstnameEditInfor.getText().toString().trim());
                     user.setLastname(txtLastnameEditInfor.getText().toString().trim());
                     user.setBirthday(txtBirthdayChangeInfor.getText().toString());

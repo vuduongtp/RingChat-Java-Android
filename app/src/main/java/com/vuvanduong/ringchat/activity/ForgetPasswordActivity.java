@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -25,6 +26,7 @@ import com.vuvanduong.ringchat.model.User;
 import com.vuvanduong.ringchat.util.DBUtil;
 import com.vuvanduong.ringchat.util.GMailSender;
 import com.vuvanduong.ringchat.util.MD5;
+import com.vuvanduong.ringchat.util.NetworkUtil;
 import com.vuvanduong.ringchat.util.UserUtil;
 
 import java.io.IOException;
@@ -79,6 +81,10 @@ public class ForgetPasswordActivity extends AppCompatActivity {
                     txtUsernameForgetPass.setText(getString(R.string.err_email_invalid));
                     dialog.dismiss();
                 }else {
+                    if (NetworkUtil.getConnectivityStatusString(ForgetPasswordActivity.this) == NetworkUtil.NETWORK_STATUS_NOT_CONNECTED){
+                        Toast.makeText(ForgetPasswordActivity.this, getString(R.string.network_disconnect), Toast.LENGTH_SHORT).show();
+                        return;
+                    }
                     ValueEventListener getUser = new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {

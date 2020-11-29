@@ -25,6 +25,7 @@ import com.vuvanduong.ringchat.model.User;
 import com.vuvanduong.ringchat.service.LinphoneService;
 import com.vuvanduong.ringchat.service.NetworkChangeService;
 import com.vuvanduong.ringchat.util.MD5;
+import com.vuvanduong.ringchat.util.NetworkUtil;
 import com.vuvanduong.ringchat.util.SharedPrefs;
 import android.os.Handler;
 
@@ -147,8 +148,9 @@ public class WelcomeActivity extends AppCompatActivity {
         boolean isFromLogin = intent.getBooleanExtra(Constant.IS_FROM_LOGIN,false);
         if (isFromLogin) {
             user = (User) intent.getSerializableExtra("user_login");
+            userLoginDB.deleteAll();
             long rs = userLoginDB.login(user);
-            Log.e("WelcomeActivity: ",rs+"login");
+            Log.e(Constant.TAG_SQLITE,"set login "+rs);
             Intent home = new Intent(WelcomeActivity.this, HomeActivity.class);
             home.putExtra("user_login", (Serializable) user);
             startActivity(home);
@@ -158,6 +160,27 @@ public class WelcomeActivity extends AppCompatActivity {
         if (SharedPrefs.getInstance().get(Constant.IS_LOGIN, Boolean.class)){
             final String email = SharedPrefs.getInstance().get(Constant.EMAIL_USER_LOGIN, String.class);
             final String pass = SharedPrefs.getInstance().get(Constant.PASS_USER_LOGIN, String.class);
+            if (NetworkUtil.getConnectivityStatusString(WelcomeActivity.this)==NetworkUtil.NETWORK_STATUS_NOT_CONNECTED){
+                User userLogin = userLoginDB.getUserLoginByEmail(email);
+                if (userLogin!=null) {
+                    user = userLogin;
+
+                    Intent netWorkService = new Intent(WelcomeActivity.this, NetworkChangeService.class);
+                    startService(netWorkService);
+                    configCloudinary();
+
+                    SipRegister();
+                    Intent home = new Intent(WelcomeActivity.this, HomeActivity.class);
+                    home.putExtra("user_login", (Serializable) user);
+                    startActivity(home);
+                }else {
+                    Intent login = new Intent(WelcomeActivity.this, LoginActivity.class);
+                    startActivity(login);
+                    Toast.makeText(WelcomeActivity.this, R.string.required_login, Toast.LENGTH_SHORT).show();
+                }
+                finish();
+                return;
+            }
             ValueEventListener getUser = new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -166,7 +189,7 @@ public class WelcomeActivity extends AppCompatActivity {
                         assert userCheck != null;
                         userCheck.setId(item.getKey());
                         long rs = userDB.insert(userCheck);
-                        Log.e("WelcomeActivity: ",rs+"");
+                        Log.e(Constant.TAG_SQLITE,"add user "+rs);
                         if (userCheck.getEmail().equalsIgnoreCase(email)&&userCheck.getPassword().equalsIgnoreCase(MD5.getMd5(pass))) {
                             SharedPrefs.getInstance().put(Constant.IS_LOGIN, true);
                             SharedPrefs.getInstance().put(Constant.MY_AVATAR, userCheck.getImage());
@@ -217,10 +240,12 @@ public class WelcomeActivity extends AppCompatActivity {
             home.putExtra("user_login", (Serializable) user);
             startActivity(home);
         } else {
-            Intent login = new Intent(WelcomeActivity.this, LoginActivity.class);
-            startActivity(login);
-            Toast.makeText(WelcomeActivity.this, R.string.required_login, Toast.LENGTH_SHORT).show();
-            finish();
+            if (NetworkUtil.getConnectivityStatusString(WelcomeActivity.this)!=NetworkUtil.NETWORK_STATUS_NOT_CONNECTED) {
+                Intent login = new Intent(WelcomeActivity.this, LoginActivity.class);
+                startActivity(login);
+                Toast.makeText(WelcomeActivity.this, R.string.required_login, Toast.LENGTH_SHORT).show();
+                finish();
+            }
         }
     }
 

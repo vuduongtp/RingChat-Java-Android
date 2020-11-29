@@ -34,6 +34,7 @@ import com.vuvanduong.ringchat.model.Message;
 import com.vuvanduong.ringchat.model.User;
 import com.vuvanduong.ringchat.service.LinphoneService;
 import com.vuvanduong.ringchat.util.DBUtil;
+import com.vuvanduong.ringchat.util.NetworkUtil;
 
 import org.linphone.core.Address;
 import org.linphone.core.ChatMessage;
@@ -99,6 +100,10 @@ public class GroupConversationActivity extends AppCompatActivity {
         btnSendMessageGroupConversation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (NetworkUtil.getConnectivityStatusString(GroupConversationActivity.this) == NetworkUtil.NETWORK_STATUS_NOT_CONNECTED){
+                    Toast.makeText(GroupConversationActivity.this, getString(R.string.network_disconnect), Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 if (!txtContextGroupConversation.getText().toString().trim().equals("")) {
                     Message newMessage = new Message();
                     newMessage.setType("message");
@@ -114,26 +119,27 @@ public class GroupConversationActivity extends AppCompatActivity {
                     groupChat.setDatetime(DBUtil.getStringDateTimeChatRoom());
                     groupLastMessage.setValue(groupChat);
 
-                    for (int i = 0; i < usersInRoom.size(); i++) {
-                        if (usersInRoom.get(i).getId().equals(userLogin.getId())) {
-                            continue;
-                        } else {
-                            Address address = core.interpretUrl("sip:" + usersInRoom.get(i).getId() + "@" + Constant.SIP_SERVER);
-                            ChatRoom chatRoom = core.createChatRoom(address);
-                            if (chatRoom != null) {
-                                ChatMessage chatMessage = chatRoom.createEmptyMessage();
-                                chatMessage.addTextContent(txtContextGroupConversation.getText().toString());
-                                chatMessage.addCustomHeader("group", groupChat.getGroupName());
-                                if (chatMessage.getTextContent() != null) {
-                                    chatRoom.sendChatMessage(chatMessage);
-                                } else {
-                                    System.err.println("message = null");
-                                }
-                            } else {
-                                System.err.println("room = null");
-                            }
-                        }
-                    }
+                    //send by sip
+//                    for (int i = 0; i < usersInRoom.size(); i++) {
+//                        if (usersInRoom.get(i).getId().equals(userLogin.getId())) {
+//                            continue;
+//                        } else {
+//                            Address address = core.interpretUrl("sip:" + usersInRoom.get(i).getId() + "@" + Constant.SIP_SERVER);
+//                            ChatRoom chatRoom = core.createChatRoom(address);
+//                            if (chatRoom != null) {
+//                                ChatMessage chatMessage = chatRoom.createEmptyMessage();
+//                                chatMessage.addTextContent(txtContextGroupConversation.getText().toString());
+//                                chatMessage.addCustomHeader("group", groupChat.getGroupName());
+//                                if (chatMessage.getTextContent() != null) {
+//                                    chatRoom.sendChatMessage(chatMessage);
+//                                } else {
+//                                    System.err.println("message = null");
+//                                }
+//                            } else {
+//                                System.err.println("room = null");
+//                            }
+//                        }
+//                    }
                 }
                 txtContextGroupConversation.setText("");
             }

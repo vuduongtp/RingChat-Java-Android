@@ -107,4 +107,5 @@
     <string name="sent_a_image">sent a image.</string>
     <string name="set_avatar_success">Set avatar successful.</string>
     <string name="change_avatar">Change avatar</string>
+    <string name="network_disconnect">Please connect to internet</string>
 </resources>

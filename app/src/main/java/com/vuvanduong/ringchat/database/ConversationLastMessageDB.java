@@ -7,6 +7,7 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import com.vuvanduong.ringchat.config.Constant;
 import com.vuvanduong.ringchat.model.GroupChat;
 import com.vuvanduong.ringchat.model.Message;
 
@@ -32,13 +33,13 @@ public class ConversationLastMessageDB {
         }
     }
 
-    public long insert(GroupChat groupChat) {
+    public long insert(Message message) {
         ContentValues values = new ContentValues();
-        values.put(CONVERSATIONID, groupChat.getIdRoom());
-        values.put(CONTEXT, groupChat.getContext());
-        values.put(DATETIME, groupChat.getDatetime());
-        values.put(TYPE, groupChat.getType());
-        values.put(USERID, groupChat.getUserID());
+        values.put(CONVERSATIONID, message.getIdRoom());
+        values.put(CONTEXT, message.getContext());
+        values.put(DATETIME, message.getDatetime());
+        values.put(TYPE, message.getType());
+        values.put(USERID, message.getUserID());
         values.put(URL, "");
         return database.insert(CONVERSATIONLASTMESSAGE, null, values);
     }
@@ -47,9 +48,13 @@ public class ConversationLastMessageDB {
         return database.delete(CONVERSATIONLASTMESSAGE,CONVERSATIONID +"='"+conversationid+"'", null);
     }
 
+    public long deleteAll() {
+        return database.delete(CONVERSATIONLASTMESSAGE,null, null);
+    }
+
     public Message getLastMessageOfGroup(String conversationid) {
         String selectQuery = "SELECT * FROM " + CONVERSATIONLASTMESSAGE+ " WHERE "+ CONVERSATIONID+" ='"+conversationid+"'";
-        Log.e("select",selectQuery);
+        Log.e(Constant.TAG_SQLITE,selectQuery);
         Cursor cursor = database.rawQuery(selectQuery, null);
         Log.e("count",""+cursor.getCount());
         Message message = new Message();

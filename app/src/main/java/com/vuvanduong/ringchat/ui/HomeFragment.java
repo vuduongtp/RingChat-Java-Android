@@ -2,7 +2,6 @@ package com.vuvanduong.ringchat.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +30,8 @@ import com.vuvanduong.ringchat.activity.AddFriendActivity;
 import com.vuvanduong.ringchat.activity.UserProfileActivity;
 import com.vuvanduong.ringchat.adapter.MessageAdapter;
 import com.vuvanduong.ringchat.config.Constant;
+import com.vuvanduong.ringchat.database.ContactDB;
+import com.vuvanduong.ringchat.database.ConversationLastMessageDB;
 import com.vuvanduong.ringchat.model.Message;
 import com.vuvanduong.ringchat.model.User;
 import com.vuvanduong.ringchat.util.CircleTransform;
@@ -43,7 +44,7 @@ import java.util.Comparator;
 import java.util.Objects;
 
 public class HomeFragment extends Fragment {
-    private User user;
+    private User userLogin;
     private View view;
     private TextView txtUserHome, txtEmailHome;
     private ImageButton btnSearchHome;
@@ -59,6 +60,8 @@ public class HomeFragment extends Fragment {
     private int count = 0;
     private boolean isFirstLoad = true;
     private ImageView img_avt_friend;
+    private ContactDB contactDB;
+    private ConversationLastMessageDB conversationLastMessageDB;
 
     @Nullable
     @Override
@@ -66,9 +69,12 @@ public class HomeFragment extends Fragment {
         view = inflater.inflate(R.layout.fragment_home, container, false);
 
         assert getArguments() != null;
-        user = (User) getArguments().getSerializable("user_login");
+        userLogin = (User) getArguments().getSerializable("user_login");
         loading = view.findViewById(R.id.loadingHomeFragment);
         loading.setVisibility(View.VISIBLE);
+        contactDB = new ContactDB(getActivity());
+        conversationLastMessageDB = new ConversationLastMessageDB(getActivity());
+
         setControl(view);
         setEvent();
         return view;
@@ -79,7 +85,7 @@ public class HomeFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent addFriend = new Intent(getActivity(), AddFriendActivity.class);
-                addFriend.putExtra("user_login", (Serializable) user);
+                addFriend.putExtra("user_login", (Serializable) userLogin);
                 startActivity(addFriend);
             }
         });
@@ -88,8 +94,8 @@ public class HomeFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent user_profile = new Intent(getActivity(), UserProfileActivity.class);
-                user_profile.putExtra("user_login", (Serializable) user);
-                user_profile.putExtra("user_scan", (Serializable) user);
+                user_profile.putExtra("user_login", (Serializable) userLogin);
+                user_profile.putExtra("user_scan", (Serializable) userLogin);
                 user_profile.putExtra("isScanFriend", false);
                 user_profile.putExtra("isUserLogin", true);
                 startActivityForResult(user_profile, Constant.GET_GET_AVATAR);
@@ -123,14 +129,14 @@ public class HomeFragment extends Fragment {
         btnSearchHome = view.findViewById(R.id.btnSearchHome);
         rvConversation = view.findViewById(R.id.rvConversation);
         img_avt_friend = view.findViewById(R.id.img_avt_friend);
-        txtUserHome.setText(UserUtil.getFullName(user));
-        txtEmailHome.setText(user.getEmail());
+        txtUserHome.setText(UserUtil.getFullName(userLogin));
+        txtEmailHome.setText(userLogin.getEmail());
         reloadListMessage = view.findViewById(R.id.reloadListMessage);
         messages = new ArrayList<>();
         friends = new ArrayList<>();
 
         Picasso.with(getActivity())
-                .load(user.getImage())
+                .load(userLogin.getImage())
                 .placeholder(R.drawable.user)
                 .transform(new CircleTransform())
                 .into(img_avt_friend);
@@ -155,9 +161,9 @@ public class HomeFragment extends Fragment {
                     if (!friends.isEmpty()) friends.clear();
                     for (DataSnapshot item : dataSnapshot.getChildren()) {
                         String[] usersId = Objects.requireNonNull(item.getKey()).split("&");
-                        if (usersId[0].equalsIgnoreCase(user.getId()) || usersId[1].equalsIgnoreCase(user.getId())) {
+                        if (usersId[0].equalsIgnoreCase(userLogin.getId()) || usersId[1].equalsIgnoreCase(userLogin.getId())) {
                             String idfriend = "";
-                            if (usersId[0].equalsIgnoreCase(user.getId())) {
+                            if (usersId[0].equalsIgnoreCase(userLogin.getId())) {
                                 idfriend = usersId[1];
                             } else {
                                 idfriend = usersId[0];
@@ -167,6 +173,7 @@ public class HomeFragment extends Fragment {
                             assert message != null;
                             message.setIdRoom(item.getKey());
                             messages.add(message);
+                            conversationLastMessageDB.insert(message);
                             Query getFriend = users.orderByKey()
                                     .equalTo(idfriend);
                             getFriend.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -178,6 +185,7 @@ public class HomeFragment extends Fragment {
                                         assert user != null;
                                         user.setId(item.getKey());
                                         friends.add(user);
+                                        contactDB.insert(userLogin.getId(),user.getId());
                                         if (messages.size() == friends.size()) {
                                             chatBoxView(200);
                                             if (loading.getVisibility() == View.VISIBLE) {
@@ -224,7 +232,7 @@ public class HomeFragment extends Fragment {
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(rvConversation.getContext(),
                 layoutManager.getOrientation());
         rvConversation.addItemDecoration(dividerItemDecoration);
-        messageAdapter = new MessageAdapter(messages, getActivity(), user, friends, false);
+        messageAdapter = new MessageAdapter(messages, getActivity(), userLogin, friends, false);
         rvConversation.setAdapter(messageAdapter);
 
         rvConversation.postDelayed(new Runnable() {

@@ -34,5 +34,6 @@ public class Constant {
     public static final String PASS_EMAIL_SENDER = "ptithcm123";
     public static final int IMAGE_SIZE_DISPLAY = 500;
     public static final int GET_GET_AVATAR = 1006;
+    public static final String TAG_SQLITE = "SQLITE";
 
 }

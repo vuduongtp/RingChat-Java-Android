@@ -23,6 +23,7 @@ import com.vuvanduong.ringchat.config.Constant;
 import com.vuvanduong.ringchat.model.User;
 import com.vuvanduong.ringchat.util.DBUtil;
 import com.vuvanduong.ringchat.util.MD5;
+import com.vuvanduong.ringchat.util.NetworkUtil;
 
 import java.io.Serializable;
 import java.util.Calendar;
@@ -77,6 +78,10 @@ public class EditPasswordActivity extends AppCompatActivity {
                     txtErrorChangePass.setText(R.string.new_pass_not_match);
                 }
                 else {
+                    if (NetworkUtil.getConnectivityStatusString(EditPasswordActivity.this) == NetworkUtil.NETWORK_STATUS_NOT_CONNECTED){
+                        Toast.makeText(EditPasswordActivity.this, getString(R.string.network_disconnect), Toast.LENGTH_SHORT).show();
+                        return;
+                    }
                     user.setPassword(MD5.getMd5(txtPasswordNewEditPass.getText().toString().trim()));
                     user.setId(null);
                     users.child(id).setValue(user);

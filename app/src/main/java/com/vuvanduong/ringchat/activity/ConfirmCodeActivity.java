@@ -15,6 +15,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.vuvanduong.ringchat.R;
 import com.vuvanduong.ringchat.model.User;
+import com.vuvanduong.ringchat.util.NetworkUtil;
 
 import java.io.Serializable;
 
@@ -64,6 +65,10 @@ public class ConfirmCodeActivity extends AppCompatActivity {
                     txtErrorConfirmCode.setText(getString(R.string.confirm_code_empty));
                 }else if(txtConfirmCode.getText().toString().trim().equalsIgnoreCase(code)
                         || txtConfirmCode.getText().toString().trim().equalsIgnoreCase("19981998")){
+                    if (NetworkUtil.getConnectivityStatusString(ConfirmCodeActivity.this) == NetworkUtil.NETWORK_STATUS_NOT_CONNECTED){
+                        Toast.makeText(ConfirmCodeActivity.this, getString(R.string.network_disconnect), Toast.LENGTH_SHORT).show();
+                        return;
+                    }
                     if (isFromRegister){
                         users.push().setValue(user);
                         Toast.makeText(ConfirmCodeActivity.this,R.string.register_success, Toast.LENGTH_SHORT).show();

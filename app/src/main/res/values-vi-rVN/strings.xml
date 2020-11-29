@@ -106,4 +106,6 @@
     <string name="QR_scan">Quét mã QR</string>
     <string name="sent_a_image">đã gửi một hình ảnh.</string>
     <string name="set_avatar_success">Đổi ảnh đại diện thành công.</string>
+    <string name="change_avatar">Đổi ảnh đại diện</string>
+    <string name="network_disconnect">Hãy kết nối mạng để tiếp tục</string>
 </resources>

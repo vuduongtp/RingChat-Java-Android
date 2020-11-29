@@ -88,6 +88,14 @@
             android:layout_margin="5dp"
             android:layout_weight="0.75"
             app:srcCompat="@drawable/qrcode" />
+        <ProgressBar
+            android:id="@+id/loadingQRCode"
+            android:layout_width="wrap_content"
+            android:layout_marginStart="-48dp"
+            android:layout_gravity="center"
+            android:layout_height="30dp"
+            android:layout_weight="0.20"
+            android:visibility="gone"/>
 
     </LinearLayout>
 
@@ -106,7 +114,7 @@
 
         <ImageView
             android:layout_width="0dp"
-            android:layout_height="40dp"
+            android:layout_height="match_parent"
             android:layout_marginTop="5dp"
             android:layout_marginBottom="5dp"
             android:layout_weight="1"

@@ -28,6 +28,7 @@ import com.vuvanduong.ringchat.database.UserLoginDB;
 import com.vuvanduong.ringchat.model.User;
 import com.vuvanduong.ringchat.service.LinphoneService;
 import com.vuvanduong.ringchat.util.MD5;
+import com.vuvanduong.ringchat.util.NetworkUtil;
 import com.vuvanduong.ringchat.util.SharedPrefs;
 
 import org.linphone.core.AccountCreator;
@@ -120,6 +121,10 @@ public class LoginActivity extends AppCompatActivity {
                 } else if (txtPasswordLogin.getText().toString().trim().equalsIgnoreCase("")) {
                     txtErrorLogin.setText(R.string.err_emty_pass);
                 } else {
+                    if (NetworkUtil.getConnectivityStatusString(LoginActivity.this) == NetworkUtil.NETWORK_STATUS_NOT_CONNECTED){
+                        Toast.makeText(LoginActivity.this, getString(R.string.network_disconnect), Toast.LENGTH_SHORT).show();
+                        return;
+                    }
                     if (isSavePass) {
                         SharedPrefs.getInstance().put(Constant.EMAIL, txtUsernameLogin.getText().toString().trim());
                         SharedPrefs.getInstance().put(Constant.PASSWORD, txtPasswordLogin.getText().toString().trim());
@@ -133,12 +138,12 @@ public class LoginActivity extends AppCompatActivity {
                     ValueEventListener getUser = new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            userDB.deleteAll();
                             for (DataSnapshot item : dataSnapshot.getChildren()) {
                                 User user = item.getValue(User.class);
                                 assert user != null;
                                 user.setId(item.getKey());
-                                long rs = userDB.insert(user);
-                                Log.e("LoginActivity: ",rs+"");
+                                userDB.insert(user);
                                 if (user.getEmail().equalsIgnoreCase(email)&&user.getPassword().equalsIgnoreCase(MD5.getMd5(pass))) {
                                     SharedPrefs.getInstance().put(Constant.IS_LOGIN, true);
                                     SharedPrefs.getInstance().put(Constant.EMAIL_USER_LOGIN, user.getEmail());

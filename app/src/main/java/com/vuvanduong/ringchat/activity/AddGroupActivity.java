@@ -28,6 +28,7 @@ import com.vuvanduong.ringchat.model.GroupChat;
 import com.vuvanduong.ringchat.model.Message;
 import com.vuvanduong.ringchat.model.User;
 import com.vuvanduong.ringchat.util.DBUtil;
+import com.vuvanduong.ringchat.util.NetworkUtil;
 import com.vuvanduong.ringchat.util.UserUtil;
 
 import java.util.ArrayList;
@@ -87,6 +88,10 @@ public class AddGroupActivity extends AppCompatActivity {
                 }else if (txtGroupName.getText().toString().trim().length()>50){
                     Toast.makeText(AddGroupActivity.this, getString(R.string.group_name_too_long), Toast.LENGTH_SHORT).show();
                 }else {
+                    if (NetworkUtil.getConnectivityStatusString(AddGroupActivity.this) == NetworkUtil.NETWORK_STATUS_NOT_CONNECTED){
+                        Toast.makeText(AddGroupActivity.this, getString(R.string.network_disconnect), Toast.LENGTH_SHORT).show();
+                        return;
+                    }
                     String newKey = groupMembers.push().getKey();
                     String groupName = txtGroupName.getText().toString().trim();
                     StringBuilder nameMembers = new StringBuilder();

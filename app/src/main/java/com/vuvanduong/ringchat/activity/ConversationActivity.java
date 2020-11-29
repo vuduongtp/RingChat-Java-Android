@@ -57,6 +57,7 @@ import com.vuvanduong.ringchat.service.LinphoneService;
 import com.vuvanduong.ringchat.util.CircleTransform;
 import com.vuvanduong.ringchat.util.DBUtil;
 import com.vuvanduong.ringchat.util.ImageUtils;
+import com.vuvanduong.ringchat.util.NetworkUtil;
 import com.vuvanduong.ringchat.util.UserUtil;
 
 import java.io.ByteArrayOutputStream;
@@ -222,6 +223,10 @@ public class ConversationActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (!txtContextConversation.getText().toString().trim().equals("")) {
+                    if (NetworkUtil.getConnectivityStatusString(ConversationActivity.this) == NetworkUtil.NETWORK_STATUS_NOT_CONNECTED){
+                        Toast.makeText(ConversationActivity.this, getString(R.string.network_disconnect), Toast.LENGTH_SHORT).show();
+                        return;
+                    }
                     Message newMessage = new Message();
                     newMessage.setType("message");
                     newMessage.setContext(txtContextConversation.getText().toString().trim());
@@ -264,6 +269,10 @@ public class ConversationActivity extends AppCompatActivity {
         img_but_video.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (NetworkUtil.getConnectivityStatusString(ConversationActivity.this) == NetworkUtil.NETWORK_STATUS_NOT_CONNECTED){
+                    Toast.makeText(ConversationActivity.this, getString(R.string.network_disconnect), Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 if (friend.getStatus() == null || !friend.getStatus().equalsIgnoreCase("Online")) {
                     Toast.makeText(ConversationActivity.this, UserUtil.getFullName(friend) + " " + getString(R.string.friend_is_offline), Toast.LENGTH_SHORT).show();
                 } else {
@@ -275,6 +284,10 @@ public class ConversationActivity extends AppCompatActivity {
         img_but_voice.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (NetworkUtil.getConnectivityStatusString(ConversationActivity.this) == NetworkUtil.NETWORK_STATUS_NOT_CONNECTED){
+                    Toast.makeText(ConversationActivity.this, getString(R.string.network_disconnect), Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 if (friend.getStatus() == null || !friend.getStatus().equalsIgnoreCase("Online")) {
                     Toast.makeText(ConversationActivity.this, UserUtil.getFullName(friend) + " " + getString(R.string.friend_is_offline), Toast.LENGTH_SHORT).show();
                 } else {
@@ -286,6 +299,10 @@ public class ConversationActivity extends AppCompatActivity {
         btnSendImageMessageConversation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (NetworkUtil.getConnectivityStatusString(ConversationActivity.this) == NetworkUtil.NETWORK_STATUS_NOT_CONNECTED){
+                    Toast.makeText(ConversationActivity.this, getString(R.string.network_disconnect), Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 requestPermission();
             }
         });
@@ -521,6 +538,7 @@ public class ConversationActivity extends AppCompatActivity {
                     if (!messages.isEmpty()) messages.clear();
                     for (DataSnapshot item : dataSnapshot.getChildren()) {
                         Message message = item.getValue(Message.class);
+                        assert message != null;
                         message.setMessageId(item.getKey());
                         messages.add(message);
                     }
@@ -550,6 +568,13 @@ public class ConversationActivity extends AppCompatActivity {
                     message = dataSnapshot.getValue(Message.class);
                     //add to GUI
                     messageAdapter.addItem(message);
+
+                    messages.add(message);
+                    TOTAL_LIST_ITEMS ++;
+                    int val = TOTAL_LIST_ITEMS % NUM_ITEMS_PAGE;
+                    val = val == 0 ? 0 : 1;
+                    pageCount = TOTAL_LIST_ITEMS / NUM_ITEMS_PAGE + val;
+
                     rvChatConversation.smoothScrollToPosition(Objects.requireNonNull(rvChatConversation.getAdapter()).getItemCount() - 1);
                     txtContextConversation.requestFocus();
                     InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);

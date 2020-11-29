@@ -43,6 +43,7 @@ import com.vuvanduong.ringchat.model.User;
 import com.vuvanduong.ringchat.util.CircleTransform;
 import com.vuvanduong.ringchat.util.DBUtil;
 import com.vuvanduong.ringchat.util.ImageUtils;
+import com.vuvanduong.ringchat.util.NetworkUtil;
 import com.vuvanduong.ringchat.util.UserUtil;
 
 import org.linphone.core.tools.Log;
@@ -55,10 +56,10 @@ import java.util.Map;
 import java.util.Objects;
 
 public class UserProfileActivity extends AppCompatActivity {
-    ImageView imgProfileAvatar,imgProfileBack,btnProfileChat,btnProfileUnfriend,btnProfileAddFriend;
-    TextView txtNameUserProfile,txtUserProfileInfo;
+    ImageView imgProfileAvatar, imgProfileBack, btnProfileChat, btnProfileUnfriend, btnProfileAddFriend;
+    TextView txtNameUserProfile, txtUserProfileInfo;
     User userLogin, userScan;
-    boolean isFriend,isUserLogin;
+    boolean isFriend, isUserLogin;
 
     private static final int PERMISSION_CODE = 3;
     private static final int PICK_IMAGE = 3;
@@ -89,7 +90,7 @@ public class UserProfileActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //requestPermission();
-                if (userLogin.getImage()!=null) {
+                if (userLogin.getImage() != null) {
                     Intent viewImage = new Intent(UserProfileActivity.this, ViewImageActivity.class);
                     viewImage.putExtra("url", userLogin.getImage());
                     startActivity(viewImage);
@@ -111,8 +112,12 @@ public class UserProfileActivity extends AppCompatActivity {
                 DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        switch (which){
+                        switch (which) {
                             case DialogInterface.BUTTON_POSITIVE:
+                                if (NetworkUtil.getConnectivityStatusString(UserProfileActivity.this) == NetworkUtil.NETWORK_STATUS_NOT_CONNECTED) {
+                                    Toast.makeText(UserProfileActivity.this, getString(R.string.network_disconnect), Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
                                 userContacts.child(userScan.getId()).removeValue();
                                 btnProfileUnfriend.setVisibility(View.GONE);
                                 Toast.makeText(UserProfileActivity.this, R.string.remove_friend_success, Toast.LENGTH_SHORT).show();
@@ -135,6 +140,10 @@ public class UserProfileActivity extends AppCompatActivity {
         btnProfileAddFriend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (NetworkUtil.getConnectivityStatusString(UserProfileActivity.this) == NetworkUtil.NETWORK_STATUS_NOT_CONNECTED) {
+                    Toast.makeText(UserProfileActivity.this, getString(R.string.network_disconnect), Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 userContacts.child(userScan.getId()).setValue(userScan.getId());
                 v.setVisibility(View.GONE);
                 Toast.makeText(UserProfileActivity.this, R.string.add_friend_success, Toast.LENGTH_SHORT).show();
@@ -154,29 +163,29 @@ public class UserProfileActivity extends AppCompatActivity {
         Intent intent = getIntent();
         userLogin = (User) intent.getSerializableExtra("user_login");
         userScan = (User) intent.getSerializableExtra("user_scan");
-        isFriend = intent.getBooleanExtra("isScanFriend",false);
-        isUserLogin = intent.getBooleanExtra("isUserLogin",false);
-        userContacts = dbReference.child("contacts/"+userLogin.getId()+"/");
+        isFriend = intent.getBooleanExtra("isScanFriend", false);
+        isUserLogin = intent.getBooleanExtra("isUserLogin", false);
+        userContacts = dbReference.child("contacts/" + userLogin.getId() + "/");
 
-        if (isUserLogin){
+        if (isUserLogin) {
             btnProfileChat.setVisibility(View.GONE);
             btnProfileAddFriend.setVisibility(View.GONE);
             btnProfileUnfriend.setVisibility(View.GONE);
         }
 
-        if (isFriend){
+        if (isFriend) {
             btnProfileAddFriend.setVisibility(View.GONE);
-        }else {
+        } else {
             btnProfileChat.setVisibility(View.GONE);
             btnProfileUnfriend.setVisibility(View.GONE);
         }
 
         txtNameUserProfile.setText(UserUtil.getFullName(userScan));
-        String info = getResources().getString(R.string.firstname) + " : "+ userScan.getFirstname() + "\n"
-                +getResources().getString(R.string.lastname) + " : "+ userScan.getLastname() + "\n"
-                +getResources().getString(R.string.birthday) + " : "+ userScan.getBirthday() + "\n";
+        String info = getResources().getString(R.string.firstname) + " : " + userScan.getFirstname() + "\n"
+                + getResources().getString(R.string.lastname) + " : " + userScan.getLastname() + "\n"
+                + getResources().getString(R.string.birthday) + " : " + userScan.getBirthday() + "\n";
         txtUserProfileInfo.setText(info);
-        if (!userScan.getImage().equalsIgnoreCase("")) {
+        if (userScan.getImage() != null && !userScan.getImage().equalsIgnoreCase("")) {
             Picasso.with(this)
                     .load(userScan.getImage())
                     .placeholder(R.drawable.user)
@@ -300,16 +309,16 @@ public class UserProfileActivity extends AppCompatActivity {
                             users = dbReference.child("users/" + userLogin.getId());
                             users.child("image").setValue(Objects.requireNonNull(resultData.get("url")).toString());
                             userLogin.setImage(Objects.requireNonNull(resultData.get("url")).toString());
-                            Intent intent=new Intent();
+                            Intent intent = new Intent();
                             intent.putExtra("avatar", resultData.get("url").toString());
-                            setResult(Constant.GET_GET_AVATAR,intent);
+                            setResult(Constant.GET_GET_AVATAR, intent);
                             Toast.makeText(UserProfileActivity.this, getString(R.string.set_avatar_success), Toast.LENGTH_SHORT).show();
                             dialog.dismiss();
                         }
 
                         @Override
                         public void onError(String requestId, ErrorInfo error) {
-                            Log.e("upload_image",error.toString());
+                            Log.e("upload_image", error.toString());
                             dialog.dismiss();
                         }
 

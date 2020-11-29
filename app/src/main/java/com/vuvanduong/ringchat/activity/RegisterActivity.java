@@ -30,6 +30,7 @@ import com.vuvanduong.ringchat.model.User;
 import com.vuvanduong.ringchat.util.DBUtil;
 import com.vuvanduong.ringchat.util.GMailSender;
 import com.vuvanduong.ringchat.util.MD5;
+import com.vuvanduong.ringchat.util.NetworkUtil;
 import com.vuvanduong.ringchat.util.UserUtil;
 
 import java.io.IOException;
@@ -138,6 +139,11 @@ public class RegisterActivity extends AppCompatActivity {
                     txtErrorRegister.setText(R.string.err_pass_not_match);
                     dialog.dismiss();
                 } else {
+                    if (NetworkUtil.getConnectivityStatusString(RegisterActivity.this) == NetworkUtil.NETWORK_STATUS_NOT_CONNECTED){
+                        Toast.makeText(RegisterActivity.this, getString(R.string.network_disconnect), Toast.LENGTH_SHORT).show();
+                        dialog.dismiss();
+                        return;
+                    }
                     email = txtUsernameRegister.getText().toString().trim();
                     ValueEventListener getUser = new ValueEventListener() {
                         @Override

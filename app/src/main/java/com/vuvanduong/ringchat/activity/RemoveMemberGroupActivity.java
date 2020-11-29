@@ -23,6 +23,7 @@ import com.vuvanduong.ringchat.model.GroupChat;
 import com.vuvanduong.ringchat.model.Message;
 import com.vuvanduong.ringchat.model.User;
 import com.vuvanduong.ringchat.util.DBUtil;
+import com.vuvanduong.ringchat.util.NetworkUtil;
 import com.vuvanduong.ringchat.util.UserUtil;
 
 import java.util.ArrayList;
@@ -82,6 +83,10 @@ public class RemoveMemberGroupActivity extends AppCompatActivity {
                 }else if (txtGroupNameRemove.getText().toString().trim().length()>50){
                     Toast.makeText(RemoveMemberGroupActivity.this, getString(R.string.group_name_too_long), Toast.LENGTH_SHORT).show();
                 }else {
+                    if (NetworkUtil.getConnectivityStatusString(RemoveMemberGroupActivity.this) == NetworkUtil.NETWORK_STATUS_NOT_CONNECTED){
+                        Toast.makeText(RemoveMemberGroupActivity.this, getString(R.string.network_disconnect), Toast.LENGTH_SHORT).show();
+                        return;
+                    }
                     StringBuilder nameMembers = new StringBuilder();
                     String groupName = txtGroupNameRemove.getText().toString().trim();
                     for (int i=0; i<chosenContact.size();i++) {

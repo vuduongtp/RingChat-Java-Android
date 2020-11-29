@@ -5,7 +5,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
+import com.vuvanduong.ringchat.config.Constant;
 import com.vuvanduong.ringchat.model.User;
 import com.vuvanduong.ringchat.util.DBUtil;
 import com.vuvanduong.ringchat.util.UserUtil;
@@ -81,8 +83,9 @@ public class UserLoginDB {
         return database.delete(USERLOGIN,null, null);
     }
 
-    public User getUserLoginById(String id) {
-        String selectQuery = "SELECT * FROM " + USERLOGIN + " WHERE " + USERID + " = '" + id + "' AND "+ISLOGIN+"=1";
+    public User getUserLoginByEmail(String email) {
+        String selectQuery = "SELECT * FROM " + USERLOGIN + " WHERE " + EMAIL + " = '" + email + "' AND "+ISLOGIN+"=1";
+        Log.e(Constant.TAG_SQLITE, "getUserLoginByEmail "+selectQuery);
         Cursor cursor = database.rawQuery(selectQuery, null);
         User user = new User();
         if (cursor != null && cursor.getCount()!=0) {

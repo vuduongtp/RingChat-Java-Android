@@ -27,6 +27,7 @@ import com.vuvanduong.ringchat.model.GroupChat;
 import com.vuvanduong.ringchat.model.Message;
 import com.vuvanduong.ringchat.model.User;
 import com.vuvanduong.ringchat.util.DBUtil;
+import com.vuvanduong.ringchat.util.NetworkUtil;
 import com.vuvanduong.ringchat.util.UserUtil;
 
 import java.util.ArrayList;
@@ -82,6 +83,10 @@ public class AddMemberGroupActivity extends AppCompatActivity {
         btnAddMemberGroup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (NetworkUtil.getConnectivityStatusString(AddMemberGroupActivity.this) == NetworkUtil.NETWORK_STATUS_NOT_CONNECTED){
+                    Toast.makeText(AddMemberGroupActivity.this, getString(R.string.network_disconnect), Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 chosenContact = new ArrayList<>();
                 chosenContact = selectFriendAdapter.getListFriendSelected();
                 if (chosenContact.size()==0){

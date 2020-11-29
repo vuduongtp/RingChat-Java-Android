@@ -16,6 +16,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.vuvanduong.ringchat.R;
 import com.vuvanduong.ringchat.model.User;
 import com.vuvanduong.ringchat.util.MD5;
+import com.vuvanduong.ringchat.util.NetworkUtil;
 
 import java.io.Serializable;
 
@@ -60,6 +61,10 @@ public class ResetPasswordActivity extends AppCompatActivity {
                 }else if (!txtPasswordNewResetPass.getText().toString().trim().equalsIgnoreCase(txtConfirmPasswordNewResetPass.getText().toString().trim())){
                     txtErrorResetPass.setText(getString(R.string.new_pass_not_match));
                 }else {
+                    if (NetworkUtil.getConnectivityStatusString(ResetPasswordActivity.this) == NetworkUtil.NETWORK_STATUS_NOT_CONNECTED){
+                        Toast.makeText(ResetPasswordActivity.this, getString(R.string.network_disconnect), Toast.LENGTH_SHORT).show();
+                        return;
+                    }
                     String id = user.getId();
                     user.setId(null);
                     user.setPassword(MD5.getMd5(txtPasswordNewResetPass.getText().toString().trim()));

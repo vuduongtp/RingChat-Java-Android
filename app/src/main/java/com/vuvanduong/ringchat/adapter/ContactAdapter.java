@@ -27,6 +27,7 @@ import com.vuvanduong.ringchat.activity.WelcomeActivity;
 import com.vuvanduong.ringchat.app.InitialApp;
 import com.vuvanduong.ringchat.model.User;
 import com.vuvanduong.ringchat.util.CircleTransform;
+import com.vuvanduong.ringchat.util.NetworkUtil;
 import com.vuvanduong.ringchat.util.UserUtil;
 
 import java.io.Serializable;
@@ -114,6 +115,10 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
                         public void onClick(DialogInterface dialog, int which) {
                             switch (which){
                                 case DialogInterface.BUTTON_POSITIVE:
+                                    if (NetworkUtil.getConnectivityStatusString(v.getContext()) == NetworkUtil.NETWORK_STATUS_NOT_CONNECTED){
+                                        Toast.makeText(v.getContext(), v.getContext().getString(R.string.network_disconnect), Toast.LENGTH_SHORT).show();
+                                        return;
+                                    }
                                     userContacts.child(users.get(position).getId()).removeValue();
                                     v.setVisibility(View.GONE);
                                     Toast.makeText(context, R.string.remove_friend_success, Toast.LENGTH_SHORT).show();
@@ -140,6 +145,10 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
             holder.btnAddNewFriend.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    if (NetworkUtil.getConnectivityStatusString(v.getContext()) == NetworkUtil.NETWORK_STATUS_NOT_CONNECTED){
+                        Toast.makeText(v.getContext(), v.getContext().getString(R.string.network_disconnect), Toast.LENGTH_SHORT).show();
+                        return;
+                    }
                     userContacts.child(users.get(position).getId()).setValue(users.get(position).getId());
                     v.setVisibility(View.GONE);
                     Toast.makeText(context, R.string.add_friend_success, Toast.LENGTH_SHORT).show();

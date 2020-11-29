@@ -18,6 +18,7 @@ import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,6 +27,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -60,6 +62,7 @@ import com.vuvanduong.ringchat.service.LinphoneService;
 import com.vuvanduong.ringchat.service.NetworkChangeService;
 import com.vuvanduong.ringchat.util.CircleTransform;
 import com.vuvanduong.ringchat.util.ImageUtils;
+import com.vuvanduong.ringchat.util.NetworkUtil;
 import com.vuvanduong.ringchat.util.SharedPrefs;
 import com.vuvanduong.ringchat.util.UserUtil;
 
@@ -85,6 +88,7 @@ public class AccountFragment extends Fragment {
     private static final int PICK_IMAGE = 1;
     int rotationInDegrees = 0, rotation = 0;
     ProgressDialog dialog;
+    ProgressBar loadingQRCode;
 
     private void requestPermission() {
         if (ContextCompat.checkSelfPermission
@@ -154,6 +158,10 @@ public class AccountFragment extends Fragment {
         layoutLogout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (NetworkUtil.getConnectivityStatusString(getActivity()) == NetworkUtil.NETWORK_STATUS_NOT_CONNECTED){
+                    Toast.makeText(getActivity(), getString(R.string.network_disconnect), Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -222,6 +230,10 @@ public class AccountFragment extends Fragment {
         imgMyAvatarAccount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (NetworkUtil.getConnectivityStatusString(getActivity()) == NetworkUtil.NETWORK_STATUS_NOT_CONNECTED){
+                    Toast.makeText(getActivity(), getString(R.string.network_disconnect), Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 requestPermission();
             }
         });
@@ -229,6 +241,10 @@ public class AccountFragment extends Fragment {
         layoutChangeAvatar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (NetworkUtil.getConnectivityStatusString(getActivity()) == NetworkUtil.NETWORK_STATUS_NOT_CONNECTED){
+                    Toast.makeText(getActivity(), getString(R.string.network_disconnect), Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 requestPermission();
             }
         });
@@ -236,27 +252,51 @@ public class AccountFragment extends Fragment {
         imgQRGen.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //ProgressDialog progressDialog=new ProgressDialog(getActivity());
-                //progressDialog.show();
+                final ProgressDialog progressDialog=new ProgressDialog(getActivity());
+                progressDialog.setMessage("Loading...");
+                progressDialog.show();
                 try {
-                    if (user.getId() == null || user.getId().equals("")) {
-                        return;
-                    }
-                    Bitmap bitmap = TextToImageEncode(user.getId());
-                    Dialog QRDialog = new Dialog(Objects.requireNonNull(getActivity()));
-                    Objects.requireNonNull(QRDialog.getWindow()).requestFeature(Window.FEATURE_NO_TITLE);
-                    QRDialog.setContentView(getLayoutInflater().inflate(R.layout.qrcode_dialog
-                            , null));
-                    QRDialog.show();
-                    ImageView imageQR = QRDialog.findViewById(R.id.imageQRDialog);
-                    TextView QRDialogFullName = QRDialog.findViewById(R.id.QRDialogFullName);
+                    new Handler().postDelayed(new Runnable() {
+                        public void run() {
+                            if (user.getId() == null || user.getId().equals("")) {
+                                return;
+                            }
+                            Bitmap bitmap = null;
+                            try {
+                                bitmap = TextToImageEncode(user.getId());
+                            } catch (WriterException e) {
+                                e.printStackTrace();
+                            }
+                            final Bitmap finalBitmap = bitmap;
+                            Objects.requireNonNull(getActivity()).runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Dialog QRDialog = new Dialog(Objects.requireNonNull(getActivity()));
+                                    Objects.requireNonNull(QRDialog.getWindow()).requestFeature(Window.FEATURE_NO_TITLE);
+                                    QRDialog.setContentView(getLayoutInflater().inflate(R.layout.qrcode_dialog
+                                            , null));
+                                    QRDialog.show();
+                                    ImageView imageQR = QRDialog.findViewById(R.id.imageQRDialog);
+                                    ImageView imageQRAvatar = QRDialog.findViewById(R.id.QRDialogAvatar);
+                                    TextView QRDialogFullName = QRDialog.findViewById(R.id.QRDialogFullName);
+                                    Picasso.with(getActivity())
+                                            .load(user.getImage())
+                                            .placeholder(R.drawable.user)
+                                            .transform(new CircleTransform())
+                                            .into(imageQRAvatar);
 
-                    imageQR.setImageBitmap(bitmap);
-                    QRDialogFullName.setText(UserUtil.getFullName(user));
-                    //progressDialog.dismiss();
-                } catch (WriterException e) {
+                                    imageQR.setImageBitmap(finalBitmap);
+                                    QRDialogFullName.setText(UserUtil.getFullName(user));
+                                    progressDialog.dismiss();
+                                }
+                            });
+
+                        }
+                    }, 100);
+
+                } catch (Exception e) {
                     e.printStackTrace();
-                    //progressDialog.dismiss();
+                    progressDialog.dismiss();
                 }
             }
         });
@@ -466,6 +506,7 @@ public class AccountFragment extends Fragment {
         imgMyAvatarAccount = view.findViewById(R.id.imgMyAvatarAccount);
         layoutChangeAvatar = view.findViewById(R.id.layoutChangeAvatar);
         imgQRGen = view.findViewById(R.id.imgQRGen);
+        loadingQRCode = view.findViewById(R.id.loadingQRCode);
         txtNameAccount.setText(UserUtil.getFullName(user));
         txtEmailAccount.setText(user.getEmail());
         Picasso.with(getActivity())
