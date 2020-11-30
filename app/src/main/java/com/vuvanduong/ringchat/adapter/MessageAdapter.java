@@ -161,23 +161,26 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             me.txtTimeMessageMe.setText(time);
             me.imgIconMessageMe.setVisibility(View.VISIBLE);
             Log.e("image",messages.get(position).getContext());
-            Picasso.with(this.context)
-                    .load(userLogin.getImage())
-                    .placeholder(R.drawable.user)
-                    .transform(new CircleTransform())
-                    .into(me.imgAvatarMeMessage);
-            Picasso.with(this.context)
-                    .load(R.drawable.emptyimage)
-                    .resize(maxSizeImage,maxSizeImage)
-                    .centerInside()
-                    .transform(new RoundedCornersTransform(30,0))
-                    .into(me.imgIconMessageMe);
-            Picasso.with(this.context)
-                    .load(messages.get(position).getContext())
-                    .resize(maxSizeImage,maxSizeImage)
-                    .centerInside()
-                    .transform(new RoundedCornersTransform(30,0))
-                    .into(me.imgIconMessageMe);
+            try {
+                Picasso.with(this.context)
+                        .load(userLogin.getImage())
+                        .placeholder(R.drawable.user)
+                        .transform(new CircleTransform())
+                        .into(me.imgAvatarMeMessage);
+                Picasso.with(this.context)
+                        .load(R.drawable.emptyimage)
+                        .resize(maxSizeImage, maxSizeImage)
+                        .centerInside()
+                        .transform(new RoundedCornersTransform(30, 0))
+                        .into(me.imgIconMessageMe);
+                Picasso.with(this.context)
+                        .load(messages.get(position).getContext())
+                        .resize(maxSizeImage, maxSizeImage)
+                        .centerInside()
+                        .transform(new RoundedCornersTransform(30, 0))
+                        .into(me.imgIconMessageMe);
+            }catch (NullPointerException ignored){
+            }
 
         }else {
             if (isGroup) {
@@ -191,11 +194,13 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             me.imgIconMessageMe.getLayoutParams().height = 0;
             me.imgIconMessageMe.getLayoutParams().width = 0;
 
-            Picasso.with(this.context)
-                    .load(userLogin.getImage())
-                    .placeholder(R.drawable.user)
-                    .transform(new CircleTransform())
-                    .into(me.imgAvatarMeMessage);
+            if (userLogin.getImage()!=null) {
+                Picasso.with(this.context)
+                        .load(userLogin.getImage())
+                        .placeholder(R.drawable.user)
+                        .transform(new CircleTransform())
+                        .into(me.imgAvatarMeMessage);
+            }
 
         }
         me.itemView.setOnClickListener(new View.OnClickListener() {
@@ -214,6 +219,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             public void onClick(View v) {
                 Intent viewImage = new Intent(context, ViewImageActivity.class);
                 viewImage.putExtra("url", messages.get(position).getContext());
+                viewImage.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(viewImage);
             }
         });
@@ -226,47 +232,57 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             you.txtTimeMessageYou.setText(time);
             you.imgIconMessageYou.setVisibility(View.VISIBLE);
             Log.e("image",messages.get(position).getContext());
-            Picasso.with(this.context)
-                    .load(friend.getImage())
-                    .placeholder(R.drawable.user)
-                    .transform(new CircleTransform())
-                    .into(you.imgAvatarFriendYou);
-            Picasso.with(this.context)
-                    .load(R.drawable.emptyimage)
-                    .resize(maxSizeImage,maxSizeImage)
-                    .centerInside()
-                    .transform(new RoundedCornersTransform(30,0))
-                    .into(you.imgIconMessageYou);
-            Picasso.with(this.context)
-                    .load(messages.get(position).getContext())
-                    .resize(maxSizeImage,maxSizeImage)
-                    .centerInside()
-                    .transform(new RoundedCornersTransform(30,0))
-                    .into(you.imgIconMessageYou);
-
-        }else {
-            if (isGroup) {
-                time = messages.get(position).getDatetime() + "\n" + getNameUser(messages.get(position).getUserID());
-                if (messages.get(position).getUserID().equalsIgnoreCase(userLogin.getId())){
-                    Picasso.with(this.context)
-                            .load(userLogin.getImage())
-                            .placeholder(R.drawable.user)
-                            .transform(new CircleTransform())
-                            .into(you.imgAvatarFriendYou);
-                }else {
-                    Picasso.with(this.context)
-                            .load(getUser(messages.get(position).getUserID()).getImage())
-                            .placeholder(R.drawable.user)
-                            .transform(new CircleTransform())
-                            .into(you.imgAvatarFriendYou);
-                }
-            } else {
-                time = messages.get(position).getDatetime();
+            try {
                 Picasso.with(this.context)
                         .load(friend.getImage())
                         .placeholder(R.drawable.user)
                         .transform(new CircleTransform())
                         .into(you.imgAvatarFriendYou);
+                Picasso.with(this.context)
+                        .load(R.drawable.emptyimage)
+                        .resize(maxSizeImage, maxSizeImage)
+                        .centerInside()
+                        .transform(new RoundedCornersTransform(30, 0))
+                        .into(you.imgIconMessageYou);
+                Picasso.with(this.context)
+                        .load(messages.get(position).getContext())
+                        .resize(maxSizeImage, maxSizeImage)
+                        .centerInside()
+                        .transform(new RoundedCornersTransform(30, 0))
+                        .into(you.imgIconMessageYou);
+            }catch (NullPointerException ignored){
+            }
+
+        }else {
+            if (isGroup) {
+                time = messages.get(position).getDatetime() + "\n" + getNameUser(messages.get(position).getUserID());
+                if (messages.get(position).getUserID().equalsIgnoreCase(userLogin.getId())){
+                    if (userLogin.getImage() != null) {
+                        Picasso.with(this.context)
+                                .load(userLogin.getImage())
+                                .placeholder(R.drawable.user)
+                                .transform(new CircleTransform())
+                                .into(you.imgAvatarFriendYou);
+                    }
+                }else {
+                    try {
+                        Picasso.with(this.context)
+                                .load(getUser(messages.get(position).getUserID()).getImage())
+                                .placeholder(R.drawable.user)
+                                .transform(new CircleTransform())
+                                .into(you.imgAvatarFriendYou);
+                    }catch (NullPointerException ignored){
+                    }
+                }
+            } else {
+                time = messages.get(position).getDatetime();
+                if (friend.getImage() != null) {
+                    Picasso.with(this.context)
+                            .load(friend.getImage())
+                            .placeholder(R.drawable.user)
+                            .transform(new CircleTransform())
+                            .into(you.imgAvatarFriendYou);
+                }
             }
             you.txtTimeMessageYou.setText(time);
             you.txtContextMessageYou.setText(messages.get(position).getContext());
@@ -292,6 +308,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             public void onClick(View v) {
                 Intent viewImage = new Intent(context, ViewImageActivity.class);
                 viewImage.putExtra("url", messages.get(position).getContext());
+                viewImage.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(viewImage);
             }
         });
@@ -318,11 +335,14 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             lastMessage.imgIconMessageLast.getLayoutParams().width = 0;
             lastMessage.imgIconMessageLast.setScaleType(ImageView.ScaleType.FIT_XY);
         }
-        Picasso.with(this.context)
-                .load(getUser(getFriendId(messages.get(position).getIdRoom())).getImage())
-                .placeholder(R.drawable.user)
-                .transform(new CircleTransform())
-                .into(lastMessage.imgFriendHome);
+        try{
+            Picasso.with(this.context)
+                    .load(getUser(getFriendId(messages.get(position).getIdRoom())).getImage())
+                    .placeholder(R.drawable.user)
+                    .transform(new CircleTransform())
+                    .into(lastMessage.imgFriendHome);
+        }catch (NullPointerException ignored){
+        }
         lastMessage.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

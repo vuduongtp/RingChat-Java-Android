@@ -66,6 +66,7 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Timer;
@@ -113,9 +114,12 @@ public class ConversationActivity extends AppCompatActivity {
 
     private int pageCount;
     private int increment = 0;
+    private int originNumItem = 0;
+    private int countChildAdded = 0;
     public int TOTAL_LIST_ITEMS = 0;
     public int NUM_ITEMS_PAGE = 10;
     ArrayList<Message> messageDisplay;
+    private Map<String, String> config = new HashMap<String, String>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -136,6 +140,8 @@ public class ConversationActivity extends AppCompatActivity {
                 .placeholder(R.drawable.user)
                 .transform(new CircleTransform())
                 .into(imgAvatarFriendConversation);
+
+        configCloudinary();
 
         mCoreListener = new CoreListenerStub() {
             @Override
@@ -477,6 +483,17 @@ public class ConversationActivity extends AppCompatActivity {
         }
     }
 
+    private void configCloudinary() {
+        config.put("cloud_name", "vuduongtp");
+        config.put("api_key", "987439358416729");
+        config.put("api_secret", "Uj9Jes5zUjtAnYLXd81uR5qnGts");
+        try {
+            MediaManager.init(Objects.requireNonNull(ConversationActivity.this), config);
+        }catch (IllegalStateException ex){
+            android.util.Log.e("IllegalStateException",ex.toString());
+        }
+    }
+
     private Boolean CheckListEnable() {
         if (increment == pageCount) {
             return false;
@@ -543,13 +560,14 @@ public class ConversationActivity extends AppCompatActivity {
                         messages.add(message);
                     }
                     TOTAL_LIST_ITEMS = (int) dataSnapshot.getChildrenCount();
+                    originNumItem = TOTAL_LIST_ITEMS;
                     int val = TOTAL_LIST_ITEMS % NUM_ITEMS_PAGE;
                     val = val == 0 ? 0 : 1;
                     pageCount = TOTAL_LIST_ITEMS / NUM_ITEMS_PAGE + val;
                     //Collections.reverse(messages);
                 }
                 chatBoxView(500);
-                //conversationMessages.addChildEventListener(messageReceive);
+                conversationMessages.addChildEventListener(messageReceive);
                 loadingConversation.setVisibility(View.GONE);
             }
 
@@ -564,28 +582,31 @@ public class ConversationActivity extends AppCompatActivity {
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 if (dataSnapshot.exists()) {
                     //get from firebase
-                    Message message;
-                    message = dataSnapshot.getValue(Message.class);
-                    //add to GUI
-                    messageAdapter.addItem(message);
+                    countChildAdded++;
+                    if (countChildAdded > originNumItem) {
+                        Message message;
+                        message = dataSnapshot.getValue(Message.class);
+                        //add to GUI
+                        messageAdapter.addItem(message);
 
-                    messages.add(message);
-                    TOTAL_LIST_ITEMS ++;
-                    int val = TOTAL_LIST_ITEMS % NUM_ITEMS_PAGE;
-                    val = val == 0 ? 0 : 1;
-                    pageCount = TOTAL_LIST_ITEMS / NUM_ITEMS_PAGE + val;
+                        messages.add(message);
+                        TOTAL_LIST_ITEMS++;
+                        int val = TOTAL_LIST_ITEMS % NUM_ITEMS_PAGE;
+                        val = val == 0 ? 0 : 1;
+                        pageCount = TOTAL_LIST_ITEMS / NUM_ITEMS_PAGE + val;
 
-                    rvChatConversation.smoothScrollToPosition(Objects.requireNonNull(rvChatConversation.getAdapter()).getItemCount() - 1);
-                    txtContextConversation.requestFocus();
-                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                    if (isFirstLoad && Objects.requireNonNull(rvChatConversation.getAdapter()).getItemCount() == TOTAL_LIST_ITEMS - 1) {
-                        assert imm != null;
-                        imm.showSoftInput(txtContextConversation, InputMethodManager.SHOW_IMPLICIT);
-                        isFirstLoad = false;
-                    }
-                    if (Objects.requireNonNull(rvChatConversation.getAdapter()).getItemCount() == TOTAL_LIST_ITEMS) {
-                        assert imm != null;
-                        imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.HIDE_IMPLICIT_ONLY);
+                        rvChatConversation.smoothScrollToPosition(Objects.requireNonNull(rvChatConversation.getAdapter()).getItemCount() - 1);
+                        txtContextConversation.requestFocus();
+                        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                        if (isFirstLoad && Objects.requireNonNull(rvChatConversation.getAdapter()).getItemCount() == TOTAL_LIST_ITEMS - 1) {
+                            assert imm != null;
+                            imm.showSoftInput(txtContextConversation, InputMethodManager.SHOW_IMPLICIT);
+                            isFirstLoad = false;
+                        }
+                        if (Objects.requireNonNull(rvChatConversation.getAdapter()).getItemCount() == TOTAL_LIST_ITEMS) {
+                            assert imm != null;
+                            imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.HIDE_IMPLICIT_ONLY);
+                        }
                     }
                 }
             }
@@ -732,8 +753,12 @@ public class ConversationActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         ProxyConfig proxyConfig = LinphoneService.getCore().getDefaultProxyConfig();
-        if (proxyConfig == null) {
-            configureAccount();
+        if (proxyConfig == null && NetworkUtil.getConnectivityStatusString(ConversationActivity.this)!=NetworkUtil.NETWORK_STATUS_NOT_CONNECTED) {
+           try {
+               configureAccount();
+           }catch (RuntimeException ex){
+               android.util.Log.e("RuntimeException", ex.toString());
+           }
         }
     }
 

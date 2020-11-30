@@ -2,6 +2,7 @@ package com.vuvanduong.ringchat.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,7 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.cloudinary.android.MediaManager;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -28,6 +30,7 @@ import com.squareup.picasso.Picasso;
 import com.vuvanduong.ringchat.R;
 import com.vuvanduong.ringchat.activity.AddFriendActivity;
 import com.vuvanduong.ringchat.activity.UserProfileActivity;
+import com.vuvanduong.ringchat.activity.WelcomeActivity;
 import com.vuvanduong.ringchat.adapter.MessageAdapter;
 import com.vuvanduong.ringchat.config.Constant;
 import com.vuvanduong.ringchat.database.ContactDB;
@@ -41,6 +44,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class HomeFragment extends Fragment {
@@ -63,6 +68,19 @@ public class HomeFragment extends Fragment {
     private ContactDB contactDB;
     private ConversationLastMessageDB conversationLastMessageDB;
 
+    private Map<String, String> config = new HashMap<String, String>();
+
+    private void configCloudinary() {
+        config.put("cloud_name", "vuduongtp");
+        config.put("api_key", "987439358416729");
+        config.put("api_secret", "Uj9Jes5zUjtAnYLXd81uR5qnGts");
+        try {
+            MediaManager.init(Objects.requireNonNull(getActivity()), config);
+        }catch (IllegalStateException ex){
+            Log.e("IllegalStateException",ex.toString());
+        }
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -75,6 +93,7 @@ public class HomeFragment extends Fragment {
         contactDB = new ContactDB(getActivity());
         conversationLastMessageDB = new ConversationLastMessageDB(getActivity());
 
+        configCloudinary();
         setControl(view);
         setEvent();
         return view;
