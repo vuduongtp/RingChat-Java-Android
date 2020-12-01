@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.firebase.database.DataSnapshot;
@@ -16,10 +17,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 import com.vuvanduong.ringchat.R;
 import com.vuvanduong.ringchat.model.Message;
 import com.vuvanduong.ringchat.model.User;
 import com.vuvanduong.ringchat.service.LinphoneService;
+import com.vuvanduong.ringchat.util.CircleTransform;
 import com.vuvanduong.ringchat.util.DBUtil;
 import com.vuvanduong.ringchat.util.UserUtil;
 
@@ -28,6 +31,8 @@ import org.linphone.core.CallParams;
 import org.linphone.core.Core;
 import org.linphone.core.CoreListenerStub;
 import org.linphone.core.tools.Log;
+
+import java.io.Serializable;
 
 public class CallIncomingActivity extends AppCompatActivity {
 
@@ -44,6 +49,7 @@ public class CallIncomingActivity extends AppCompatActivity {
     private DatabaseReference users = dbReference.child("users");
     boolean isFirstAdd;
     String chatRoom;
+    ImageView image_caller;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +59,7 @@ public class CallIncomingActivity extends AppCompatActivity {
         btn_accept = findViewById(R.id.btn_accept);
         txtv_caller = findViewById(R.id.txtv_caller);
         txtTypeCall = findViewById(R.id.txtTypeCall);
+        image_caller = findViewById(R.id.image_caller);
 
         isFirstAdd = true;
         String idUserCall = LinphoneService.getCore().getCurrentCall().getRemoteAddress().getUsername();
@@ -65,6 +72,15 @@ public class CallIncomingActivity extends AppCompatActivity {
                     assert userCall != null;
                     userCall.setId(item.getKey());
                     txtv_caller.setText(UserUtil.getFullName(userCall));
+                    try {
+                        Picasso.with(CallIncomingActivity.this)
+                                .load(userCall.getImage())
+                                .placeholder(R.drawable.user)
+                                .transform(new CircleTransform())
+                                .into(image_caller);
+                    }catch (NullPointerException ignored){
+
+                    }
                 }
             }
 

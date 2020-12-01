@@ -95,8 +95,8 @@ public class WelcomeActivity extends AppCompatActivity {
         } catch (java.sql.SQLException throwables) {
             throwables.printStackTrace();
         }
-        userDB = new UserDB(this);
-        userLoginDB = new UserLoginDB(this);
+        userDB = new UserDB(WelcomeActivity.this);
+        userLoginDB = new UserLoginDB(WelcomeActivity.this);
 
         Locale current = getResources().getConfiguration().locale;
         String language = SharedPrefs.getInstance().get(Constant.LANGUAGE_CODE, String.class);

@@ -29,11 +29,13 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 import com.vuvanduong.ringchat.R;
 import com.vuvanduong.ringchat.config.Constant;
 import com.vuvanduong.ringchat.model.Message;
 import com.vuvanduong.ringchat.model.User;
 import com.vuvanduong.ringchat.service.LinphoneService;
+import com.vuvanduong.ringchat.util.CircleTransform;
 import com.vuvanduong.ringchat.util.DBUtil;
 import com.vuvanduong.ringchat.util.SharedPrefs;
 import com.vuvanduong.ringchat.util.UserUtil;
@@ -79,6 +81,7 @@ public class CallOutgoingActivity extends AppCompatActivity {
         setContentView(R.layout.activity_outgoing_call);
 
         final long start = System.currentTimeMillis();
+        mImageCallee = findViewById(R.id.image_callee);
 
         mCoreListener = new CoreListenerStub(){
             @Override
@@ -233,6 +236,15 @@ public class CallOutgoingActivity extends AppCompatActivity {
                         assert userCall != null;
                         userCall.setId(item.getKey());
                         mTextCallee.setText(UserUtil.getFullName(userCall));
+                        try {
+                            Picasso.with(CallOutgoingActivity.this)
+                                    .load(userCall.getImage())
+                                    .placeholder(R.drawable.user)
+                                    .transform(new CircleTransform())
+                                    .into(mImageCallee);
+                        }catch (NullPointerException ignored){
+
+                        }
                     }
                 }
 
@@ -257,7 +269,6 @@ public class CallOutgoingActivity extends AppCompatActivity {
 //            updateInterfaceDependingOnVideo();
         }
 
-        mImageCallee = findViewById(R.id.image_callee);
     }
 
     @Override

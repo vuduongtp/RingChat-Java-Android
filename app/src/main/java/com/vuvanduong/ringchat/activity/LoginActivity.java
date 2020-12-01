@@ -79,7 +79,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         };
 
-        userDB = new UserDB(this);
+        userDB = new UserDB(LoginActivity.this);
         addControl();
         addEvent();
     }
@@ -138,12 +138,12 @@ public class LoginActivity extends AppCompatActivity {
                     ValueEventListener getUser = new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            userDB.deleteAll();
                             for (DataSnapshot item : dataSnapshot.getChildren()) {
                                 User user = item.getValue(User.class);
                                 assert user != null;
                                 user.setId(item.getKey());
-                                userDB.insert(user);
+                                long rs = userDB.insert(user);
+                                Log.e(Constant.TAG_SQLITE,"LoginActivity add user "+rs);
                                 if (user.getEmail().equalsIgnoreCase(email)&&user.getPassword().equalsIgnoreCase(MD5.getMd5(pass))) {
                                     SharedPrefs.getInstance().put(Constant.IS_LOGIN, true);
                                     SharedPrefs.getInstance().put(Constant.EMAIL_USER_LOGIN, user.getEmail());
@@ -213,14 +213,18 @@ public class LoginActivity extends AppCompatActivity {
         mAccountCreator.setTransport(TransportType.Tcp);
         // This will automatically create the proxy config and auth info and add them to the Core
         ProxyConfig cfg = mAccountCreator.createProxyConfig();
-        cfg.edit();
-        Address proxy = Factory.instance().createAddress("sip:"+Constant.SIP_SERVER);
-        cfg.setServerAddr(proxy.asString());
-        cfg.enableRegister(true);
-        cfg.setExpires(3600);
-        cfg.done();
-        // Make sure the newly created one is the default
-        LinphoneService.getCore().setDefaultProxyConfig(cfg);
+        try {
+            cfg.edit();
+            Address proxy = Factory.instance().createAddress("sip:" + Constant.SIP_SERVER);
+            cfg.setServerAddr(proxy.asString());
+            cfg.enableRegister(true);
+            cfg.setExpires(3600);
+            cfg.done();
+            // Make sure the newly created one is the default
+            LinphoneService.getCore().setDefaultProxyConfig(cfg);
+        }catch (NullPointerException ignored){
+
+        }
     }
 
     @Override

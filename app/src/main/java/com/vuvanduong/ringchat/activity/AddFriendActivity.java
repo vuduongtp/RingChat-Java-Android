@@ -76,6 +76,10 @@ public class AddFriendActivity extends AppCompatActivity {
         btnSearchNewFriend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (NetworkUtil.getConnectivityStatusString(AddFriendActivity.this) == NetworkUtil.NETWORK_STATUS_NOT_CONNECTED){
+                    Toast.makeText(AddFriendActivity.this, getString(R.string.network_disconnect), Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 loading.setVisibility(View.VISIBLE);
                 final String findUser = txtSearchNewFriend.getText().toString().trim();
                 userFind.clear();

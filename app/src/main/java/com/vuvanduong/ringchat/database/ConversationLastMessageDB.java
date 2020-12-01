@@ -52,7 +52,7 @@ public class ConversationLastMessageDB {
         return database.delete(CONVERSATIONLASTMESSAGE,null, null);
     }
 
-    public Message getLastMessageOfGroup(String conversationid) {
+    public Message getLastMessageByRoomId(String conversationid) {
         String selectQuery = "SELECT * FROM " + CONVERSATIONLASTMESSAGE+ " WHERE "+ CONVERSATIONID+" ='"+conversationid+"'";
         Log.e(Constant.TAG_SQLITE,selectQuery);
         Cursor cursor = database.rawQuery(selectQuery, null);

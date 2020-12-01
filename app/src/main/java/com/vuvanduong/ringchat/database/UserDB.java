@@ -5,7 +5,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
+import com.vuvanduong.ringchat.config.Constant;
 import com.vuvanduong.ringchat.model.User;
 import java.util.ArrayList;
 
@@ -32,6 +34,7 @@ public class UserDB {
     }
 
     public long insert(User user) {
+        Log.e(Constant.TAG_SQLITE,user.toString());
         ContentValues values = new ContentValues();
         values.put(USERID, user.getId());
         values.put(FIRSTNAME, user.getFirstname());
@@ -59,6 +62,8 @@ public class UserDB {
     public ArrayList<User> getAllUser() {
         String selectQuery = "SELECT * FROM " + USERS;
         Cursor cursor = database.rawQuery(selectQuery, null);
+        Log.e(Constant.TAG_SQLITE,selectQuery);
+        Log.e("count",""+cursor.getCount());
         ArrayList<User> users = new ArrayList<>();
         if (cursor != null && cursor.getCount()!=0) {
             cursor.moveToFirst();
@@ -87,6 +92,8 @@ public class UserDB {
     public User getUserById(String id) {
         String selectQuery = "SELECT * FROM " + USERS + " WHERE " + USERID + " = '" + id + "'";
         Cursor cursor = database.rawQuery(selectQuery, null);
+        Log.e(Constant.TAG_SQLITE,selectQuery);
+        Log.e("count",""+cursor.getCount());
         User user = new User();
         if (cursor != null && cursor.getCount()!=0) {
             cursor.moveToFirst();

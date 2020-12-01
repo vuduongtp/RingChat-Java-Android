@@ -57,6 +57,7 @@ import com.vuvanduong.ringchat.activity.LoginActivity;
 import com.vuvanduong.ringchat.activity.WelcomeActivity;
 import com.vuvanduong.ringchat.app.InitialApp;
 import com.vuvanduong.ringchat.config.Constant;
+import com.vuvanduong.ringchat.database.UserLoginDB;
 import com.vuvanduong.ringchat.model.User;
 import com.vuvanduong.ringchat.service.LinphoneService;
 import com.vuvanduong.ringchat.service.NetworkChangeService;
@@ -89,6 +90,20 @@ public class AccountFragment extends Fragment {
     int rotationInDegrees = 0, rotation = 0;
     ProgressDialog dialog;
     ProgressBar loadingQRCode;
+    UserLoginDB userLoginDB;
+
+    private Map<String, String> config = new HashMap<String, String>();
+
+    private void configCloudinary() {
+        config.put("cloud_name", "vuduongtp");
+        config.put("api_key", "987439358416729");
+        config.put("api_secret", "Uj9Jes5zUjtAnYLXd81uR5qnGts");
+        try {
+            MediaManager.init(Objects.requireNonNull(getActivity()), config);
+        }catch (IllegalStateException ex){
+            Log.e("IllegalStateException",ex.toString());
+        }
+    }
 
     private void requestPermission() {
         if (ContextCompat.checkSelfPermission
@@ -149,6 +164,9 @@ public class AccountFragment extends Fragment {
 
         assert getArguments() != null;
         user = (User) getArguments().getSerializable("user_login");
+        userLoginDB = new UserLoginDB(getActivity());
+
+        configCloudinary();
         setControl(view);
         setEvent();
         return view;
@@ -180,6 +198,7 @@ public class AccountFragment extends Fragment {
                                 getActivity().stopService(linphone);
                                 Intent network = new Intent(getActivity(), NetworkChangeService.class);
                                 getActivity().stopService(network);
+                                userLoginDB.logout(user);
 
                                 Intent login = new Intent(getActivity(), WelcomeActivity.class);
                                 startActivity(login);

@@ -35,9 +35,11 @@ import com.vuvanduong.ringchat.adapter.MessageAdapter;
 import com.vuvanduong.ringchat.config.Constant;
 import com.vuvanduong.ringchat.database.ContactDB;
 import com.vuvanduong.ringchat.database.ConversationLastMessageDB;
+import com.vuvanduong.ringchat.database.UserDB;
 import com.vuvanduong.ringchat.model.Message;
 import com.vuvanduong.ringchat.model.User;
 import com.vuvanduong.ringchat.util.CircleTransform;
+import com.vuvanduong.ringchat.util.NetworkUtil;
 import com.vuvanduong.ringchat.util.UserUtil;
 
 import java.io.Serializable;
@@ -67,19 +69,7 @@ public class HomeFragment extends Fragment {
     private ImageView img_avt_friend;
     private ContactDB contactDB;
     private ConversationLastMessageDB conversationLastMessageDB;
-
-    private Map<String, String> config = new HashMap<String, String>();
-
-    private void configCloudinary() {
-        config.put("cloud_name", "vuduongtp");
-        config.put("api_key", "987439358416729");
-        config.put("api_secret", "Uj9Jes5zUjtAnYLXd81uR5qnGts");
-        try {
-            MediaManager.init(Objects.requireNonNull(getActivity()), config);
-        }catch (IllegalStateException ex){
-            Log.e("IllegalStateException",ex.toString());
-        }
-    }
+    private UserDB userDB;
 
     @Nullable
     @Override
@@ -92,8 +82,8 @@ public class HomeFragment extends Fragment {
         loading.setVisibility(View.VISIBLE);
         contactDB = new ContactDB(getActivity());
         conversationLastMessageDB = new ConversationLastMessageDB(getActivity());
+        userDB = new UserDB(getActivity());
 
-        configCloudinary();
         setControl(view);
         setEvent();
         return view;
@@ -125,7 +115,7 @@ public class HomeFragment extends Fragment {
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
-                if (!recyclerView.canScrollVertically(-1) && newState==0) { //check for scroll down
+                if (!recyclerView.canScrollVertically(-1) && newState==0 && NetworkUtil.getConnectivityStatusString(getActivity())!=NetworkUtil.NETWORK_STATUS_NOT_CONNECTED) { //check for scroll down
                     if (messages.size() != 0 && count % messages.size() == 0 && reloadListMessage.getVisibility() == View.GONE) {
                         messages.clear();
                         reloadListMessage.setVisibility(View.VISIBLE);
@@ -164,6 +154,32 @@ public class HomeFragment extends Fragment {
     }
 
     private void getData() {
+        if (NetworkUtil.getConnectivityStatusString(getActivity())==NetworkUtil.NETWORK_STATUS_NOT_CONNECTED){
+            try {
+                if (!messages.isEmpty()) messages.clear();
+                if (!friends.isEmpty()) friends.clear();
+                messages = conversationLastMessageDB.getAllLastMessageOfUser(userLogin.getId());
+                for (Message message : messages) {
+                    System.out.println(message.toString());
+                    String[] usersId = message.getIdRoom().split("&");
+                    String idfriend = "";
+                    if (usersId[0].equalsIgnoreCase(userLogin.getId())) {
+                        idfriend = usersId[1];
+                    } else {
+                        idfriend = usersId[0];
+                    }
+                    User friend = userDB.getUserById(idfriend);
+                    friends.add(friend);
+                    if (messages.size() == friends.size()) {
+                        chatBoxView(200);
+                        loading.setVisibility(View.GONE);
+                    }
+                }
+            }catch (Exception e){
+                System.err.println(e.toString());
+            }
+            return;
+        }
         final Query listChatRoom = conversationLastMessage.getRef()
                 .orderByKey();
 //                .startAt("&" + user.getId() + "&")
@@ -178,6 +194,8 @@ public class HomeFragment extends Fragment {
                 if (dataSnapshot.exists()) {// get data whem first open
                     if (!messages.isEmpty()) messages.clear();
                     if (!friends.isEmpty()) friends.clear();
+                    contactDB.deleteAll(userLogin.getId());
+                    conversationLastMessageDB.deleteAll();
                     for (DataSnapshot item : dataSnapshot.getChildren()) {
                         String[] usersId = Objects.requireNonNull(item.getKey()).split("&");
                         if (usersId[0].equalsIgnoreCase(userLogin.getId()) || usersId[1].equalsIgnoreCase(userLogin.getId())) {
@@ -204,6 +222,7 @@ public class HomeFragment extends Fragment {
                                         assert user != null;
                                         user.setId(item.getKey());
                                         friends.add(user);
+                                        userDB.insert(user);
                                         contactDB.insert(userLogin.getId(),user.getId());
                                         if (messages.size() == friends.size()) {
                                             chatBoxView(200);
