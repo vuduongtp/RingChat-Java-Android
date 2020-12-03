@@ -27,7 +27,11 @@ import com.google.firebase.database.ValueEventListener;
 import com.vuvanduong.ringchat.R;
 import com.vuvanduong.ringchat.activity.AddFriendActivity;
 import com.vuvanduong.ringchat.adapter.ContactAdapter;
+import com.vuvanduong.ringchat.config.Constant;
+import com.vuvanduong.ringchat.database.ContactDB;
+import com.vuvanduong.ringchat.database.UserDB;
 import com.vuvanduong.ringchat.model.User;
+import com.vuvanduong.ringchat.util.NetworkUtil;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -48,6 +52,8 @@ public class ContactFragment extends Fragment {
     private int count = 0;
     private EditText txtSearchFriend;
     private boolean isFirstLoad = true;
+    private ContactDB contactDB;
+    private UserDB userDB;
 
     @Nullable
     @Override
@@ -59,24 +65,55 @@ public class ContactFragment extends Fragment {
 
         loading = view.findViewById(R.id.loadingContacts);
         loading.setVisibility(View.VISIBLE);
+        contactDB = new ContactDB(getActivity());
+        userDB = new UserDB(getActivity());
+
         initFriend();
         return view;
     }
 
     private void initFriend() {
+        idFriends = new ArrayList<>();
+        listFriend = new ArrayList<>();
+        if (NetworkUtil.getConnectivityStatusString(getActivity())==NetworkUtil.NETWORK_STATUS_NOT_CONNECTED){
+            try {
+                if (!idFriends.isEmpty())idFriends.clear();
+                if (!listFriend.isEmpty())listFriend.clear();
+                idFriends = contactDB.getAllFriendOfUser(user.getId());
+                Log.e(Constant.TAG_SQLITE, "size " + idFriends.size());
+                for (String idFriend : idFriends) {
+                    User friend = userDB.getUserById(idFriend);
+                    if (friend==null)continue;
+                    listFriend.add(friend);
+                    if (idFriends.size() == listFriend.size()) {
+                        setControl(view);
+                        setEvent();
+                    }
+                }
+            }catch (NullPointerException e){
+                //Log.e("error",e.toString());
+                e.printStackTrace();
+            }
+            return;
+        }
         String id = user.getId();
         userContacts = dbReference.child("contacts/" + id);
-        idFriends = new ArrayList<>();
+        contactDB.deleteAll(user.getId());
+        if (!idFriends.isEmpty())idFriends.clear();
+        if (!listFriend.isEmpty())listFriend.clear();
         ValueEventListener getAllFriend = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.getChildrenCount() == 0) {
                     setControl(view);
                     setEvent();
+                    return;
                 }
                 for (DataSnapshot item : dataSnapshot.getChildren()) {
                     String userId = item.getKey();
                     idFriends.add(userId);
+                    long rs = contactDB.insert(user.getId(),userId);
+                    Log.e(Constant.TAG_SQLITE, "insert contact "+rs);
                     if (dataSnapshot.getChildrenCount() == idFriends.size()) {
                         getListFriend();
                     }
@@ -97,7 +134,6 @@ public class ContactFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 int count1 = 0;
-                listFriend = new ArrayList<>();
                 for (DataSnapshot item : dataSnapshot.getChildren()) {
                     count1++;
                     User user = item.getValue(User.class);
@@ -106,6 +142,8 @@ public class ContactFragment extends Fragment {
                     for (String id : idFriends) {
                         if (id.equalsIgnoreCase(user.getId())) {
                             listFriend.add(user);
+                            long rs = userDB.insert(user);
+                            Log.e(Constant.TAG_SQLITE, "insert user "+rs);
                         }
                     }
                     if (dataSnapshot.getChildrenCount() == count1) {
@@ -139,7 +177,7 @@ public class ContactFragment extends Fragment {
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
-                if (!recyclerView.canScrollVertically(-1) && newState==0) { //check for scroll down
+                if (!recyclerView.canScrollVertically(-1) && newState==0 && NetworkUtil.getConnectivityStatusString(getActivity())!=NetworkUtil.NETWORK_STATUS_NOT_CONNECTED) { //check for scroll down
                     if (listFriend.size() != 0 && count % listFriend.size() == 0 && reloadListContact.getVisibility() == View.GONE) {
                         listFriend.clear();
                         reloadListContact.setVisibility(View.VISIBLE);

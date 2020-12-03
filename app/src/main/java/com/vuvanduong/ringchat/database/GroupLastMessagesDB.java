@@ -49,6 +49,10 @@ public class GroupLastMessagesDB {
         return database.delete(GROUPLASTMESSAGES,GROUPID +"='"+groupid+"'", null);
     }
 
+    public long deleteAll() {
+        return database.delete(GROUPLASTMESSAGES,null, null);
+    }
+
     public GroupChat getLastMessageOfGroup(String groupid) {
         String selectQuery = "SELECT * FROM " + GROUPLASTMESSAGES+ " WHERE "+ GROUPID+" ='"+groupid+"'";
         Log.e("select",selectQuery);
@@ -66,6 +70,30 @@ public class GroupLastMessagesDB {
         }
         cursor.close();
         return groupChat;
+    }
+
+    public ArrayList<GroupChat> getAllLastMessageOfGroup() {
+        ArrayList<GroupChat> groupChats = new ArrayList<>();
+        String selectQuery = "SELECT * FROM " + GROUPLASTMESSAGES;
+        Log.e("select",selectQuery);
+        Cursor cursor = database.rawQuery(selectQuery, null);
+        Log.e("count",""+cursor.getCount());
+        if (cursor != null && cursor.getCount()!=0) {
+            cursor.moveToFirst();
+            for (int i = 0; i < cursor.getCount(); i++) {
+                GroupChat groupChat = new GroupChat();
+                groupChat.setGroupName(cursor.getString(cursor.getColumnIndex(GROUPNAME)));
+                groupChat.setIdRoom(cursor.getString(cursor.getColumnIndex(GROUPID)));
+                groupChat.setContext(cursor.getString(cursor.getColumnIndex(CONTEXT)));
+                groupChat.setDatetime(cursor.getString(cursor.getColumnIndex(DATETIME)));
+                groupChat.setType(cursor.getString(cursor.getColumnIndex(TYPE)));
+                groupChat.setUserID(cursor.getString(cursor.getColumnIndex(USERID)));
+                groupChats.add(groupChat);
+                cursor.moveToNext();
+            }
+        }
+        cursor.close();
+        return groupChats;
     }
 
 }

@@ -160,7 +160,7 @@ public class HomeFragment extends Fragment {
                 if (!friends.isEmpty()) friends.clear();
                 messages = conversationLastMessageDB.getAllLastMessageOfUser(userLogin.getId());
                 for (Message message : messages) {
-                    System.out.println(message.toString());
+                    //System.out.println(message.toString());
                     String[] usersId = message.getIdRoom().split("&");
                     String idfriend = "";
                     if (usersId[0].equalsIgnoreCase(userLogin.getId())) {
@@ -169,6 +169,7 @@ public class HomeFragment extends Fragment {
                         idfriend = usersId[0];
                     }
                     User friend = userDB.getUserById(idfriend);
+                    if (friend==null)continue;
                     friends.add(friend);
                     if (messages.size() == friends.size()) {
                         chatBoxView(200);

@@ -1,7 +1,6 @@
 package com.vuvanduong.ringchat.ui;
 
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,11 +9,9 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.view.ViewCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -30,22 +27,23 @@ import com.squareup.picasso.Picasso;
 import com.vuvanduong.ringchat.R;
 import com.vuvanduong.ringchat.activity.AddFriendActivity;
 import com.vuvanduong.ringchat.activity.AddGroupActivity;
-import com.vuvanduong.ringchat.activity.GroupConversationActivity;
 import com.vuvanduong.ringchat.activity.UserProfileActivity;
 import com.vuvanduong.ringchat.adapter.GroupAdapter;
-import com.vuvanduong.ringchat.adapter.SelectFriendAdapter;
 import com.vuvanduong.ringchat.config.Constant;
+import com.vuvanduong.ringchat.database.GroupLastMessagesDB;
+import com.vuvanduong.ringchat.database.GroupMemberDB;
+import com.vuvanduong.ringchat.database.GroupMessageDB;
+import com.vuvanduong.ringchat.database.UserDB;
 import com.vuvanduong.ringchat.model.GroupChat;
-import com.vuvanduong.ringchat.model.Message;
 import com.vuvanduong.ringchat.model.User;
 import com.vuvanduong.ringchat.util.CircleTransform;
+import com.vuvanduong.ringchat.util.NetworkUtil;
 import com.vuvanduong.ringchat.util.UserUtil;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Objects;
 
 public class GroupFragment extends Fragment {
     private User user;
@@ -64,6 +62,7 @@ public class GroupFragment extends Fragment {
     private int count = 0;
     private boolean isFirstLoad = true;
     private ImageView imgMyAvatar;
+    private GroupLastMessagesDB groupLastMessagesDB;
 
     @Nullable
     @Override
@@ -72,6 +71,7 @@ public class GroupFragment extends Fragment {
 
         assert getArguments() != null;
         user = (User) getArguments().getSerializable("user_login");
+        groupLastMessagesDB = new GroupLastMessagesDB(getActivity());
         setControl(view);
         setEvent();
         return view;
@@ -115,7 +115,7 @@ public class GroupFragment extends Fragment {
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
-                if (!recyclerView.canScrollVertically(-1) && newState==0) { //check for scroll down
+                if (!recyclerView.canScrollVertically(-1) && newState==0 && NetworkUtil.getConnectivityStatusString(getActivity())!= NetworkUtil.NETWORK_STATUS_NOT_CONNECTED) { //check for scroll down
                     if (groupChats.size()!=0&&count%groupChats.size()==0 && reloadListGroup.getVisibility()==View.GONE) {
                         groupChats.clear();
                         reloadListGroup.setVisibility(View.VISIBLE);
@@ -134,6 +134,24 @@ public class GroupFragment extends Fragment {
     }
 
     private void getData(){
+        if (!groupChats.isEmpty())groupChats.clear();
+        if (NetworkUtil.getConnectivityStatusString(getActivity())==NetworkUtil.NETWORK_STATUS_NOT_CONNECTED){
+            groupChats = groupLastMessagesDB.getAllLastMessageOfGroup();
+            if (groupChats.size()>0){
+                Collections.sort(groupChats, new Comparator<GroupChat>() {
+                    @Override
+                    public int compare(GroupChat o1, GroupChat o2) {
+                        return o2.getDatetime().compareTo(o1.getDatetime());
+                    }
+                });
+                if (loading.getVisibility()==View.VISIBLE) {
+                    loading.setVisibility(View.GONE);
+                }
+                groupAdapter.addAllItem(groupChats);
+            }
+            return;
+        }
+        groupLastMessagesDB.deleteAll();
         final Query getGroups = groupMembers.orderByKey();
         getGroups.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -156,6 +174,7 @@ public class GroupFragment extends Fragment {
                                         assert groupChat != null;
                                         groupChat.setIdRoom(item.getKey());
                                         groupChats.add(groupChat);
+                                        groupLastMessagesDB.insert(groupChat);
                                         if (loading.getVisibility()==View.VISIBLE) {
                                             loading.setVisibility(View.GONE);
                                         }
@@ -191,13 +210,6 @@ public class GroupFragment extends Fragment {
             }
         });
     }
-
-    private boolean IsRecyclerViewAtTop()   {
-        if(rvGroupConversation.getChildCount() == 0)
-            return true;
-        return rvGroupConversation.getChildAt(0).getTop() == 0;
-    }
-
 
     private void setControl(View view) {
         txtUserGroup = view.findViewById(R.id.txtUserGroup);

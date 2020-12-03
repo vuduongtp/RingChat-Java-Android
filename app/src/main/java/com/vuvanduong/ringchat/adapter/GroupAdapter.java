@@ -33,6 +33,12 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder>{
         this.userLogin = userLogin;
     }
 
+    public void addAllItem(ArrayList<GroupChat> groupChatList){
+        if (this.groupChats!= null) this.groupChats.clear();
+        this.groupChats.addAll(groupChatList);
+        this.notifyDataSetChanged();
+    }
+
     @NonNull
     @Override
     public GroupAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {

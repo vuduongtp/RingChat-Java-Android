@@ -7,6 +7,8 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import com.vuvanduong.ringchat.config.Constant;
+
 import java.util.ArrayList;
 
 public class ContactDB {
