@@ -254,8 +254,8 @@ public class LinphoneService extends Service {
         super.onDestroy();
         //set offline
         if (mCore.getDefaultProxyConfig() != null) {
-            String username = mCore.getDefaultProxyConfig().getContact().getUsername();
             try {
+                String username = mCore.getDefaultProxyConfig().getContact().getUsername();
                 users = dbReference.child("users/"+username);
                 users.child("status").setValue("Offline");
 

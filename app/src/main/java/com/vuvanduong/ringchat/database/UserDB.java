@@ -34,7 +34,7 @@ public class UserDB {
     }
 
     public long insert(User user) {
-        Log.e(Constant.TAG_SQLITE,user.toString());
+        //Log.e(Constant.TAG_SQLITE,user.toString());
         ContentValues values = new ContentValues();
         values.put(USERID, user.getId());
         values.put(FIRSTNAME, user.getFirstname());

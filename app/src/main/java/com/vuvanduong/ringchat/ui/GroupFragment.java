@@ -136,18 +136,22 @@ public class GroupFragment extends Fragment {
     private void getData(){
         if (!groupChats.isEmpty())groupChats.clear();
         if (NetworkUtil.getConnectivityStatusString(getActivity())==NetworkUtil.NETWORK_STATUS_NOT_CONNECTED){
-            groupChats = groupLastMessagesDB.getAllLastMessageOfGroup();
-            if (groupChats.size()>0){
-                Collections.sort(groupChats, new Comparator<GroupChat>() {
-                    @Override
-                    public int compare(GroupChat o1, GroupChat o2) {
-                        return o2.getDatetime().compareTo(o1.getDatetime());
+            try {
+                groupChats = groupLastMessagesDB.getAllLastMessageOfGroup();
+                if (groupChats.size() > 0) {
+                    Collections.sort(groupChats, new Comparator<GroupChat>() {
+                        @Override
+                        public int compare(GroupChat o1, GroupChat o2) {
+                            return o2.getDatetime().compareTo(o1.getDatetime());
+                        }
+                    });
+                    if (loading.getVisibility() == View.VISIBLE) {
+                        loading.setVisibility(View.GONE);
                     }
-                });
-                if (loading.getVisibility()==View.VISIBLE) {
-                    loading.setVisibility(View.GONE);
+                    groupAdapter.addAllItem(groupChats);
                 }
-                groupAdapter.addAllItem(groupChats);
+            }catch (NullPointerException e){
+                e.printStackTrace();
             }
             return;
         }

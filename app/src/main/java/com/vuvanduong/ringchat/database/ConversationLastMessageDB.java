@@ -33,9 +33,9 @@ public class ConversationLastMessageDB {
         }
     }
 
-    public long insert(Message message) {
+    public long insert(Message message, String roomId) {
         ContentValues values = new ContentValues();
-        values.put(CONVERSATIONID, message.getIdRoom());
+        values.put(CONVERSATIONID, roomId);
         values.put(CONTEXT, message.getContext());
         values.put(DATETIME, message.getDatetime());
         values.put(TYPE, message.getType());

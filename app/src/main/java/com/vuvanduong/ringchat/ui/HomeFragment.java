@@ -211,7 +211,7 @@ public class HomeFragment extends Fragment {
                             assert message != null;
                             message.setIdRoom(item.getKey());
                             messages.add(message);
-                            conversationLastMessageDB.insert(message);
+                            conversationLastMessageDB.insert(message, item.getKey());
                             Query getFriend = users.orderByKey()
                                     .equalTo(idfriend);
                             getFriend.addListenerForSingleValueEvent(new ValueEventListener() {

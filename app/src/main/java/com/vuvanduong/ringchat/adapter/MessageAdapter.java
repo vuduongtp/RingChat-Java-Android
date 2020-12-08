@@ -329,12 +329,12 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
         lastMessage.txtContextMessageHome.setText(context);
         lastMessage.txtNameFriendHome.setText(getNameUser(getFriendId(messages.get(position).getIdRoom())));
-        if (messages.get(position).getType().equalsIgnoreCase("message")) {
-            lastMessage.imgIconMessageLast.requestLayout();
-            lastMessage.imgIconMessageLast.getLayoutParams().height = 0;
-            lastMessage.imgIconMessageLast.getLayoutParams().width = 0;
-            lastMessage.imgIconMessageLast.setScaleType(ImageView.ScaleType.FIT_XY);
-        }
+//        if (messages.get(position).getType().equalsIgnoreCase("message")) {
+//            lastMessage.imgIconMessageLast.requestLayout();
+//            lastMessage.imgIconMessageLast.getLayoutParams().height = 0;
+//            lastMessage.imgIconMessageLast.getLayoutParams().width = 0;
+//            lastMessage.imgIconMessageLast.setScaleType(ImageView.ScaleType.FIT_XY);
+//        }
         try{
             Picasso.with(this.context)
                     .load(getUser(getFriendId(messages.get(position).getIdRoom())).getImage())

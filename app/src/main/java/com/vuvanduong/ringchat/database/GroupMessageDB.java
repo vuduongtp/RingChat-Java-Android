@@ -7,6 +7,7 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import com.vuvanduong.ringchat.config.Constant;
 import com.vuvanduong.ringchat.model.Message;
 
 import java.util.ArrayList;
@@ -32,10 +33,10 @@ public class GroupMessageDB {
         }
     }
 
-    public long insert(Message message) {
+    public long insert(Message message, String groupId, String messageId) {
         ContentValues values = new ContentValues();
-        values.put(MESSAGEID, message.getMessageId());
-        values.put(GROUPID, message.getIdRoom());
+        values.put(MESSAGEID, messageId);
+        values.put(GROUPID, groupId);
         values.put(CONTEXT, message.getContext());
         values.put(DATETIME, message.getDatetime());
         values.put(TYPE, message.getType());
@@ -46,6 +47,10 @@ public class GroupMessageDB {
 
     public long deleteAll(String groupid) {
         return database.delete(GROUPMESSAGE,GROUPID +"='"+groupid+"'", null);
+    }
+
+    public long deleteAllMess() {
+        return database.delete(GROUPMESSAGE,null, null);
     }
 
     public ArrayList<Message> getAllMessageOfRoom(String groupid) {

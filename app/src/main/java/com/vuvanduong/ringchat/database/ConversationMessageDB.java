@@ -32,10 +32,10 @@ public class ConversationMessageDB {
         }
     }
 
-    public long insert(Message message) {
+    public long insert(Message message, String messageId, String roomId) {
         ContentValues values = new ContentValues();
-        values.put(MESSAGEID, message.getMessageId());
-        values.put(CONVERSATIONID, message.getIdRoom());
+        values.put(MESSAGEID, messageId);
+        values.put(CONVERSATIONID, roomId);
         values.put(CONTEXT, message.getContext());
         values.put(DATETIME, message.getDatetime());
         values.put(TYPE, message.getType());
@@ -48,8 +48,12 @@ public class ConversationMessageDB {
         return database.delete(CONVERSATIONMESSAGES, CONVERSATIONID + "='" + conversationid + "'", null);
     }
 
+    public void deletePending() {
+        database.delete(CONVERSATIONMESSAGES, TYPE + "='Pending'", null);
+    }
+
     public ArrayList<Message> getAllMessageOfRoom(String room) {
-        String selectQuery = "SELECT * FROM " + CONVERSATIONMESSAGES + " WHERE " + CONVERSATIONID + " LIKE '%" + room + "%' ORDER BY " + CONVERSATIONID + " ASC";
+        String selectQuery = "SELECT * FROM " + CONVERSATIONMESSAGES + " WHERE " + CONVERSATIONID + " LIKE '%" + room + "%' ORDER BY " + CONVERSATIONID + " DESC";
         Log.e("select", selectQuery);
         Cursor cursor = database.rawQuery(selectQuery, null);
         Log.e("count", "" + cursor.getCount());
@@ -58,8 +62,8 @@ public class ConversationMessageDB {
             cursor.moveToFirst();
             for (int i = 0; i < cursor.getCount(); i++) {
                 Message message = new Message();
-                message.setMessageId(cursor.getString(cursor.getColumnIndex(MESSAGEID)));
-                message.setIdRoom(cursor.getString(cursor.getColumnIndex(CONVERSATIONID)));
+               // message.setMessageId(cursor.getString(cursor.getColumnIndex(MESSAGEID)));
+               // message.setIdRoom(cursor.getString(cursor.getColumnIndex(CONVERSATIONID)));
                 message.setContext(cursor.getString(cursor.getColumnIndex(CONTEXT)));
                 message.setDatetime(cursor.getString(cursor.getColumnIndex(DATETIME)));
                 message.setType(cursor.getString(cursor.getColumnIndex(TYPE)));
@@ -73,7 +77,7 @@ public class ConversationMessageDB {
         return messages;
     }
 
-    public ArrayList<Message> getAllMessagePending(String room) {
+    public ArrayList<Message> getAllMessagePending() {
         String selectQuery = "SELECT * FROM " + CONVERSATIONMESSAGES + " WHERE " + TYPE + "='Pending' ORDER BY " + CONVERSATIONID + " ASC";
         Log.e("select", selectQuery);
         Cursor cursor = database.rawQuery(selectQuery, null);

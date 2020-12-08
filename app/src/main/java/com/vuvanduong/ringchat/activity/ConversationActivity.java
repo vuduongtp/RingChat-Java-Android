@@ -51,6 +51,8 @@ import com.squareup.picasso.Picasso;
 import com.vuvanduong.ringchat.R;
 import com.vuvanduong.ringchat.adapter.MessageAdapter;
 import com.vuvanduong.ringchat.config.Constant;
+import com.vuvanduong.ringchat.database.ConversationLastMessageDB;
+import com.vuvanduong.ringchat.database.ConversationMessageDB;
 import com.vuvanduong.ringchat.model.Message;
 import com.vuvanduong.ringchat.model.User;
 import com.vuvanduong.ringchat.service.LinphoneService;
@@ -65,6 +67,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -120,6 +123,8 @@ public class ConversationActivity extends AppCompatActivity {
     public int NUM_ITEMS_PAGE = 10;
     ArrayList<Message> messageDisplay;
     private Map<String, String> config = new HashMap<String, String>();
+    private ConversationMessageDB conversationMessageDB;
+    private ConversationLastMessageDB conversationLastMessageDB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -141,8 +146,6 @@ public class ConversationActivity extends AppCompatActivity {
                 .transform(new CircleTransform())
                 .into(imgAvatarFriendConversation);
 
-        configCloudinary();
-
         mCoreListener = new CoreListenerStub() {
             @Override
             public void onRegistrationStateChanged(Core core, ProxyConfig cfg, RegistrationState state, String message) {
@@ -155,6 +158,9 @@ public class ConversationActivity extends AppCompatActivity {
                 }
             }
         };
+
+        conversationMessageDB = new ConversationMessageDB(ConversationActivity.this);
+        conversationLastMessageDB = new ConversationLastMessageDB(ConversationActivity.this);
 
         friendStatus = new ChildEventListener() {
             @Override
@@ -230,7 +236,19 @@ public class ConversationActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (!txtContextConversation.getText().toString().trim().equals("")) {
                     if (NetworkUtil.getConnectivityStatusString(ConversationActivity.this) == NetworkUtil.NETWORK_STATUS_NOT_CONNECTED){
-                        Toast.makeText(ConversationActivity.this, getString(R.string.network_disconnect), Toast.LENGTH_SHORT).show();
+                        Message newMessage = new Message();
+                        String id = conversationMessages.push().getKey();
+                        newMessage.setType("Pending");
+                        newMessage.setContext(txtContextConversation.getText().toString().trim());
+                        newMessage.setDatetime(DBUtil.getStringDateTime());
+                        newMessage.setUserID(userLogin.getId());
+
+                        conversationMessageDB.insert(newMessage, id,chatRoom);
+                        newMessage.setDatetime(DBUtil.getStringDateTimeChatRoom());
+                        conversationLastMessageDB.insert(newMessage, chatRoom);
+                        messageAdapter.addItem(newMessage);
+                        rvChatConversation.smoothScrollToPosition(Objects.requireNonNull(rvChatConversation.getAdapter()).getItemCount() - 1);
+                        txtContextConversation.setText("");
                         return;
                     }
                     Message newMessage = new Message();
@@ -240,9 +258,12 @@ public class ConversationActivity extends AppCompatActivity {
                     newMessage.setUserID(userLogin.getId());
 
                     //them vao firebase
-                    conversationMessages.push().setValue(newMessage);
+                    String id = conversationMessages.push().getKey();
+                    conversationMessages.child(id).setValue(newMessage);
+                    conversationMessageDB.insert(newMessage, id, chatRoom);
                     newMessage.setDatetime(DBUtil.getStringDateTimeChatRoom());
                     conversationLastMessage.setValue(newMessage);
+                    conversationLastMessageDB.insert(newMessage,chatRoom);
 
                     //send by sip
 //                    Core core = LinphoneService.getCore();
@@ -309,6 +330,7 @@ public class ConversationActivity extends AppCompatActivity {
                     Toast.makeText(ConversationActivity.this, getString(R.string.network_disconnect), Toast.LENGTH_SHORT).show();
                     return;
                 }
+                configCloudinary();
                 requestPermission();
             }
         });
@@ -430,10 +452,14 @@ public class ConversationActivity extends AppCompatActivity {
                             newMessage.setUserID(userLogin.getId());
 
                             //them vao firebase
-                            conversationMessages.push().setValue(newMessage);
+                            String id = conversationMessages.push().getKey();
+                            conversationMessages.child(id).setValue(newMessage);
+                            conversationMessageDB.insert(newMessage, id, chatRoom);
+
                             newMessage.setDatetime(DBUtil.getStringDateTimeChatRoom());
                             newMessage.setContext(UserUtil.getFullName(userLogin) + " " + getString(R.string.sent_a_image));
                             conversationLastMessage.setValue(newMessage);
+                            conversationLastMessageDB.insert(newMessage, chatRoom);
                             dialog.dismiss();
                         }
 
@@ -547,113 +573,135 @@ public class ConversationActivity extends AppCompatActivity {
 
         messages = new ArrayList<>();
         messageDisplay = new ArrayList<>();
-        ValueEventListener getListMessage = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                //get data when after update message
-                if (dataSnapshot.exists()) {// get data when first open
-                    if (!messages.isEmpty()) messages.clear();
-                    for (DataSnapshot item : dataSnapshot.getChildren()) {
-                        Message message = item.getValue(Message.class);
-                        assert message != null;
-                        message.setMessageId(item.getKey());
-                        messages.add(message);
-                    }
-                    TOTAL_LIST_ITEMS = (int) dataSnapshot.getChildrenCount();
-                    originNumItem = TOTAL_LIST_ITEMS;
-                    int val = TOTAL_LIST_ITEMS % NUM_ITEMS_PAGE;
-                    val = val == 0 ? 0 : 1;
-                    pageCount = TOTAL_LIST_ITEMS / NUM_ITEMS_PAGE + val;
-                    //Collections.reverse(messages);
-                }
-                chatBoxView(500);
-                conversationMessages.addChildEventListener(messageReceive);
+
+        if (NetworkUtil.getConnectivityStatusString(ConversationActivity.this)==NetworkUtil.NETWORK_STATUS_NOT_CONNECTED){
+            messages = conversationMessageDB.getAllMessageOfRoom(chatRoom);
+            TOTAL_LIST_ITEMS = (int) messages.size();
+            originNumItem = TOTAL_LIST_ITEMS;
+            int val = TOTAL_LIST_ITEMS % NUM_ITEMS_PAGE;
+            val = val == 0 ? 0 : 1;
+            pageCount = TOTAL_LIST_ITEMS / NUM_ITEMS_PAGE + val;
+            chatBoxView(500);
+            if (loadingConversation.getVisibility()==View.VISIBLE) {
                 loadingConversation.setVisibility(View.GONE);
             }
+        }
+        else {
+            conversationMessageDB.deleteAll(chatRoom);
+            ValueEventListener getListMessage = new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    //get data when after update message
+                    if (dataSnapshot.exists()) {// get data when first open
+                        if (!messages.isEmpty()) messages.clear();
+                        for (DataSnapshot item : dataSnapshot.getChildren()) {
+                            Message message;
+                            message = item.getValue(Message.class);
+                            assert message != null;
+                            messages.add(message);
+                            conversationMessageDB.insert(message, item.getKey(), chatRoom);
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Toast.makeText(getApplicationContext(), "Error load database", Toast.LENGTH_SHORT).show();
-            }
-        };
-
-        messageReceive = new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                if (dataSnapshot.exists()) {
-                    //get from firebase
-                    countChildAdded++;
-                    if (countChildAdded > originNumItem) {
-                        Message message;
-                        message = dataSnapshot.getValue(Message.class);
-                        //add to GUI
-                        messageAdapter.addItem(message);
-
-                        messages.add(message);
-                        TOTAL_LIST_ITEMS++;
+                        }
+                        TOTAL_LIST_ITEMS = (int) dataSnapshot.getChildrenCount();
+                        originNumItem = TOTAL_LIST_ITEMS;
                         int val = TOTAL_LIST_ITEMS % NUM_ITEMS_PAGE;
                         val = val == 0 ? 0 : 1;
                         pageCount = TOTAL_LIST_ITEMS / NUM_ITEMS_PAGE + val;
+                        //Collections.reverse(messages);
+                    }
+                    chatBoxView(500);
+                    conversationMessages.addChildEventListener(messageReceive);
+                    loadingConversation.setVisibility(View.GONE);
+                }
 
-                        rvChatConversation.smoothScrollToPosition(Objects.requireNonNull(rvChatConversation.getAdapter()).getItemCount() - 1);
-                        txtContextConversation.requestFocus();
-                        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                        if (isFirstLoad && Objects.requireNonNull(rvChatConversation.getAdapter()).getItemCount() == TOTAL_LIST_ITEMS - 1) {
-                            assert imm != null;
-                            imm.showSoftInput(txtContextConversation, InputMethodManager.SHOW_IMPLICIT);
-                            isFirstLoad = false;
-                        }
-                        if (Objects.requireNonNull(rvChatConversation.getAdapter()).getItemCount() == TOTAL_LIST_ITEMS) {
-                            assert imm != null;
-                            imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.HIDE_IMPLICIT_ONLY);
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    Toast.makeText(getApplicationContext(), "Error load database", Toast.LENGTH_SHORT).show();
+                }
+            };
+
+            messageReceive = new ChildEventListener() {
+                @Override
+                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                    if (dataSnapshot.exists()) {
+                        //get from firebase
+                        countChildAdded++;
+                        if (countChildAdded > originNumItem) {
+                            Message message;
+                            message = dataSnapshot.getValue(Message.class);
+                            //add to GUI
+                            if (message.getType().equalsIgnoreCase("messageP")){
+                                return;
+                            }
+                            messageAdapter.addItem(message);
+
+                            messages.add(message);
+                            conversationMessageDB.insert(message, dataSnapshot.getKey(), chatRoom);
+                            conversationLastMessageDB.insert(message, chatRoom);
+                            TOTAL_LIST_ITEMS++;
+                            int val = TOTAL_LIST_ITEMS % NUM_ITEMS_PAGE;
+                            val = val == 0 ? 0 : 1;
+                            pageCount = TOTAL_LIST_ITEMS / NUM_ITEMS_PAGE + val;
+
+                            rvChatConversation.smoothScrollToPosition(Objects.requireNonNull(rvChatConversation.getAdapter()).getItemCount() - 1);
+                            txtContextConversation.requestFocus();
+                            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                            if (isFirstLoad && Objects.requireNonNull(rvChatConversation.getAdapter()).getItemCount() == TOTAL_LIST_ITEMS - 1) {
+                                assert imm != null;
+                                imm.showSoftInput(txtContextConversation, InputMethodManager.SHOW_IMPLICIT);
+                                isFirstLoad = false;
+                            }
+                            if (Objects.requireNonNull(rvChatConversation.getAdapter()).getItemCount() == TOTAL_LIST_ITEMS) {
+                                assert imm != null;
+                                imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.HIDE_IMPLICIT_ONLY);
+                            }
                         }
                     }
                 }
-            }
 
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                @Override
+                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
 
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        };
-
-        //create messages if it is not exist
-        final Query check_ChatRoom = allConversationMessages;
-        check_ChatRoom.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (!dataSnapshot.hasChild(chatRoom)) {
-                    conversationMessages.setValue(0);
-                } else {
-                    return;
                 }
-                check_ChatRoom.removeEventListener(this);
-            }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Toast.makeText(getApplicationContext(), "Lỗi load database", Toast.LENGTH_SHORT).show();
-            }
-        });
+                @Override
+                public void onChildRemoved(DataSnapshot dataSnapshot) {
 
-        conversationMessages.addListenerForSingleValueEvent(getListMessage);
-        conversationMessages.removeEventListener(getListMessage);
+                }
 
+                @Override
+                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            };
+
+            //create messages if it is not exist
+            final Query check_ChatRoom = allConversationMessages;
+            check_ChatRoom.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if (!dataSnapshot.hasChild(chatRoom)) {
+                        conversationMessages.setValue(0);
+                    } else {
+                        return;
+                    }
+                    check_ChatRoom.removeEventListener(this);
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    Toast.makeText(getApplicationContext(), "Lỗi load database", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            conversationMessages.addListenerForSingleValueEvent(getListMessage);
+            conversationMessages.removeEventListener(getListMessage);
+        }
     }
 
     public void chatBoxView(int delayTime) {
@@ -727,8 +775,12 @@ public class ConversationActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        conversationMessages.removeEventListener(messageReceive);
-        users.removeEventListener(friendStatus);
+        try {
+            conversationMessages.removeEventListener(messageReceive);
+            users.removeEventListener(friendStatus);
+        }catch (RuntimeException e){
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -753,7 +805,7 @@ public class ConversationActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         ProxyConfig proxyConfig = LinphoneService.getCore().getDefaultProxyConfig();
-        if (proxyConfig == null && NetworkUtil.getConnectivityStatusString(ConversationActivity.this)!=NetworkUtil.NETWORK_STATUS_NOT_CONNECTED) {
+        if (proxyConfig == null) {
            try {
                configureAccount();
            }catch (RuntimeException ex){

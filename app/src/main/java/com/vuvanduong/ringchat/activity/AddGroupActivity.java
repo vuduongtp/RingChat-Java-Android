@@ -79,6 +79,10 @@ public class AddGroupActivity extends AppCompatActivity {
         btnCreateAddGroup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (NetworkUtil.getConnectivityStatusString(AddGroupActivity.this)==NetworkUtil.NETWORK_STATUS_NOT_CONNECTED){
+                    Toast.makeText(AddGroupActivity.this, getString(R.string.network_disconnect), Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 chosenContact = new ArrayList<>();
                 chosenContact = selectFriendAdapter.getListFriendSelected();
                 if (chosenContact.size()==0){

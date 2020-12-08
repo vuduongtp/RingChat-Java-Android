@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -29,6 +30,10 @@ import com.google.firebase.database.ValueEventListener;
 import com.vuvanduong.ringchat.R;
 import com.vuvanduong.ringchat.adapter.MessageAdapter;
 import com.vuvanduong.ringchat.config.Constant;
+import com.vuvanduong.ringchat.database.GroupLastMessagesDB;
+import com.vuvanduong.ringchat.database.GroupMemberDB;
+import com.vuvanduong.ringchat.database.GroupMessageDB;
+import com.vuvanduong.ringchat.database.UserDB;
 import com.vuvanduong.ringchat.model.GroupChat;
 import com.vuvanduong.ringchat.model.Message;
 import com.vuvanduong.ringchat.model.User;
@@ -66,6 +71,10 @@ public class GroupConversationActivity extends AppCompatActivity {
     private boolean isFirstLoad = false;
     Core core;
     int countMess = 0;
+    private GroupMessageDB groupMessageDB;
+    private GroupLastMessagesDB groupLastMessagesDB;
+    private GroupMemberDB groupMemberDB;
+    private UserDB userDB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +85,11 @@ public class GroupConversationActivity extends AppCompatActivity {
         userLogin = (User) intent.getSerializableExtra("userLogin");
         groupChat = (GroupChat) intent.getSerializableExtra("group");
         core = LinphoneService.getCore();
+
+        groupMessageDB = new GroupMessageDB(GroupConversationActivity.this);
+        groupLastMessagesDB = new GroupLastMessagesDB(GroupConversationActivity.this);
+        groupMemberDB = new GroupMemberDB(GroupConversationActivity.this);
+        userDB = new UserDB(GroupConversationActivity.this);
 
         assert groupChat != null;
         groupLastMessage = dbReference.child("groupLastMessages/" + groupChat.getIdRoom());
@@ -238,6 +252,20 @@ public class GroupConversationActivity extends AppCompatActivity {
     }
 
     private void getData() {
+        if (NetworkUtil.getConnectivityStatusString(GroupConversationActivity.this)==NetworkUtil.NETWORK_STATUS_NOT_CONNECTED){
+             ArrayList<String> groupMember = groupMemberDB.getAllMemberOfGroup(groupChat.getIdRoom());
+             for (String memberId : groupMember){
+                 User member = userDB.getUserById(memberId);
+                 usersInRoom.add(member);
+             }
+             chatBoxView(500);
+             messages = groupMessageDB.getAllMessageOfRoom(groupChat.getIdRoom());
+             messageAdapter.addArrayItem(messages);
+            if (loadingConversation.getVisibility() == View.VISIBLE && messages.size()>0) {
+                loadingConversation.setVisibility(View.GONE);
+            }
+             return;
+        }
         messageReceive = new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
@@ -250,6 +278,19 @@ public class GroupConversationActivity extends AppCompatActivity {
                     message = dataSnapshot.getValue(Message.class);
                     //add to GUI
                     messageAdapter.addItem(message);
+                    assert message != null;
+
+                    GroupChat groupChatDB = new GroupChat();
+                    groupChatDB.setGroupName(groupChat.getGroupName());
+                    groupChatDB.setContext(message.getContext());
+                    groupChatDB.setDatetime(DBUtil.convertDatetimeMessage(message.getDatetime()));
+                    groupChatDB.setIdRoom(groupChat.getIdRoom());
+                    groupChatDB.setType(message.getType());
+                    groupChatDB.setUserID(message.getUserID());
+                    long rsms = groupMessageDB.insert(message, groupChat.getIdRoom(), dataSnapshot.getKey());
+                    Log.e(Constant.TAG_SQLITE, "kq "+rsms);
+                    groupLastMessagesDB.insert(groupChatDB);
+
                     rvChatGroupConversation.smoothScrollToPosition(Objects.requireNonNull(rvChatGroupConversation.getAdapter()).getItemCount() - 1);
                     txtContextGroupConversation.requestFocus();
                     if (!isFirstLoad && countMess == Objects.requireNonNull(rvChatGroupConversation.getAdapter()).getItemCount() ) {
@@ -300,6 +341,7 @@ public class GroupConversationActivity extends AppCompatActivity {
                     assert memberRemove != null;
                     if (memberRemove.equalsIgnoreCase(userLogin.getId())) {
                         Toast.makeText(GroupConversationActivity.this, R.string.you_not_in_this_group, Toast.LENGTH_SHORT).show();
+                        groupLastMessagesDB.delete(groupChat.getIdRoom());
                         finish();
                     }
                 }
@@ -319,6 +361,7 @@ public class GroupConversationActivity extends AppCompatActivity {
         groupMembers.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                groupMemberDB.deleteAll(groupChat.getIdRoom());
                 final int count = (int) dataSnapshot.getChildrenCount();
                 for (DataSnapshot item : dataSnapshot.getChildren()) {
                     String userId = item.getKey();
@@ -331,8 +374,11 @@ public class GroupConversationActivity extends AppCompatActivity {
                                 assert user != null;
                                 user.setId(item.getKey());
                                 usersInRoom.add(user);
+                                groupMemberDB.insert(groupChat.getIdRoom(), user.getId());
+                                userDB.insert(user);
                                 if (count == usersInRoom.size()) {
                                     chatBoxView(500);
+                                    groupMessageDB.deleteAll(groupChat.getIdRoom());
                                     groupMessages.addChildEventListener(messageReceive);
                                     groupMembers.addChildEventListener(removeMember);
                                     groupMessages.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -370,7 +416,11 @@ public class GroupConversationActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        groupMessages.removeEventListener(messageReceive);
-        groupMembers.removeEventListener(removeMember);
+        try {
+            groupMessages.removeEventListener(messageReceive);
+            groupMembers.removeEventListener(removeMember);
+        }catch (RuntimeException e){
+            e.printStackTrace();
+        }
     }
 }
