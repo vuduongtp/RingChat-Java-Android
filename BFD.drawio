@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2020-12-12T10:56:49.738Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36 Edg/87.0.664.60" etag="hbDDQOYKOGSPbDq-r0m-" version="14.0.1" type="github">
+<mxfile host="app.diagrams.net" modified="2020-12-12T11:01:33.741Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36 Edg/87.0.664.60" etag="EcOK27kYQOoadEQauZG8" version="14.0.1" type="github">
   <diagram name="Page-1" id="b98fa263-6416-c6ec-5b7d-78bf54ef71d0">
     <mxGraphModel dx="1673" dy="934" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1.5" pageWidth="1169" pageHeight="826" background="#ffffff" math="0" shadow="0">
       <root>
@@ -229,7 +229,7 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="OgO4U9FMztmrYL_u2vYB-30" value="7. Đổi tên nhóm" style="whiteSpace=wrap;html=1;rounded=1;shadow=1;strokeWidth=1;fontSize=16;align=center;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1">
+        <mxCell id="OgO4U9FMztmrYL_u2vYB-30" value="6. Đổi tên nhóm" style="whiteSpace=wrap;html=1;rounded=1;shadow=1;strokeWidth=1;fontSize=16;align=center;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1">
           <mxGeometry x="901" y="1010" width="125" height="80" as="geometry" />
         </mxCell>
         <mxCell id="OgO4U9FMztmrYL_u2vYB-31" value="" style="endArrow=none;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" target="OgO4U9FMztmrYL_u2vYB-30">
