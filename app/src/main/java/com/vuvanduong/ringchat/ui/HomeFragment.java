@@ -212,6 +212,10 @@ public class HomeFragment extends Fragment {
                             message.setIdRoom(item.getKey());
                             messages.add(message);
                             conversationLastMessageDB.insert(message, item.getKey());
+                            Intent intent = new Intent();
+                            intent.putExtra("message", item.getKey());
+                            intent.setAction("NOTIFY");
+                            Objects.requireNonNull(getActivity()).sendBroadcast(intent);
                             Query getFriend = users.orderByKey()
                                     .equalTo(idfriend);
                             getFriend.addListenerForSingleValueEvent(new ValueEventListener() {

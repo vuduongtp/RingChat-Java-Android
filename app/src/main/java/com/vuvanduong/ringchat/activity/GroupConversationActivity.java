@@ -71,6 +71,7 @@ public class GroupConversationActivity extends AppCompatActivity {
     private boolean isFirstLoad = false;
     Core core;
     int countMess = 0;
+    int countPending = 0;
     private GroupMessageDB groupMessageDB;
     private GroupLastMessagesDB groupLastMessagesDB;
     private GroupMemberDB groupMemberDB;
@@ -115,7 +116,28 @@ public class GroupConversationActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (NetworkUtil.getConnectivityStatusString(GroupConversationActivity.this) == NetworkUtil.NETWORK_STATUS_NOT_CONNECTED){
-                    Toast.makeText(GroupConversationActivity.this, getString(R.string.network_disconnect), Toast.LENGTH_SHORT).show();
+                    Message newMessage = new Message();
+                    String id = groupMessages.push().getKey();
+                    newMessage.setType("Pending");
+                    newMessage.setContext(txtContextGroupConversation.getText().toString().trim());
+                    newMessage.setDatetime(DBUtil.getStringDateTime());
+                    newMessage.setUserID(userLogin.getId());
+
+                    groupMessageDB.insert(newMessage, groupChat.getIdRoom(), id);
+                    System.out.println(newMessage.toString());
+                    System.out.println(id+"id");
+                    messageAdapter.addItem(newMessage);
+                    GroupChat groupChatDB = new GroupChat();
+                    groupChatDB.setGroupName(groupChat.getGroupName());
+                    groupChatDB.setContext(newMessage.getContext());
+                    groupChatDB.setDatetime(DBUtil.convertDatetimeMessage(newMessage.getDatetime()));
+                    groupChatDB.setIdRoom(groupChat.getIdRoom());
+                    groupChatDB.setType(newMessage.getType());
+                    groupChatDB.setUserID(newMessage.getUserID());
+
+                    groupLastMessagesDB.insert(groupChatDB);
+                    countPending ++;
+                    txtContextGroupConversation.setText("");
                     return;
                 }
                 if (!txtContextGroupConversation.getText().toString().trim().equals("")) {
@@ -254,16 +276,20 @@ public class GroupConversationActivity extends AppCompatActivity {
     private void getData() {
         if (NetworkUtil.getConnectivityStatusString(GroupConversationActivity.this)==NetworkUtil.NETWORK_STATUS_NOT_CONNECTED){
              ArrayList<String> groupMember = groupMemberDB.getAllMemberOfGroup(groupChat.getIdRoom());
-             for (String memberId : groupMember){
-                 User member = userDB.getUserById(memberId);
-                 usersInRoom.add(member);
+             try {
+                 for (String memberId : groupMember) {
+                     User member = userDB.getUserById(memberId);
+                     usersInRoom.add(member);
+                 }
+                 chatBoxView(500);
+                 messages = groupMessageDB.getAllMessageOfRoom(groupChat.getIdRoom());
+                 messageAdapter.addArrayItem(messages);
+                 if (loadingConversation.getVisibility() == View.VISIBLE && messages.size() > 0) {
+                     loadingConversation.setVisibility(View.GONE);
+                 }
+             }catch (NullPointerException e){
+                 e.printStackTrace();
              }
-             chatBoxView(500);
-             messages = groupMessageDB.getAllMessageOfRoom(groupChat.getIdRoom());
-             messageAdapter.addArrayItem(messages);
-            if (loadingConversation.getVisibility() == View.VISIBLE && messages.size()>0) {
-                loadingConversation.setVisibility(View.GONE);
-            }
              return;
         }
         messageReceive = new ChildEventListener() {
@@ -276,9 +302,15 @@ public class GroupConversationActivity extends AppCompatActivity {
                     //get from firebase
                     Message message;
                     message = dataSnapshot.getValue(Message.class);
+                    assert message != null;
+                    if (message.getType().equalsIgnoreCase("messageP")){
+                        countPending --;
+                        if (countPending>0) {
+                            return;
+                        }
+                    }
                     //add to GUI
                     messageAdapter.addItem(message);
-                    assert message != null;
 
                     GroupChat groupChatDB = new GroupChat();
                     groupChatDB.setGroupName(groupChat.getGroupName());

@@ -17,7 +17,12 @@
         android:roundIcon="@drawable/logo"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.ViewImageActivity"></activity>
+        <service
+            android:name=".service.NotificationService"
+            android:enabled="true"
+            android:exported="false"></service>
+
+        <activity android:name=".activity.ViewImageActivity" />
 
         <receiver
             android:name=".service.NetworkChangeReceiver"

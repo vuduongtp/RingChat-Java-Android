@@ -24,6 +24,7 @@ import com.vuvanduong.ringchat.database.UserLoginDB;
 import com.vuvanduong.ringchat.model.User;
 import com.vuvanduong.ringchat.service.LinphoneService;
 import com.vuvanduong.ringchat.service.NetworkChangeService;
+import com.vuvanduong.ringchat.service.NotificationService;
 import com.vuvanduong.ringchat.util.MD5;
 import com.vuvanduong.ringchat.util.NetworkUtil;
 import com.vuvanduong.ringchat.util.SharedPrefs;
@@ -167,6 +168,8 @@ public class WelcomeActivity extends AppCompatActivity {
 
                     Intent netWorkService = new Intent(WelcomeActivity.this, NetworkChangeService.class);
                     startService(netWorkService);
+                    Intent notifyService = new Intent(WelcomeActivity.this, NotificationService.class);
+                    startService(notifyService);
                     configCloudinary();
 
                     SipRegister();

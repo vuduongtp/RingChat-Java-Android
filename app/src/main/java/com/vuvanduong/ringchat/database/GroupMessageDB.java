@@ -78,13 +78,17 @@ public class GroupMessageDB {
         return messages;
     }
 
-    public ArrayList<Message> getAllMessagePending(String groupid) {
+    public void deletePending() {
+        database.delete(GROUPMESSAGE, TYPE + "='Pending'", null);
+    }
+
+    public ArrayList<Message> getAllMessagePending() {
         String selectQuery = "SELECT * FROM " + GROUPMESSAGE+ " WHERE "+ TYPE+" ='Pending' ORDER BY "+MESSAGEID+" ASC";
         Log.e("select",selectQuery);
         Cursor cursor = database.rawQuery(selectQuery, null);
         Log.e("count",""+cursor.getCount());
         ArrayList<Message> messages = new ArrayList<>();
-        if (cursor != null && cursor.getCount()!=0) {
+        if (cursor.getCount() != 0) {
             cursor.moveToFirst();
             for (int i = 0; i < cursor.getCount(); i++) {
                 Message message = new Message();
