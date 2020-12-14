@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/backgroung2"
+    tools:context=".activity.LoginActivity">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_marginTop="20dp"
+        android:layout_gravity="center"
+        app:cardCornerRadius="30dp">
+
+        <ImageView
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            app:srcCompat="@drawable/logo"
+            android:scaleType="centerCrop" />
+
+    </androidx.cardview.widget.CardView>
+
+    <TextView
+        android:gravity="center"
+        android:layout_marginBottom="10dp"
+        android:fontFamily="@font/roboto_bold"
+        android:textSize="20sp"
+        android:textColor="@color/white"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/app_name" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:fontFamily="@font/roboto_bold"
+        android:gravity="center"
+        android:text="@string/login"
+        android:textColor="@color/colorMain"
+        android:textSize="30sp" />
+
+    <TextView
+        android:id="@+id/txtErrorLogin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:fontFamily="@font/roboto_bold"
+        android:gravity="center"
+        android:textSize="20sp"
+        android:text=""
+        android:textColor="@color/red" />
+
+    <EditText
+        android:id="@+id/txtUsernameLogin"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/edit_text_login"
+        android:drawableLeft="@drawable/ic_account_box_black_24dp"
+        android:paddingStart="20sp"
+        android:drawablePadding="20dp"
+        android:layout_width="match_parent"
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        android:layout_height="50dp"
+        android:ems="10"
+        android:inputType="textEmailAddress"
+        android:hint="@string/username"/>
+
+    <EditText
+        android:id="@+id/txtPasswordLogin"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:background="@drawable/edit_text_login"
+        android:drawableLeft="@drawable/ic_vpn_key_black_24dp"
+        android:paddingStart="20sp"
+        android:drawablePadding="20dp"
+        android:layout_width="match_parent"
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        android:layout_height="50dp"
+        android:ems="10"
+        android:inputType="textPassword"
+        android:hint="@string/password" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal">
+
+<!--        <TextView-->
+<!--            android:layout_width="2dp"-->
+<!--            android:background="@color/white"-->
+<!--            android:layout_height="match_parent"/>-->
+
+        <CheckBox
+            android:id="@+id/chkRememberPass"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginStart="10dp"
+            android:textColor="@color/white"
+            android:text="@string/remember_pass"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/btnForgetPass"
+            android:gravity="center"
+            android:layout_margin="2dp"
+            android:paddingStart="10dp"
+            android:fontFamily="@font/roboto_regular"
+            android:textSize="20sp"
+            android:textColor="@color/dark_blue"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/forget_pass" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btnLogin"
+        android:layout_margin="10dp"
+        android:textColor="@color/white"
+        android:background="@drawable/button_gradient"
+        android:layout_gravity="center"
+        android:textSize="18sp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/login" />
+
+    <TextView
+        android:id="@+id/btnGoToRegister"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="2dp"
+        android:fontFamily="@font/roboto_regular"
+        android:gravity="center"
+        android:text="@string/register"
+        android:textColor="@color/white"
+        android:textSize="22sp" />
+</LinearLayout>

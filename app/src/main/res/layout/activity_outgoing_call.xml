@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity.CallOutgoingActivity"
+    android:background="@drawable/backgroung2">
+
+    <TextureView
+        android:id="@+id/texture_remote_video"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <TextureView
+        android:id="@+id/texture_local_preview"
+        android:layout_width="150dp"
+        android:layout_height="200dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"/>
+
+    <ImageView
+        android:id="@+id/image_callee"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_margin="20dp"
+        android:layout_centerHorizontal="true"
+        android:layout_above="@id/text_callee"
+        android:src="@drawable/user"/>
+
+    <TextView
+        android:id="@+id/text_callee"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_centerHorizontal="true"
+        android:text="Connect..."
+        android:textColor="#fff"
+        android:textSize="30sp"/>
+
+    <Chronometer
+        android:id="@+id/call_timer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="20dp"
+        android:textColor="#fff"
+        android:layout_below="@+id/text_callee"
+        android:visibility="invisible"/>
+
+    <ImageButton
+        android:id="@+id/button_switch_camera"
+        android:layout_margin="10dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/ic_switch_camera"
+        android:background="@drawable/btn_call_enabled" />
+
+    <RelativeLayout
+        android:id="@+id/function_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/call_timer">
+
+        <ImageButton
+            android:id="@+id/button_mute"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_margin="10dp"
+            android:contentDescription="@string/app_name"
+            android:background="@drawable/btn_call_enabled"
+            android:src="@drawable/btn_mute_disable"/>
+
+        <ImageButton
+            android:id="@+id/button_speaker"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_margin="10dp"
+            android:layout_toRightOf="@+id/button_mute"
+            android:contentDescription="@string/app_name"
+            android:background="@drawable/btn_call_enabled"
+            android:src="@drawable/btn_speaker_disable"/>
+
+        <ImageButton
+            android:id="@+id/button_video"
+            android:layout_toEndOf="@id/button_speaker"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_margin="10dp"
+            android:contentDescription="@string/app_name"
+            android:background="@drawable/btn_call_enabled"
+            android:src="@drawable/ic_videocam_white_24dp"
+            android:layout_toRightOf="@id/button_speaker" />
+
+        <ImageButton
+            android:id="@+id/button_call_terminate"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_marginTop="20dp"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/button_speaker"
+            android:background="@null"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/decline_call_64" />
+    </RelativeLayout>
+</RelativeLayout>

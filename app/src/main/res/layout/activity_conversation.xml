@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context=".activity.ConversationActivity">
+
+    <LinearLayout
+        android:id="@+id/layout_header_chatting"
+        android:layout_width="match_parent"
+        android:layout_height="75dp"
+        android:minHeight="75dp"
+        android:background="@color/white"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0">
+
+        <ImageView
+            android:id="@+id/btnBackFromConversation"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_arrow_back_blue_24dp"
+            android:layout_weight="2"/>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="3.5"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/imgAvatarFriendConversation"
+                android:layout_width="match_parent"
+                android:layout_height="53dp"
+                android:layout_marginTop="5dp"
+                android:layout_gravity="center"
+                app:srcCompat="@drawable/user" />
+
+            <TextView
+                android:id="@+id/txtStatusConversation"
+                android:layout_width="match_parent"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:fontFamily="@font/roboto_regular"
+                android:layout_height="wrap_content"
+                android:textColor="@color/red"
+                android:text="Offline"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="8"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/txtNameFriendConversation"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center|start"
+                android:textColor="@color/dark_blue"
+                android:paddingStart="15dp"
+                android:paddingEnd="15dp"
+                android:fontFamily="@font/roboto_regular"
+                android:textSize="22sp"
+                android:text=""
+                tools:ignore="RtlSymmetry" />
+
+        </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/img_but_video"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1.5"
+            android:background="@null"
+            app:srcCompat="@drawable/camera" />
+
+        <ImageButton
+            android:id="@+id/img_but_voice"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1.5"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="10dp"
+            android:background="@null"
+            app:srcCompat="@drawable/call" />
+    </LinearLayout>
+    <TextView
+        android:id="@+id/sectorCut"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@+id/layout_header_chatting"
+        android:background="@color/light_gray" />
+    <ProgressBar
+        android:id="@+id/loadingConversation"
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:layout_below="@+id/sectorCut"
+        android:visibility="gone"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvChatConversation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/loadingConversation"
+        android:layout_marginBottom="61dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="@color/white"
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true"
+        android:focusable="true"
+        android:focusableInTouchMode="true">
+
+        <EditText
+            android:id="@+id/txtContextConversation"
+            android:layout_width="0dp"
+            android:layout_height="45dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="10dp"
+            android:layout_weight="9"
+            android:autofillHints=""
+            android:background="@drawable/edit_text_send"
+            android:ellipsize="none"
+            android:ems="10"
+            android:fontFamily="@font/roboto_regular"
+            android:hint="Aa"
+            android:inputType="textMultiLine"
+            android:paddingStart="15dp"
+            android:paddingEnd="15dp"
+            android:scrollHorizontally="false"
+            android:textColor="@color/black"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/btnSendImageMessageConversation"
+            android:layout_width="0dp"
+            android:layout_height="32dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="10dp"
+            android:layout_weight="1"
+            android:background="@drawable/sendimage" />
+
+        <Button
+            android:id="@+id/btnSendMessageConversation"
+            android:layout_width="0dp"
+            android:layout_height="32dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="10dp"
+            android:layout_weight="1"
+            android:background="@drawable/send"/>
+    </LinearLayout>
+
+</RelativeLayout>

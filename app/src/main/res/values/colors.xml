@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#6200EE</color>
+    <color name="colorPrimaryDark">#3700B3</color>
+    <color name="colorAccent">#0779e4</color>
+    <color name="colorMain">#0779e4</color>
+    <color name="colorBackgroundMain">#EFEBEA</color>
+    <color name="colorMenuSelected">#D2D7D3</color>
+    <color name="textBold">#2F3230</color>
+    <color name="gray">#676767</color>
+    <color name="white">#ffffff</color>
+    <color name="dark_gray">#504F4F</color>
+    <color name="dark_blue">#1F4788</color>
+    <color name="red">#A62029</color>
+    <color name="orange">#F9690E</color>
+    <color name="green">#2BDC01</color>
+    <color name="light_gray">#D8DADA</color>
+    <color name="colorCallToggleButtonEnabled">#808080</color>
+    <color name="colorCallToggleButtonDisabled">#f2f2f2</color>
+    <color name="lvChat">#EDEDED</color>
+    <color name="black">#272727</color>
+    <color name="me">#0779e4</color>
+    <color name="you">#bdbdbd</color>
+</resources>

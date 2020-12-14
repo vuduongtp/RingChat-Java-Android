@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ProgressBar
+        android:id="@+id/loadingRemoveMemberGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone"/>
+
+    <LinearLayout
+        android:id="@+id/topOfRemoveMemberGroup"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:orientation="horizontal"
+        android:background="@color/colorMain">
+
+        <ImageView
+            android:id="@+id/btnBackToRemoveMember"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_weight="1"
+            app:srcCompat="@drawable/ic_arrow_back_black_24dp"
+            android:contentDescription="@string/search" />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_marginBottom="5dp"
+            android:layout_height="match_parent"
+            android:layout_weight="8"
+            android:gravity="center|start"
+            android:fontFamily="@font/roboto_bold"
+            android:text="@string/remove_member"
+            android:textSize="24sp"
+            android:textColor="@color/white"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/middleOfRemoveMemberGroup"
+        android:layout_below="@+id/topOfRemoveMemberGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/txtGroupNameRemove"
+            android:layout_gravity="center"
+            android:layout_margin="5dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:textColor="@color/black"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="@drawable/edit_text_login"
+            android:ems="10"
+            android:hint="@string/type_name_group"
+            android:inputType="textPersonName"/>
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvFriendsRemoveGroup"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/middleOfRemoveMemberGroup"
+        android:layout_above="@+id/bottomOfRemoveMemberGroup"/>
+
+    <LinearLayout
+        android:id="@+id/bottomOfRemoveMemberGroup"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:gravity="center"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btnRemoveMemberGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_marginEnd="10dp"
+            android:gravity="center"
+            android:background="@drawable/button_gradient"
+            android:text="@string/remove"
+            android:textColor="#fff" />
+    </LinearLayout>
+</RelativeLayout>
