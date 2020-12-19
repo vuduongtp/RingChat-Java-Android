@@ -31,10 +31,14 @@ import com.vuvanduong.ringchat.util.NetworkUtil;
 import com.vuvanduong.ringchat.util.SharedPrefs;
 import android.os.Handler;
 
+import org.linphone.core.AccountCreator;
+import org.linphone.core.Address;
 import org.linphone.core.Core;
 import org.linphone.core.CoreListenerStub;
+import org.linphone.core.Factory;
 import org.linphone.core.ProxyConfig;
 import org.linphone.core.RegistrationState;
+import org.linphone.core.TransportType;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -53,6 +57,7 @@ public class WelcomeActivity extends AppCompatActivity {
     UserDB userDB;
     UserLoginDB userLoginDB;
     private Map<String, String> config = new HashMap<String, String>();
+    private AccountCreator mAccountCreator;
 
     private void configCloudinary() {
         config.put("cloud_name", "vuduongtp");
@@ -245,10 +250,48 @@ public class WelcomeActivity extends AppCompatActivity {
             startActivity(home);
         } else {
             if (NetworkUtil.getConnectivityStatusString(WelcomeActivity.this)!=NetworkUtil.NETWORK_STATUS_NOT_CONNECTED) {
-                Intent login = new Intent(WelcomeActivity.this, LoginActivity.class);
-                startActivity(login);
-                Toast.makeText(WelcomeActivity.this, R.string.required_login, Toast.LENGTH_SHORT).show();
-                finish();
+                if (SharedPrefs.getInstance().get(Constant.IS_LOGIN, Boolean.class)) {
+                    mAccountCreator = LinphoneService.getCore().createAccountCreator(null);
+                    String userId = SharedPrefs.getInstance().get(Constant.ID_USER_LOGIN, String.class);
+                    if (userId.equalsIgnoreCase(""))return;
+                    try {
+                        LinphoneService.getCore().setDefaultProxyConfig(null);
+                        LinphoneService.getCore().refreshRegisters();
+                        LinphoneService.getCore().clearAllAuthInfo();
+                        // At least the 3 below values are required
+                        mAccountCreator.setUsername(userId);
+                        mAccountCreator.setDomain(Constant.SIP_SERVER);
+                        mAccountCreator.setPassword("123456");
+
+                        // By default it will be UDP if not set, but TLS is strongly recommended
+                        mAccountCreator.setTransport(TransportType.Tcp);
+                        // This will automatically create the proxy config and auth info and add them to the Core
+                        ProxyConfig cfg = mAccountCreator.createProxyConfig();
+                        cfg.edit();
+                        Address proxy = Factory.instance().createAddress("sip:" + Constant.SIP_SERVER);
+                        cfg.setServerAddr(proxy.asString());
+                        cfg.enableRegister(true);
+                        cfg.setExpires(3600);
+                        cfg.done();
+                        // Make sure the newly created one is the default
+                        LinphoneService.getCore().setDefaultProxyConfig(cfg);
+
+                        userLoginDB.deleteAll();
+                        long rs = userLoginDB.login(user);
+                        Log.e(Constant.TAG_SQLITE,"set login "+rs);
+                        Intent home = new Intent(WelcomeActivity.this, HomeActivity.class);
+                        home.putExtra("user_login", (Serializable) user);
+                        startActivity(home);
+                        finish();
+                    }catch (NullPointerException e){
+                        e.printStackTrace();
+                    }
+                }else {
+                    Intent login = new Intent(WelcomeActivity.this, LoginActivity.class);
+                    startActivity(login);
+                    Toast.makeText(WelcomeActivity.this, R.string.required_login, Toast.LENGTH_SHORT).show();
+                    finish();
+                }
             }
         }
     }

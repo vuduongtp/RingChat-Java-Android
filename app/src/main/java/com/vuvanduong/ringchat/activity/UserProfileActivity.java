@@ -103,6 +103,7 @@ public class UserProfileActivity extends AppCompatActivity {
                 Intent conversation = new Intent(UserProfileActivity.this, ConversationActivity.class);
                 conversation.putExtra("userLogin", (Serializable) userLogin);
                 conversation.putExtra("friend", (Serializable) userScan);
+                startActivity(conversation);
             }
         });
 

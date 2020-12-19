@@ -175,11 +175,11 @@ public class ConversationActivity extends AppCompatActivity {
                     assert userStatus != null;
                     if (Objects.requireNonNull(dataSnapshot.getKey()).equalsIgnoreCase("status")) {
                         if (userStatus.equalsIgnoreCase("Online")) {
-                            userLogin.setStatus("Online");
+                            friend.setStatus("Online");
                             txtStatusConversation.setText("Online");
                             txtStatusConversation.setTextColor(ContextCompat.getColor(ConversationActivity.this, R.color.green));
                         } else {
-                            userLogin.setStatus("Offline");
+                            friend.setStatus("Offline");
                             txtStatusConversation.setText("Offline");
                             txtStatusConversation.setTextColor(ContextCompat.getColor(ConversationActivity.this, R.color.red));
                         }
@@ -484,6 +484,7 @@ public class ConversationActivity extends AppCompatActivity {
         Address toSipAddress = core.interpretUrl(impu);
         CallParams params = core.createCallParams(null);
         params.enableVideo(true);
+        params.addCustomHeader("fromConversation","fromConversation");
         if (core.isNetworkReachable()) {
             core.inviteAddressWithParams(toSipAddress, params);
         } else {
@@ -502,6 +503,7 @@ public class ConversationActivity extends AppCompatActivity {
         Core core = LinphoneService.getCore();
         Address toSipAddress = core.interpretUrl(impu);
         CallParams params = core.createCallParams(null);
+        params.addCustomHeader("fromConversation","fromConversation");
         try {
             core.inviteAddressWithParams(toSipAddress, params);
         } catch (Exception ex) {

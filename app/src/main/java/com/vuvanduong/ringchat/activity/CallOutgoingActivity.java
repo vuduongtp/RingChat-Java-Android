@@ -7,6 +7,7 @@ import androidx.core.app.ActivityCompat;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Point;
 import android.media.AudioManager;
@@ -65,7 +66,6 @@ public class CallOutgoingActivity extends AppCompatActivity {
     private CoreListenerStub mCoreListener;
     private boolean mIsUsingSpeaker = false;
     private boolean mIsVisible = true;
-    private boolean isCallIncommingActivity = CallIncomingActivity.isCallIncommingActivity;
 
     String chatRoom;
     private FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -258,16 +258,20 @@ public class CallOutgoingActivity extends AppCompatActivity {
         } catch (Exception ex) {
             System.err.println(ex.toString());
         }
-
-        mCallTimer = findViewById(R.id.call_timer);
-        mCallTimer.setVisibility(View.INVISIBLE);
-        if (isCallIncommingActivity) {
-            Call call = LinphoneService.getCore().getCalls()[0];
-            mCallTimer.setVisibility(View.VISIBLE);
-            mCallTimer.setBase(SystemClock.elapsedRealtime() - 1000 * call.getDuration());
-            mCallTimer.start();
-            isCallIncommingActivity = false;
+        try {
+            CallParams params = LinphoneService.getCore().getCurrentCall().getParams();
+            String fromConversation = params.getCustomHeader("fromConversation");
+            mCallTimer = findViewById(R.id.call_timer);
+            mCallTimer.setVisibility(View.INVISIBLE);
+            if (fromConversation == null || fromConversation.equalsIgnoreCase("")) {
+                Call call = LinphoneService.getCore().getCalls()[0];
+                mCallTimer.setVisibility(View.VISIBLE);
+                mCallTimer.setBase(SystemClock.elapsedRealtime() - 1000 * call.getDuration());
+                mCallTimer.start();
 //            updateInterfaceDependingOnVideo();
+            }
+        }catch (Exception e){
+            e.printStackTrace();
         }
 
     }
