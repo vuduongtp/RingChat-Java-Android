@@ -190,7 +190,7 @@ public class UserProfileActivity extends AppCompatActivity {
                 + getResources().getString(R.string.birthday) + " : " + userScan.getBirthday() + "\n";
         txtUserProfileInfo.setText(info);
         if (userScan.getImage() != null && !userScan.getImage().equalsIgnoreCase("")) {
-            Picasso.with(this)
+            Picasso.get()
                     .load(userScan.getImage())
                     .placeholder(R.drawable.user)
                     .transform(new CircleTransform())

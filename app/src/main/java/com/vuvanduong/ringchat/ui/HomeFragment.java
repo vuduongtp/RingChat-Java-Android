@@ -144,7 +144,7 @@ public class HomeFragment extends Fragment {
         messages = new ArrayList<>();
         friends = new ArrayList<>();
 
-        Picasso.with(getActivity())
+        Picasso.get()
                 .load(userLogin.getImage())
                 .placeholder(R.drawable.user)
                 .transform(new CircleTransform())

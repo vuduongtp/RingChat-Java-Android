@@ -140,7 +140,7 @@ public class ConversationActivity extends AppCompatActivity {
         loadingConversation.setVisibility(View.VISIBLE);
         impu = friend.getId() + "@" + Constant.SIP_SERVER;
         imgAvatarFriendConversation = findViewById(R.id.imgAvatarFriendConversation);
-        Picasso.with(this)
+        Picasso.get()
                 .load(friend.getImage())
                 .placeholder(R.drawable.user)
                 .transform(new CircleTransform())
@@ -639,6 +639,7 @@ public class ConversationActivity extends AppCompatActivity {
 
                             messages.add(message);
                             conversationMessageDB.insert(message, dataSnapshot.getKey(), chatRoom);
+                            message.setDatetime(DBUtil.convertDatetimeMessage(message.getDatetime()));
                             conversationLastMessageDB.insert(message, chatRoom);
                             TOTAL_LIST_ITEMS++;
                             int val = TOTAL_LIST_ITEMS % NUM_ITEMS_PAGE;
@@ -788,16 +789,16 @@ public class ConversationActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (LinphoneService.getCore() != null) {
-            LinphoneService.getCore().addListener(mCoreListener);
-        }
+//        if (LinphoneService.getCore() != null) {
+//            LinphoneService.getCore().addListener(mCoreListener);
+//        }
     }
 
     @Override
     protected void onPause() {
-        if (LinphoneService.getCore() != null) {
-            LinphoneService.getCore().removeListener(mCoreListener);
-        }
+//        if (LinphoneService.getCore() != null) {
+//            LinphoneService.getCore().removeListener(mCoreListener);
+//        }
 
         super.onPause();
 
@@ -806,14 +807,14 @@ public class ConversationActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        ProxyConfig proxyConfig = LinphoneService.getCore().getDefaultProxyConfig();
-        if (proxyConfig == null) {
-           try {
-               configureAccount();
-           }catch (RuntimeException ex){
-               android.util.Log.e("RuntimeException", ex.toString());
-           }
-        }
+//        ProxyConfig proxyConfig = LinphoneService.getCore().getDefaultProxyConfig();
+//        if (proxyConfig == null) {
+//           try {
+//               configureAccount();
+//           }catch (RuntimeException ex){
+//               android.util.Log.e("RuntimeException", ex.toString());
+//           }
+//        }
     }
 
     @Override

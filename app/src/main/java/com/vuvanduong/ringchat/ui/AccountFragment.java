@@ -298,7 +298,7 @@ public class AccountFragment extends Fragment {
                                     ImageView imageQR = QRDialog.findViewById(R.id.imageQRDialog);
                                     ImageView imageQRAvatar = QRDialog.findViewById(R.id.QRDialogAvatar);
                                     TextView QRDialogFullName = QRDialog.findViewById(R.id.QRDialogFullName);
-                                    Picasso.with(getActivity())
+                                    Picasso.get()
                                             .load(user.getImage())
                                             .placeholder(R.drawable.user)
                                             .transform(new CircleTransform())
@@ -528,7 +528,7 @@ public class AccountFragment extends Fragment {
         loadingQRCode = view.findViewById(R.id.loadingQRCode);
         txtNameAccount.setText(UserUtil.getFullName(user));
         txtEmailAccount.setText(user.getEmail());
-        Picasso.with(getActivity())
+        Picasso.get()
                 .load(user.getImage())
                 .placeholder(R.drawable.user)
                 .transform(new CircleTransform())

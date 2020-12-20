@@ -73,7 +73,7 @@ public class CallIncomingActivity extends AppCompatActivity {
                     userCall.setId(item.getKey());
                     txtv_caller.setText(UserUtil.getFullName(userCall));
                     try {
-                        Picasso.with(CallIncomingActivity.this)
+                        Picasso.get()
                                 .load(userCall.getImage())
                                 .placeholder(R.drawable.user)
                                 .transform(new CircleTransform())

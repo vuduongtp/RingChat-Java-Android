@@ -138,7 +138,7 @@ public class EditInforActivity extends AppCompatActivity {
         txtBirthdayChangeInfor.setText(user.getBirthday());
         txtFirstnameEditInfor.setText(user.getFirstname());
         txtLastnameEditInfor.setText(user.getLastname());
-        Picasso.with(EditInforActivity.this)
+        Picasso.get()
                 .load(user.getImage())
                 .placeholder(R.drawable.user)
                 .transform(new CircleTransform())

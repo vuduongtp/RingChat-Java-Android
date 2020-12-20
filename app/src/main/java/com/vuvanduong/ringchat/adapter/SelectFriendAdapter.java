@@ -60,7 +60,7 @@ public class SelectFriendAdapter extends RecyclerView.Adapter<SelectFriendAdapte
                 }
             }
         });
-        Picasso.with(this.context)
+        Picasso.get()
                 .load(dataContacts.get(position).getImage())
                 .placeholder(R.drawable.user)
                 .transform(new CircleTransform())

@@ -77,8 +77,8 @@ public class DBUtil {
 
     public static String revertDatetimeMessage(String date){
         Date dateTime = new Date();
-        SimpleDateFormat formatNew = new SimpleDateFormat("dd-MM-yyyy HH:mm", Locale.getDefault());
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        SimpleDateFormat formatNew = new SimpleDateFormat("dd-MM-yyyy  HH:mm", Locale.getDefault());
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd  HH:mm:ss", Locale.getDefault());
         try {
             dateTime = format.parse(date);
         } catch (ParseException e) {

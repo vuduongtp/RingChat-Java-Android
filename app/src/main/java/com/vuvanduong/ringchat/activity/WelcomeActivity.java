@@ -29,6 +29,7 @@ import com.vuvanduong.ringchat.service.NotificationService;
 import com.vuvanduong.ringchat.util.MD5;
 import com.vuvanduong.ringchat.util.NetworkUtil;
 import com.vuvanduong.ringchat.util.SharedPrefs;
+
 import android.os.Handler;
 
 import org.linphone.core.AccountCreator;
@@ -65,8 +66,8 @@ public class WelcomeActivity extends AppCompatActivity {
         config.put("api_secret", "Uj9Jes5zUjtAnYLXd81uR5qnGts");
         try {
             MediaManager.init(Objects.requireNonNull(WelcomeActivity.this), config);
-        }catch (IllegalStateException ex){
-            Log.e("exist","cloudinary");
+        } catch (IllegalStateException ex) {
+            Log.e("exist", "cloudinary");
         }
     }
 
@@ -78,15 +79,15 @@ public class WelcomeActivity extends AppCompatActivity {
         } catch (IOException ioe) {
             throw new Error("Unable to create database");
         }
-        Log.e("database","create database success");
+        Log.e("database", "create database success");
     }
 
-    private void setLanguage(String local, String country)  {
+    private void setLanguage(String local, String country) {
         Resources res = getResources();
         // Change locale settings in the app.
         DisplayMetrics dm = res.getDisplayMetrics();
         android.content.res.Configuration conf = res.getConfiguration();
-        conf.setLocale(new Locale(local.toLowerCase(),country)); // API 17+ only.
+        conf.setLocale(new Locale(local.toLowerCase(), country)); // API 17+ only.
         //Toast.makeText(this, local+"-"+country, Toast.LENGTH_SHORT).show();
         // Use conf.locale = new Locale(...) if targeting lower versions
         res.updateConfiguration(conf, dm);
@@ -108,12 +109,12 @@ public class WelcomeActivity extends AppCompatActivity {
         Locale current = getResources().getConfiguration().locale;
         String language = SharedPrefs.getInstance().get(Constant.LANGUAGE_CODE, String.class);
         String country = "";
-        if (!language.equalsIgnoreCase(current.toString().substring(0,2)) && !language.equalsIgnoreCase("")) {
+        if (!language.equalsIgnoreCase(current.toString().substring(0, 2)) && !language.equalsIgnoreCase("")) {
             if (language.equalsIgnoreCase("vi")) {
                 country = "VN";
                 setLanguage(language, country);
                 Intent refresh = new Intent(this, WelcomeActivity.class);
-                if (user!=null) {
+                if (user != null) {
                     refresh.putExtra("user_login", (Serializable) user);
                     refresh.putExtra(Constant.IS_FROM_LOGIN, true);
                 }
@@ -123,7 +124,7 @@ public class WelcomeActivity extends AppCompatActivity {
                 country = "EN";
                 setLanguage(language, country);
                 Intent refresh = new Intent(this, WelcomeActivity.class);
-                if (user!=null) {
+                if (user != null) {
                     refresh.putExtra("user_login", (Serializable) user);
                     refresh.putExtra(Constant.IS_FROM_LOGIN, true);
                 }
@@ -152,24 +153,24 @@ public class WelcomeActivity extends AppCompatActivity {
 
     private void setEvent() {
         Intent intent = getIntent();
-        boolean isFromLogin = intent.getBooleanExtra(Constant.IS_FROM_LOGIN,false);
+        boolean isFromLogin = intent.getBooleanExtra(Constant.IS_FROM_LOGIN, false);
         if (isFromLogin) {
             user = (User) intent.getSerializableExtra("user_login");
             userLoginDB.deleteAll();
             long rs = userLoginDB.login(user);
-            Log.e(Constant.TAG_SQLITE,"set login "+rs);
+            Log.e(Constant.TAG_SQLITE, "set login " + rs);
             Intent home = new Intent(WelcomeActivity.this, HomeActivity.class);
             home.putExtra("user_login", (Serializable) user);
             startActivity(home);
             finish();
             return;
         }
-        if (SharedPrefs.getInstance().get(Constant.IS_LOGIN, Boolean.class)){
+        if (SharedPrefs.getInstance().get(Constant.IS_LOGIN, Boolean.class)) {
             final String email = SharedPrefs.getInstance().get(Constant.EMAIL_USER_LOGIN, String.class);
             final String pass = SharedPrefs.getInstance().get(Constant.PASS_USER_LOGIN, String.class);
-            if (NetworkUtil.getConnectivityStatusString(WelcomeActivity.this)==NetworkUtil.NETWORK_STATUS_NOT_CONNECTED){
+            if (NetworkUtil.getConnectivityStatusString(WelcomeActivity.this) == NetworkUtil.NETWORK_STATUS_NOT_CONNECTED) {
                 User userLogin = userLoginDB.getUserLoginByEmail(email);
-                if (userLogin!=null) {
+                if (userLogin != null) {
                     user = userLogin;
 
                     Intent netWorkService = new Intent(WelcomeActivity.this, NetworkChangeService.class);
@@ -182,7 +183,7 @@ public class WelcomeActivity extends AppCompatActivity {
                     Intent home = new Intent(WelcomeActivity.this, HomeActivity.class);
                     home.putExtra("user_login", (Serializable) user);
                     startActivity(home);
-                }else {
+                } else {
                     Intent login = new Intent(WelcomeActivity.this, LoginActivity.class);
                     startActivity(login);
                     Toast.makeText(WelcomeActivity.this, R.string.required_login, Toast.LENGTH_SHORT).show();
@@ -198,8 +199,8 @@ public class WelcomeActivity extends AppCompatActivity {
                         assert userCheck != null;
                         userCheck.setId(item.getKey());
                         long rs = userDB.insert(userCheck);
-                        Log.e(Constant.TAG_SQLITE,"add user "+rs);
-                        if (userCheck.getEmail().equalsIgnoreCase(email)&&userCheck.getPassword().equalsIgnoreCase(MD5.getMd5(pass))) {
+                        Log.e(Constant.TAG_SQLITE, "add user " + rs);
+                        if (userCheck.getEmail().equalsIgnoreCase(email) && userCheck.getPassword().equalsIgnoreCase(MD5.getMd5(pass))) {
                             SharedPrefs.getInstance().put(Constant.IS_LOGIN, true);
                             SharedPrefs.getInstance().put(Constant.MY_AVATAR, userCheck.getImage());
                             SharedPrefs.getInstance().put(Constant.EMAIL_USER_LOGIN, userCheck.getEmail());
@@ -227,12 +228,12 @@ public class WelcomeActivity extends AppCompatActivity {
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
-                    System.err.println("db_err: "+databaseError);
+                    System.err.println("db_err: " + databaseError);
                 }
             };
             users.addListenerForSingleValueEvent(getUser);
             users.removeEventListener(getUser);
-        }else {
+        } else {
             Intent login = new Intent(WelcomeActivity.this, LoginActivity.class);
             startActivity(login);
             finish();
@@ -249,49 +250,47 @@ public class WelcomeActivity extends AppCompatActivity {
             home.putExtra("user_login", (Serializable) user);
             startActivity(home);
         } else {
-            if (NetworkUtil.getConnectivityStatusString(WelcomeActivity.this)!=NetworkUtil.NETWORK_STATUS_NOT_CONNECTED) {
-                if (SharedPrefs.getInstance().get(Constant.IS_LOGIN, Boolean.class)) {
-                    mAccountCreator = LinphoneService.getCore().createAccountCreator(null);
-                    String userId = SharedPrefs.getInstance().get(Constant.ID_USER_LOGIN, String.class);
-                    if (userId.equalsIgnoreCase(""))return;
-                    try {
-                        LinphoneService.getCore().setDefaultProxyConfig(null);
-                        LinphoneService.getCore().refreshRegisters();
-                        LinphoneService.getCore().clearAllAuthInfo();
-                        // At least the 3 below values are required
-                        mAccountCreator.setUsername(userId);
-                        mAccountCreator.setDomain(Constant.SIP_SERVER);
-                        mAccountCreator.setPassword("123456");
+            if (SharedPrefs.getInstance().get(Constant.IS_LOGIN, Boolean.class)) {
+                mAccountCreator = LinphoneService.getCore().createAccountCreator(null);
+                String userId = SharedPrefs.getInstance().get(Constant.ID_USER_LOGIN, String.class);
+                if (userId.equalsIgnoreCase("")) return;
+                try {
+                    LinphoneService.getCore().setDefaultProxyConfig(null);
+                    LinphoneService.getCore().refreshRegisters();
+                    LinphoneService.getCore().clearAllAuthInfo();
+                    // At least the 3 below values are required
+                    mAccountCreator.setUsername(userId);
+                    mAccountCreator.setDomain(Constant.SIP_SERVER);
+                    mAccountCreator.setPassword("123456");
 
-                        // By default it will be UDP if not set, but TLS is strongly recommended
-                        mAccountCreator.setTransport(TransportType.Tcp);
-                        // This will automatically create the proxy config and auth info and add them to the Core
-                        ProxyConfig cfg = mAccountCreator.createProxyConfig();
-                        cfg.edit();
-                        Address proxy = Factory.instance().createAddress("sip:" + Constant.SIP_SERVER);
-                        cfg.setServerAddr(proxy.asString());
-                        cfg.enableRegister(true);
-                        cfg.setExpires(3600);
-                        cfg.done();
-                        // Make sure the newly created one is the default
-                        LinphoneService.getCore().setDefaultProxyConfig(cfg);
+                    // By default it will be UDP if not set, but TLS is strongly recommended
+                    mAccountCreator.setTransport(TransportType.Tcp);
+                    // This will automatically create the proxy config and auth info and add them to the Core
+                    ProxyConfig cfg = mAccountCreator.createProxyConfig();
+                    cfg.edit();
+                    Address proxy = Factory.instance().createAddress("sip:" + Constant.SIP_SERVER);
+                    cfg.setServerAddr(proxy.asString());
+                    cfg.enableRegister(true);
+                    cfg.setExpires(3600);
+                    cfg.done();
+                    // Make sure the newly created one is the default
+                    LinphoneService.getCore().setDefaultProxyConfig(cfg);
 
-                        userLoginDB.deleteAll();
-                        long rs = userLoginDB.login(user);
-                        Log.e(Constant.TAG_SQLITE,"set login "+rs);
-                        Intent home = new Intent(WelcomeActivity.this, HomeActivity.class);
-                        home.putExtra("user_login", (Serializable) user);
-                        startActivity(home);
-                        finish();
-                    }catch (NullPointerException e){
-                        e.printStackTrace();
-                    }
-                }else {
-                    Intent login = new Intent(WelcomeActivity.this, LoginActivity.class);
-                    startActivity(login);
-                    Toast.makeText(WelcomeActivity.this, R.string.required_login, Toast.LENGTH_SHORT).show();
+                    userLoginDB.deleteAll();
+                    long rs = userLoginDB.login(user);
+                    Log.e(Constant.TAG_SQLITE, "set login " + rs);
+                    Intent home = new Intent(WelcomeActivity.this, HomeActivity.class);
+                    home.putExtra("user_login", (Serializable) user);
+                    startActivity(home);
                     finish();
+                } catch (NullPointerException e) {
+                    e.printStackTrace();
                 }
+            } else {
+                Intent login = new Intent(WelcomeActivity.this, LoginActivity.class);
+                startActivity(login);
+                Toast.makeText(WelcomeActivity.this, R.string.required_login, Toast.LENGTH_SHORT).show();
+                finish();
             }
         }
     }
@@ -305,7 +304,7 @@ public class WelcomeActivity extends AppCompatActivity {
             onServiceReady();
         } else {
             startService(
-                        new Intent().setClass(this, LinphoneService.class));
+                    new Intent().setClass(this, LinphoneService.class));
             // If it's not, let's start it
 
             // And wait for it to be ready, so we can safely use it afterwards

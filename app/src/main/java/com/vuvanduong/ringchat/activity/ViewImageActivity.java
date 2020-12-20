@@ -28,7 +28,7 @@ public class ViewImageActivity extends AppCompatActivity {
         imageViewMessage = findViewById(R.id.imageViewMessage);
         btnCloseImageView = findViewById(R.id.btnCloseImageView);
 
-        Picasso.with(this)
+        Picasso.get()
                 .load(url)
                 .placeholder(R.drawable.emptyimage)
                 .into(imageViewMessage);

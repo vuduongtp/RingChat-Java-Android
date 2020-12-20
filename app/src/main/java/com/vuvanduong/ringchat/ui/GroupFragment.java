@@ -227,7 +227,7 @@ public class GroupFragment extends Fragment {
         loading.setVisibility(View.VISIBLE);
         reloadListGroup= view.findViewById(R.id.reloadListGroup);
         imgMyAvatar = view.findViewById(R.id.imgMyAvatar);
-        Picasso.with(getActivity())
+        Picasso.get()
                 .load(user.getImage())
                 .placeholder(R.drawable.user)
                 .transform(new CircleTransform())

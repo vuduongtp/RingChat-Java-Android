@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Build;
 import android.util.Log;
 
 import com.vuvanduong.ringchat.config.Constant;
@@ -30,6 +31,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         this.myContext = context;
         DB_PATH="/data/data/"+context.getPackageName()+"/"+"databases/";
     }
+
+    @Override
+    public void onOpen(SQLiteDatabase db) {
+        super.onOpen(db);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            db.disableWriteAheadLogging();
+        }
+    }
+
     /**
      * Creates a empty database on the system and rewrites it with your own database.
      * */

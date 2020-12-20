@@ -238,7 +238,7 @@ public class CallOutgoingActivity extends AppCompatActivity {
                         userCall.setId(item.getKey());
                         mTextCallee.setText(UserUtil.getFullName(userCall));
                         try {
-                            Picasso.with(CallOutgoingActivity.this)
+                            Picasso.get()
                                     .load(userCall.getImage())
                                     .placeholder(R.drawable.user)
                                     .transform(new CircleTransform())

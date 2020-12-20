@@ -157,7 +157,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ViewHold
         }
         holder.txtNameFriend.setText(UserUtil.getFullName(users.get(position)));
         holder.txtEmailFriend.setText(users.get(position).getEmail());
-        Picasso.with(context)
+        Picasso.get()
                 .load(users.get(position).getImage())
                 .placeholder(R.drawable.user)
                 .transform(new CircleTransform())

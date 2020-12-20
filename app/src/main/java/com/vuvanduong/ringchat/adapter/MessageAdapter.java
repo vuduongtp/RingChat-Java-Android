@@ -162,18 +162,18 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             me.imgIconMessageMe.setVisibility(View.VISIBLE);
             Log.e("image",messages.get(position).getContext());
             try {
-                Picasso.with(this.context)
+                Picasso.get()
                         .load(userLogin.getImage())
                         .placeholder(R.drawable.user)
                         .transform(new CircleTransform())
                         .into(me.imgAvatarMeMessage);
-                Picasso.with(this.context)
+                Picasso.get()
                         .load(R.drawable.emptyimage)
                         .resize(maxSizeImage, maxSizeImage)
                         .centerInside()
                         .transform(new RoundedCornersTransform(30, 0))
                         .into(me.imgIconMessageMe);
-                Picasso.with(this.context)
+                Picasso.get()
                         .load(messages.get(position).getContext())
                         .resize(maxSizeImage, maxSizeImage)
                         .centerInside()
@@ -195,7 +195,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             me.imgIconMessageMe.getLayoutParams().width = 0;
 
             if (userLogin.getImage()!=null) {
-                Picasso.with(this.context)
+                Picasso.get()
                         .load(userLogin.getImage())
                         .placeholder(R.drawable.user)
                         .transform(new CircleTransform())
@@ -233,18 +233,18 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             you.imgIconMessageYou.setVisibility(View.VISIBLE);
             Log.e("image",messages.get(position).getContext());
             try {
-                Picasso.with(this.context)
+                Picasso.get()
                         .load(friend.getImage())
                         .placeholder(R.drawable.user)
                         .transform(new CircleTransform())
                         .into(you.imgAvatarFriendYou);
-                Picasso.with(this.context)
+                Picasso.get()
                         .load(R.drawable.emptyimage)
                         .resize(maxSizeImage, maxSizeImage)
                         .centerInside()
                         .transform(new RoundedCornersTransform(30, 0))
                         .into(you.imgIconMessageYou);
-                Picasso.with(this.context)
+                Picasso.get()
                         .load(messages.get(position).getContext())
                         .resize(maxSizeImage, maxSizeImage)
                         .centerInside()
@@ -258,7 +258,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 time = messages.get(position).getDatetime() + "\n" + getNameUser(messages.get(position).getUserID());
                 if (messages.get(position).getUserID().equalsIgnoreCase(userLogin.getId())){
                     if (userLogin.getImage() != null) {
-                        Picasso.with(this.context)
+                        Picasso.get()
                                 .load(userLogin.getImage())
                                 .placeholder(R.drawable.user)
                                 .transform(new CircleTransform())
@@ -266,7 +266,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                     }
                 }else {
                     try {
-                        Picasso.with(this.context)
+                        Picasso.get()
                                 .load(getUser(messages.get(position).getUserID()).getImage())
                                 .placeholder(R.drawable.user)
                                 .transform(new CircleTransform())
@@ -277,7 +277,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             } else {
                 time = messages.get(position).getDatetime();
                 if (friend.getImage() != null) {
-                    Picasso.with(this.context)
+                    Picasso.get()
                             .load(friend.getImage())
                             .placeholder(R.drawable.user)
                             .transform(new CircleTransform())
@@ -336,7 +336,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 //            lastMessage.imgIconMessageLast.setScaleType(ImageView.ScaleType.FIT_XY);
 //        }
         try{
-            Picasso.with(this.context)
+            Picasso.get()
                     .load(getUser(getFriendId(messages.get(position).getIdRoom())).getImage())
                     .placeholder(R.drawable.user)
                     .transform(new CircleTransform())
